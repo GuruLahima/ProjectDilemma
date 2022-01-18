@@ -67,7 +67,7 @@ namespace Workbench.ProjectDilemma
     string gameVersion = "1";
 
     [Scene]
-    private string debugScenario;
+    [SerializeField] string debugScenario;
 
 
     #endregion
@@ -102,10 +102,6 @@ namespace Workbench.ProjectDilemma
 
       _inputField.onValueChanged.AddListener(delegate (string m) { SetPlayerName(m); }); // for some reason dropdowns override their default behaviour if given listener via code
       quickMatchButton.onClick.AddListener(delegate () { QuickMatch(); }); // for some reason dropdowns override their default behaviour if given listener via code
-    }
-
-    public override void OnEnable()
-    {
     }
 
     private void Start()
@@ -152,8 +148,9 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     public void QuickMatch()
     {
-      // we want to make sure the log is clear everytime we connect, we might have several failed attempted if connection failed.
-      feedbackText.text = "";
+      if (feedbackText)
+        // we want to make sure the log is clear everytime we connect, we might have several failed attempted if connection failed.
+        feedbackText.text = "";
 
       // keep track of the will to join a room, because when we come back from the game we will get a callback that we are connected, so we need to know what to do then
       isConnecting = true;
@@ -162,8 +159,6 @@ namespace Workbench.ProjectDilemma
       // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
       if (PhotonNetwork.IsConnected)
       {
-        LogFeedback("Joining Room...");
-
         JoinRandomRoom();
       }
       else
@@ -188,6 +183,8 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     public override void OnConnectedToMaster()
     {
+      LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
+
       JoinRandomRoom();
 
       // visual stuff
@@ -214,20 +211,17 @@ namespace Workbench.ProjectDilemma
     /// Called when entering a room (by creating or joining it). Called on all clients (including the Master Client).
     /// </summary>
     /// <remarks>
-    /// This method is commonly used to instantiate player characters.
-    /// If a match has to be started "actively", you can call an [PunRPC](@ref PhotonView.RPC) triggered by a user's button-press or a timer.
-    ///
-    /// When this is called, you can usually already access the existing players in the room via PhotonNetwork.PlayerList.
-    /// Also, all custom properties should be already available as Room.customProperties. Check Room..PlayerCount to find out if
-    /// enough players are in the room to start playing.
     /// </remarks>
     public override void OnJoinedRoom()
     {
       LogFeedback("<Color=Green>OnJoinedRoom</Color> with " + PhotonNetwork.CurrentRoom.PlayerCount + " Player(s)");
       OnJoinedRoomEvent?.Invoke();
+    }
 
+    public override void OnPlayerEnteredRoom(Player player)
+    {
       // #Critical: We only load level if the second player entered too
-      if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+      if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
       {
         LoadRandomScenario();
 
@@ -254,7 +248,6 @@ namespace Workbench.ProjectDilemma
 
     void ConnectToMaster()
     {
-
       LogFeedback("Connecting...");
 
       // #Critical, we must first and foremost connect to Photon Online Server.
@@ -264,12 +257,13 @@ namespace Workbench.ProjectDilemma
 
     void JoinRandomRoom()
     {
+      LogFeedback("Joining Random Room...");
+
       // we don't want to do anything if we are not attempting to join a room. 
       // this case where isConnecting is false is typically when you lost or quit the game, when this level is loaded, OnConnectedToMaster will be called, in that case
       // we don't want to do anything.
       if (isConnecting)
       {
-        LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
 
         // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
         PhotonNetwork.JoinRandomRoom();
@@ -295,7 +289,12 @@ namespace Workbench.ProjectDilemma
 
     private string PickRandomScenario()
     {
+#if ALEK_DEBUG_ON
       return debugScenario;
+#else
+      // TODO: pick from an ABSOLUTELY random scenario from a compiled list of scenarios
+      return debugScenario;
+#endif
     }
 
     /// <summary>
