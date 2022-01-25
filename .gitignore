@@ -71,3 +71,19 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 
+# I care only about scripts
+/[Aa]ssets/! My 3D Models/
+/[Aa]ssets/! My Animations/
+/[Aa]ssets/! My Audio/
+/[Aa]ssets/! My Lighting Settings/
+/[Aa]ssets/! My Particles/
+/[Aa]ssets/! My PP Profiles/
+/[Aa]ssets/! My Prefabs/
+/[Aa]ssets/! My Scenes/
+/[Aa]ssets/! My Scriptable Objects/
+/[Aa]ssets/! My Terrains/
+/[Aa]ssets/! My Textures & Materials/
+/[Aa]ssets/!My Videos/
+/[Aa]ssets/DOTween/
+/[Aa]ssets/My Packages/
+

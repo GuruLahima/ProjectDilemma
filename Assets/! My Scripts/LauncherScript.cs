@@ -10,15 +10,15 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 using Photon.Realtime;
 using Photon.Pun;
+using ExitGames.Client.Photon;
 
-using HelperScripts;
 using NaughtyAttributes;
-using System;
-using UnityEngine.Events;
 
 namespace Workbench.ProjectDilemma
 {
@@ -30,7 +30,7 @@ namespace Workbench.ProjectDilemma
   public class LauncherScript : MonoBehaviourPunCallbacks
   {
     #region public fields
-
+    public static LauncherScript instance;
 
     #endregion
 
@@ -38,19 +38,28 @@ namespace Workbench.ProjectDilemma
 
     [Tooltip("The Ui Text to inform the user about the connection progress")]
     [SerializeField]
-    private Text feedbackText;
+    Text feedbackText;
 
     [Tooltip("The maximum number of players per room")]
     [SerializeField]
-    private byte maxPlayersPerRoom = 2;
+    byte maxPlayersPerRoom = 2;
 
     [Tooltip("The input field for the nickname")]
     [SerializeField]
-    private TMP_InputField _inputField;
-    [SerializeField]
-    [Tooltip("The input field for the nickname")]
-    private Button quickMatchButton;
+    TMP_InputField _inputField;
 
+    [Tooltip("The input field for the nickname")]
+    [SerializeField]
+    Button quickMatchButton;
+
+    [SerializeField] float loadScenarioDelay;
+
+#if UNITY_EDITOR
+    [Scene]
+#endif
+    [SerializeField] string debugScenario;
+
+    [SerializeField] bool loadDebugScenario = false;
     #endregion
 
     #region Private Fields
@@ -66,24 +75,23 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     string gameVersion = "1";
 
-    [Scene]
-    [SerializeField] string debugScenario;
-
+    RoomOptions roomOptions;
+    AppSettings appSettings;
 
     #endregion
 
     #region Unity Events
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnClickedOnQuickMatch;
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnConnectedEvent;
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnJoinedRoomEvent;
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnSecondPlayerEnteredRoomEvent;
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnFailedToFindRandomRoomEvent;
-    [Foldout("Events for visual feedback")]
+    [Foldout("Visual Feedback Events")]
     public UnityEvent OnDisconnectedEvent;
     #endregion
 
@@ -95,13 +103,39 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     void Awake()
     {
+      // singleton code
+      if (instance == null)
+        instance = this;
+      else
+        Destroy(this.gameObject);
 
       // #Critical
       // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
       PhotonNetwork.AutomaticallySyncScene = true;
 
+      // initializations
+      appSettings = new AppSettings();
+      appSettings = PhotonNetwork.PhotonServerSettings.AppSettings;
+      appSettings.AppVersion = gameVersion;
+      roomOptions = new RoomOptions();
+      roomOptions.IsVisible = true;
+      roomOptions.PublishUserId = true;
+      roomOptions.MaxPlayers = maxPlayersPerRoom; // should be exposed as option for master clients
+      roomOptions.CustomRoomPropertiesForLobby = new string[] { Keys.MAP_PROP_KEY };
+
       _inputField.onValueChanged.AddListener(delegate (string m) { SetPlayerName(m); }); // for some reason dropdowns override their default behaviour if given listener via code
       quickMatchButton.onClick.AddListener(delegate () { QuickMatch(); }); // for some reason dropdowns override their default behaviour if given listener via code
+    }
+
+    public override void OnEnable()
+    {
+      base.OnEnable();
+
+    }
+    public override void OnDisable()
+    {
+      base.OnDisable();
+
     }
 
     private void Start()
@@ -216,17 +250,47 @@ namespace Workbench.ProjectDilemma
     {
       LogFeedback("<Color=Green>OnJoinedRoom</Color> with " + PhotonNetwork.CurrentRoom.PlayerCount + " Player(s)");
       OnJoinedRoomEvent?.Invoke();
+
+      if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+      {
+        // visual stuff. probably for triggering transition between main menu and scenario
+        OnSecondPlayerEnteredRoomEvent?.Invoke();
+      }
+
+
+      if (PhotonNetwork.IsMasterClient)
+      {
+        // mark this room as available to be joined
+        Hashtable ht = new Hashtable {
+        { Keys.MAP_PROP_KEY, "in_queue"}
+         };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+      }
     }
 
+    /// <summary>
+    /// Note: this method is not called on the client that entered the room
+    /// </summary>
+    /// <param name="player"></param>
     public override void OnPlayerEnteredRoom(Player player)
     {
+      if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
+      {
+        // visual stuff. probably for triggering transition between main menu and scenario
+        OnSecondPlayerEnteredRoomEvent?.Invoke();
+      }
+
       // #Critical: We only load level if the second player entered too
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
       {
-        LoadRandomScenario();
+        // here we make sure other clients use master client room settings
+        Hashtable ht = new Hashtable {
+        { Keys.MAP_PROP_KEY, "in_game"}
+         };
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+        PhotonNetwork.CurrentRoom.IsOpen = false; // other players shouldnt be able to join it after the game started
 
-        // visual stuff
-        OnSecondPlayerEnteredRoomEvent?.Invoke();
+        Invoke("LoadRandomScenario", loadScenarioDelay);
       }
     }
 
@@ -238,6 +302,13 @@ namespace Workbench.ProjectDilemma
       LogFeedback("<Color=Red>OnDisconnected</Color> " + cause);
 
       OnDisconnectedEvent?.Invoke();
+
+      // clear photon properties so next game starts with clean slate
+      if (PhotonNetwork.IsMasterClient)
+      {
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ResetCustomProperties(PhotonNetwork.CurrentRoom.CustomProperties));
+      }
+      PhotonNetwork.LocalPlayer.SetCustomProperties(ResetCustomProperties(PhotonNetwork.LocalPlayer.CustomProperties));
 
       isConnecting = false;
     }
@@ -264,16 +335,15 @@ namespace Workbench.ProjectDilemma
       // we don't want to do anything.
       if (isConnecting)
       {
-
-        // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
-        PhotonNetwork.JoinRandomRoom();
+        Hashtable expectedCustomRoomProperties = new Hashtable { { Keys.MAP_PROP_KEY, "in_queue" } };
+        PhotonNetwork.JoinRandomRoom(expectedCustomRoomProperties, 2);
       }
     }
 
     private void CreateRoom()
     {
       // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
-      PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = this.maxPlayersPerRoom });
+      PhotonNetwork.CreateRoom(null, roomOptions);
     }
 
     private void LoadRandomScenario()
@@ -289,12 +359,28 @@ namespace Workbench.ProjectDilemma
 
     private string PickRandomScenario()
     {
-#if ALEK_DEBUG_ON
-      return debugScenario;
-#else
-      // TODO: pick from an ABSOLUTELY random scenario from a compiled list of scenarios
-      return debugScenario;
-#endif
+      if (loadDebugScenario)
+        return debugScenario;
+
+      int randomInt = TotallyRandomNumber(0, ScenariosManager.Instance.approvedScenariosNames.Count);
+      string chosenScenario = "";
+
+      if (ScenariosManager.Instance.approvedScenariosNames.Count > 0)
+      {
+        chosenScenario = ScenariosManager.Instance.approvedScenariosNames[randomInt];
+      }
+      return chosenScenario;
+    }
+
+    /// <summary>
+    /// Returns a random integer between min(included) and max(excluded)
+    /// </summary>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    private int TotallyRandomNumber(int min, int max)
+    {
+      return UnityEngine.Random.Range(min, max);
     }
 
     /// <summary>
@@ -313,6 +399,16 @@ namespace Workbench.ProjectDilemma
 
       // add new messages as a new line and at the bottom of the log.
       feedbackText.text += System.Environment.NewLine + message;
+    }
+
+    Hashtable ResetCustomProperties(Hashtable properties)
+    {
+      Hashtable temphashtable = new Hashtable();
+      foreach (var item in properties)
+      {
+        temphashtable.Add(item.Key, null);
+      }
+      return temphashtable;
     }
 
     #endregion

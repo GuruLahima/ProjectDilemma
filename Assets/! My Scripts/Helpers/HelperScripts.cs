@@ -6,7 +6,7 @@ using UnityEditor;
 using System;
 using DG.Tweening;
 
-namespace HelperScripts
+namespace Workbench.ProjectDilemma
 {
   public class HelperFunctions
   {
