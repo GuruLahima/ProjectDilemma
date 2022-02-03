@@ -19,6 +19,8 @@ using Photon.Pun;
 using ExitGames.Client.Photon;
 
 using NaughtyAttributes;
+using System.Collections.Generic;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
@@ -32,9 +34,12 @@ namespace Workbench.ProjectDilemma
     #region public fields
     public static LauncherScript instance;
 
+    public static bool introPlayed = false;
+
     #endregion
 
     #region Private Serializable Fields
+    [SerializeField] List<GameObject> introObjects = new List<GameObject>();
 
     [Tooltip("The Ui Text to inform the user about the connection progress")]
     [SerializeField]
@@ -51,6 +56,33 @@ namespace Workbench.ProjectDilemma
     [Tooltip("The input field for the nickname")]
     [SerializeField]
     Button quickMatchButton;
+    [Tooltip("The input field for the nickname")]
+    [SerializeField]
+    [Dropdown("Regions")]
+    string region;
+    private List<string> Regions
+    {
+      get
+      {
+        return new List<string>() {
+      "asia",
+      "au",
+      "cae",
+      "cn",
+      "eu",
+      "in",
+      "jp",
+      "ru",
+      "rue",
+      "za",
+      "sa",
+      "kr",
+      "tr",
+      "us",
+      "usw"
+     };
+      }
+    }
 
     [SerializeField] float loadScenarioDelay;
 
@@ -93,6 +125,7 @@ namespace Workbench.ProjectDilemma
     public UnityEvent OnFailedToFindRandomRoomEvent;
     [Foldout("Visual Feedback Events")]
     public UnityEvent OnDisconnectedEvent;
+    private Player otherPlayer;
     #endregion
 
 
@@ -117,6 +150,7 @@ namespace Workbench.ProjectDilemma
       appSettings = new AppSettings();
       appSettings = PhotonNetwork.PhotonServerSettings.AppSettings;
       appSettings.AppVersion = gameVersion;
+      appSettings.FixedRegion = region;
       roomOptions = new RoomOptions();
       roomOptions.IsVisible = true;
       roomOptions.PublishUserId = true;
@@ -126,10 +160,14 @@ namespace Workbench.ProjectDilemma
       _inputField.onValueChanged.AddListener(delegate (string m) { SetPlayerName(m); }); // for some reason dropdowns override their default behaviour if given listener via code
       quickMatchButton.onClick.AddListener(delegate () { QuickMatch(); }); // for some reason dropdowns override their default behaviour if given listener via code
     }
-
     public override void OnEnable()
     {
       base.OnEnable();
+
+      if (!introPlayed)
+        introPlayed = true;
+      else
+        introObjects.ForEach((obj) => { obj.SetActive(false); });
 
     }
     public override void OnDisable()
@@ -141,16 +179,16 @@ namespace Workbench.ProjectDilemma
     private void Start()
     {
 
-      string defaultName = string.Empty;
+      string defaultName = (Input.mousePosition.x * Input.mousePosition.y).ToString();
 
-      if (_inputField != null)
-      {
-        if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
-        {
-          defaultName = PlayerPrefs.GetString(Keys.PLAYER_NAME);
-          _inputField.text = defaultName;
-        }
-      }
+      /*       if (_inputField != null)
+            {
+              if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
+              {
+                defaultName = PlayerPrefs.GetString(Keys.PLAYER_NAME);
+                _inputField.text = defaultName;
+              }
+            } */
 
       PhotonNetwork.NickName = defaultName;
     }
@@ -175,6 +213,12 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.NickName = value;
 
       PlayerPrefs.SetString(Keys.PLAYER_NAME, value);
+    }
+
+    public void QuickMatcWithDelay(float delay)
+    {
+      if (!isConnecting)
+        Invoke("QuickMatch", delay);
     }
 
     /// <summary>
@@ -203,6 +247,11 @@ namespace Workbench.ProjectDilemma
       OnClickedOnQuickMatch?.Invoke();
     }
 
+    public void Disconnect()
+    {
+      PhotonNetwork.Disconnect();
+    }
+
 
     #endregion
 
@@ -218,6 +267,7 @@ namespace Workbench.ProjectDilemma
     public override void OnConnectedToMaster()
     {
       LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
+      MyDebug.Log("Connected to region: " + PhotonNetwork.CloudRegion);
 
       JoinRandomRoom();
 
@@ -274,6 +324,7 @@ namespace Workbench.ProjectDilemma
     /// <param name="player"></param>
     public override void OnPlayerEnteredRoom(Player player)
     {
+      otherPlayer = player;
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
       {
         // visual stuff. probably for triggering transition between main menu and scenario
@@ -283,6 +334,16 @@ namespace Workbench.ProjectDilemma
       // #Critical: We only load level if the second player entered too
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
       {
+        // determine who sits where (player number can be  1 or 2)
+        int my_player_number = Random.Range(0, 2);
+        Hashtable temphashtable = new Hashtable();
+        temphashtable.Add(Keys.PLAYER_NUMBER, (my_player_number) + 1);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(temphashtable);
+
+        temphashtable = new Hashtable();
+        temphashtable.Add(Keys.PLAYER_NUMBER, (1 - my_player_number) + 1);
+        otherPlayer.SetCustomProperties(temphashtable);
+
         // here we make sure other clients use master client room settings
         Hashtable ht = new Hashtable {
         { Keys.MAP_PROP_KEY, "in_game"}

@@ -7,10 +7,12 @@ using UnityEngine.UI;
 using Photon.Chat;
 using Photon.Realtime;
 using AuthenticationValues = Photon.Chat.AuthenticationValues;
+using System.Text;
 #if PHOTON_UNITY_NETWORKING
 using Photon.Pun;
 using Photon.Chat.Demo;
 #endif
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
@@ -34,6 +36,9 @@ namespace Workbench.ProjectDilemma
   public class ChatGui : MonoBehaviour, IChatClientListener
   {
     public static Action<bool> EnteredChatMode;
+    public static bool isInChatMode;
+    public Color PlayerColor_1 = Color.green;
+    public Color PlayerColor_2 = Color.yellow;
 
     public List<string> ChannelsToJoinOnConnect; // set in inspector. Demo channels to join automatically.
 
@@ -78,7 +83,7 @@ namespace Workbench.ProjectDilemma
     public Text UserIdText; // set in inspector
 
     System.Collections.IEnumerator spamCoroutine;
-    float spamInterval = 5f;
+    [SerializeField] float spamInterval = 5f;
 
     // private static string WelcomeText = "Welcome to chat. Type \\help to list commands.";
     private static string HelpText = "\n    -- HELP --\n" +
@@ -227,11 +232,14 @@ namespace Workbench.ProjectDilemma
         return;
       }
 
-      // toggle chat mode 
-      if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
+      if (GameMechanic.Instance.canChoose)
       {
-        // notify other scripts that keyboard input will be expected to go into chat box
-        ToggleChat(!this.InputFieldChat_outline1.activeSelf);
+        // toggle chat mode 
+        if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
+        {
+          // notify other scripts that keyboard input will be expected to go into chat box
+          ToggleChat(!this.InputFieldChat_outline1.activeSelf);
+        }
       }
 
       // this.StateText.gameObject.SetActive(this.ShowState); // this could be handled more elegantly, but for the demo it's ok.
@@ -244,6 +252,7 @@ namespace Workbench.ProjectDilemma
         MyDebug.Log(this.GetType().ToString(), "Enter Chat ");
 
         EnteredChatMode?.Invoke(inChat);
+        isInChatMode = true;
 
         // focus the chat field
         this.InputFieldChat.ActivateInputField();
@@ -256,6 +265,7 @@ namespace Workbench.ProjectDilemma
       else
       {
         MyDebug.Log(this.GetType().ToString(), "Exit Chat ");
+        isInChatMode = false;
 
         /*         if (!PauseMenu.GameIsPaused)
                   EnteredChatMode?.Invoke(inChat); */
@@ -321,7 +331,7 @@ namespace Workbench.ProjectDilemma
     public int TestLength = 2048;
     private byte[] testBytes = new byte[2048];
 
-    private void SendChatMessage(string inputLine)
+    public void SendChatMessage(string inputLine)
     {
       if (string.IsNullOrEmpty(inputLine))
       {
@@ -734,10 +744,13 @@ namespace Workbench.ProjectDilemma
       }
 
       this.selectedChannelName = channelName;
-      this.CurrentChannelText.text = channel.ToStringMessages();
+      // this.CurrentChannelText.text = channel.ToStringMessages();  // !old way
+      List<object> Messages = channel.Messages;
+      this.CurrentChannelText.text = ToStringMessages(ColoredLines(channel));
 
       // parse channel text so it colors the names of the players appropriately
-      CurrentChannelText.text = ColoredNames(CurrentChannelText.text);
+      // CurrentChannelText.text = ColoredNames(CurrentChannelText.text);
+      // CurrentChannelText.text = ParseSpecialKeywords(CurrentChannelText.text);
 
       Debug.Log("ShowChannel: " + this.selectedChannelName);
 
@@ -745,6 +758,22 @@ namespace Workbench.ProjectDilemma
       {
         pair.Value.isOn = pair.Key == channelName ? true : false;
       }
+    }
+
+
+    private string ParseSpecialKeywords(string text)
+    {
+      string parsedText = text;
+
+      /*       // do the parsing
+            if(parsedText.IndexOf("/NOTIFICATION/") >= 0){
+              // first find the starting and ending index of the player name on the same line as the notification
+              parsedText.("\n")
+              parsedText = parsedText.Replace("/NOTIFICATION/", "");
+              parsedText = parsedText.Replace("/NOTIFICATION/", "");
+            }
+       */
+      return parsedText;
     }
 
     private string ColoredNames(string text)
@@ -757,6 +786,39 @@ namespace Workbench.ProjectDilemma
       }
 
       return text;
+    }
+    private List<object> ColoredLines(ChatChannel channel)
+    {
+      // MyDebug.Log(text);
+      // search for the names of all players
+      /*       string[] textSplitted = text.Split(new string[] { "\n" }, StringSplitOptions.None);
+            for (int i = 0; i < textSplitted.Length; i++)
+            {
+              textSplitted[i] = "<color=#" + ColorUtility.ToHtmlStringRGBA(i % 2 == 0 ? PlayerColor_1 : PlayerColor_2) + ">" + textSplitted[i] + "\n" + "</color>";
+            }
+            // text.
+            MyDebug.Log(text);
+            text = string.Concat(textSplitted); */
+      List<object> processedMessages = new List<object>();
+      string nickname = PhotonNetwork.NickName;
+      for (int i = 0; i < channel.Messages.Count; i++)
+      {
+        MyDebug.Log(channel.Senders[i]);
+        processedMessages.Add("<color=#" + ColorUtility.ToHtmlStringRGBA(channel.Senders[i] == nickname ? PlayerColor_1 : PlayerColor_2) + ">" + ((string)(channel.Messages[i])) + "</color>");
+      }
+
+      return processedMessages;
+    }
+
+
+    private string ToStringMessages(List<object> messages)
+    {
+      StringBuilder txt = new StringBuilder();
+      for (int i = 0; i < messages.Count; i++)
+      {
+        txt.AppendLine(string.Format(">: {0}", messages[i]));
+      }
+      return txt.ToString();
     }
 
     private Color GetPlayerColor(Player pl)

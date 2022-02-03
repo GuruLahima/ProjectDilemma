@@ -6,6 +6,7 @@ namespace Workbench.ProjectDilemma
     public const string MAP_PROP_KEY = "map"; // 0 is Lobby, 1 is Gameplay level
     // custom properties
     public const string PLAYER_COLOR = "NameplateColor_index";
+    public const string PLAYER_NUMBER = "Player_Number";
     public const string IS_WOLF = "IsWerewolf";
     public const string TWO_WOLVES = "Two_Wolves";
     public const string WOLF_DIED = "WerewolfDied";

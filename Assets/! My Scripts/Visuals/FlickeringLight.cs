@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
@@ -65,7 +66,7 @@ namespace Workbench.ProjectDilemma
 
 
         float val = Mathf.PerlinNoise(Time.time / frequency, 0f);
-        MyDebug.Log(val.ToString());
+        // MyDebug.Log(val.ToString());
         if (val > noiseThreshold)
         {
           if (!isFlickering)
@@ -86,7 +87,7 @@ namespace Workbench.ProjectDilemma
 
     IEnumerator Flicker(float interval)
     {
-      MyDebug.Log("FlickerCycle", "flickered");
+      // MyDebug.Log("FlickerCycle", "flickered");
       isFlickering = true;
 
       // light flicker
@@ -100,11 +101,11 @@ namespace Workbench.ProjectDilemma
       // emissive material flicker
       if (objectWithEmissiveMaterials)
       {
-        MyDebug.Log("FlickerCycle", "emisive material should flickered");
+        // MyDebug.Log("FlickerCycle", "emisive material should flickered");
 
         foreach (MeshRenderer mr in objectWithEmissiveMaterials.GetComponentsInChildren<MeshRenderer>())
         {
-          MyDebug.Log("FlickerCycle", "emisive material flickered");
+          // MyDebug.Log("FlickerCycle", "emisive material flickered");
           mr.material.SetColor("_EmissionColor", emissionColor * 0f);
         }
       }

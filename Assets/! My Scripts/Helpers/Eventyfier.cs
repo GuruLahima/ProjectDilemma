@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Workbench.ProjectDilemma
+namespace GuruLaghima
 {
   public class Eventyfier : MonoBehaviour
   {

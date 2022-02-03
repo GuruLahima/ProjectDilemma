@@ -6,7 +6,7 @@ using UnityEditor;
 using System;
 using DG.Tweening;
 
-namespace Workbench.ProjectDilemma
+namespace GuruLaghima
 {
   public class HelperFunctions
   {
@@ -354,6 +354,36 @@ namespace Workbench.ProjectDilemma
     {
       public GameObject item;
       public float mod;
+
+    }
+  }
+  [Serializable]
+  public class MyEventsDictionary
+  {
+    public List<ItemModPair> items = new List<ItemModPair>();
+    public Dictionary<string, UnityEngine.Events.UnityEvent> dictionary = new Dictionary<string, UnityEngine.Events.UnityEvent>();
+
+    public Dictionary<string, UnityEngine.Events.UnityEvent> GetItems()
+    {
+      if (dictionary.Count > 0)
+        return dictionary;
+
+      foreach (ItemModPair entry in items)
+      {
+        dictionary.Add(entry.name, entry.item);
+      }
+      return dictionary;
+    }
+    public void AddRange(MyEventsDictionary mods)
+    {
+      items.AddRange(mods.items);
+    }
+
+    [Serializable]
+    public class ItemModPair
+    {
+      public string name;
+      public UnityEngine.Events.UnityEvent item;
 
     }
   }

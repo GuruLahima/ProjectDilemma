@@ -15,11 +15,9 @@ MonoBehaviour:
   isDefault: 0
   DefaultSettings: {fileID: 11400000, guid: 1d3bf83491423624ca02fb22f0514a8b, type: 2}
   approvedScenariosNames:
-  - DeathByCubes
-  - DeathByCylinders
-  - DeathBySpheres
+  - Cemetary
+  - Motel-Scene
   approvedScenesPath: Assets/! My Scenes/ApprovedScenarios
   playableScenarios:
-  - {fileID: 102900000, guid: 46f76c478c1b64b4c8c5a8c282faf3cf, type: 3}
-  - {fileID: 102900000, guid: 97c7a65e3743dfc4689800d5b4cd3313, type: 3}
-  - {fileID: 102900000, guid: 001f5057ed5c1654a9dbef2c617a5c88, type: 3}
+  - {fileID: 102900000, guid: 8deef09df2d3b7b4ea2fb807e68b942b, type: 3}
+  - {fileID: 102900000, guid: 567b948946e22e1459f54a46545687cd, type: 3}

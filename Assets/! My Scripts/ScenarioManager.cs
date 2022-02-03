@@ -7,15 +7,19 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.Playables;
-using System;
 using Photon.Pun;
 using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+using System;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
 
   public class ScenarioManager : MonoBehaviourPunCallbacks
   {
+
+    // public static ScenariosManager 
 
     #region public fields
     public static ScenarioManager instance;
@@ -52,10 +56,32 @@ namespace Workbench.ProjectDilemma
     [Foldout("Visual Feedback Events")]
 #endif
     public UnityEvent OnOtherPlayerLeftTheRoom;
+    private int playersLoadedScene;
     #endregion
 
 
     #region public methods
+    public void StartGame()
+    {
+      // if there is a timeline wait for the end of it to start the game, else start it now
+      if (director.playableAsset != null)
+        StartTimeline();
+      else
+      {
+        InitializePlayers();
+      }
+    }
+
+    private void InitializePlayers()
+    {
+      // initialize players in their spots
+      if (PhotonNetwork.IsConnected)
+      {
+        int playerSpot = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_NUMBER];
+        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(playerSpot);
+      }
+    }
+
     public void StartTimeline()
     {
       director.Play();
@@ -98,6 +124,21 @@ namespace Workbench.ProjectDilemma
       // do some kind of transition from main menu to scenario
       if (scene.name != mainMenuScene)
         OnLoadOfScenario?.Invoke();
+
+      // update network properties: a player loaded the gameplay scene
+      Hashtable hashtable = new Hashtable()
+      {
+        {Keys.MAP_PROP_KEY, "Gameplay Level" }
+      };
+      PhotonNetwork.LocalPlayer.SetCustomProperties(hashtable);
+
+
+      if (GetComponent<PlayableDirector>().playableAsset == null)
+      {
+        Director_Stopped(null);
+      }
+
+
     }
 
     // Start is called before the first frame update
@@ -124,6 +165,8 @@ namespace Workbench.ProjectDilemma
       director.Evaluate();
 
       OnEndOfCinematic?.Invoke();
+
+      InitializePlayers();
     }
 
     private void Director_Played(PlayableDirector obj)
@@ -162,11 +205,44 @@ namespace Workbench.ProjectDilemma
         PhotonNetwork.LoadLevel(mainMenuScene);
     }
 
+    public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+    {
+      /* hacky soultion to a problem i dont understand.
+       * it looks like this callback is being called on a destryoed SceneOverlord from previous game in the same session
+       */
+      if (this == null)
+        return;
 
+      object props;
+
+      /*       if (propertiesThatChanged.TryGetValue(Keys.DAYPHASE_START, out props))
+            {
+              // startTime = (double)props;
+              float phaseDuration = (float)props;
+
+            } */
+
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+      MyDebug.Log("OnPlayerPropertiesUpdate", targetPlayer.NickName);
+
+      if (changedProps.ContainsKey(Keys.MAP_PROP_KEY))
+      {
+        playersLoadedScene++;
+
+        if (playersLoadedScene == 2)
+        {
+          StartGame();
+        }
+      }
+
+
+
+    }
 
     #endregion
-
-
 
   }
 }

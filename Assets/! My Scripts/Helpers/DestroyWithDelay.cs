@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Workbench.ProjectDilemma
+namespace GuruLaghima
 {
   public class DestroyWithDelay : MonoBehaviour
   {

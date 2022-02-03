@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Workbench.Wolfsbane.Multiplayer
+namespace GuruLaghima
 {
   public class PersistentObject : MonoBehaviour
   {
