@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - FxTemporaire
+  - DeathObject
   layers:
   - Default
   - TransparentFX
@@ -14,15 +15,15 @@ TagManager:
   - UI
   - Postprocessing
   - TextChat
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - PostGame
+  - End Screen
+  - StuffInFrontOfEverythingElse
+  - Player_1_DeathBook
+  - Player_2_DeathBook
+  - Book of death canvas
+  - VotingMechanism_player_1
+  - VotingMechanism_player_2
+  - End Screen Post Processing
   - 
   - 
   - 

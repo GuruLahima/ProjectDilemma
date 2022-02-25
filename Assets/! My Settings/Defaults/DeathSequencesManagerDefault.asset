@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c722c8bae0b222f448a8a94bcf2055b6, type: 3}
+  m_Name: DeathSequencesManagerDefault
+  m_EditorClassIdentifier: 
+  isDefault: 1
+  DefaultSettings: {fileID: 11400000}
+  deathSequences:
+    list:
+    - key: Motel Defaul Death
+      value: {fileID: 8535857786923436485, guid: 343cbb980ddfe9147b9c09f0b715d701,
+        type: 3}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}
+    - key: 
+      value: {fileID: 0}

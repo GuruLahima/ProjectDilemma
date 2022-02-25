@@ -21,3 +21,4 @@ MonoBehaviour:
   playableScenarios:
   - {fileID: 102900000, guid: 8deef09df2d3b7b4ea2fb807e68b942b, type: 3}
   - {fileID: 102900000, guid: 567b948946e22e1459f54a46545687cd, type: 3}
+  - {fileID: 102900000, guid: 17743802a87cf624bb9ec1b9a0518d51, type: 3}

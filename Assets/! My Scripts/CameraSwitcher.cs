@@ -9,6 +9,7 @@ namespace Workbench.ProjectDilemma
   public class CameraSwitcher : MonoBehaviour
   {
     #region public fields
+    [HideInInspector] public Camera currentCamera;
 
     #endregion
 
@@ -30,36 +31,6 @@ namespace Workbench.ProjectDilemma
 
     #region public methods
 
-    #endregion
-
-
-    #region MonoBehaviour callbacks
-    private void Start()
-    {
-      GameMechanic.GameStarted += SetCamera;
-
-
-      // register this script's code that needs to run at certain input with the input processor
-      // InputProcessor.Instance.SubscribeMethodToInputChecks(SwitchCamera, );
-    }
-
-    private void OnDisable()
-    {
-      GameMechanic.GameStarted -= SetCamera;
-    }
-
-    #endregion
-
-
-    #region private methods
-
-    void SetCamera()
-    {
-      foreach (Camera cam in camerasStack)
-        cam.gameObject.SetActive(false);
-      if (currentCameraIndex >= 0 && currentCameraIndex < camerasStack.Count)
-        camerasStack[currentCameraIndex].gameObject.SetActive(true);
-    }
     public void SwitchCamera()
     {
       if (CanSwitch())
@@ -71,7 +42,53 @@ namespace Workbench.ProjectDilemma
             NextCamera();
         }
     }
-    private void NextCamera()
+
+    public void DisableGameplayCameras()
+    {
+
+      foreach (Camera cam in camerasStack)
+        cam.gameObject.SetActive(false);
+
+    }
+    #endregion
+
+
+    #region MonoBehaviour callbacks
+    void Start()
+    {
+      GameMechanic.GameStarted += SetCamera;
+      GameMechanic.VotingEnded += DisableGameplayCameras;
+
+
+      // register this script's code that needs to run at certain input with the input processor
+      // InputProcessor.Instance.SubscribeMethodToInputChecks(SwitchCamera, );
+    }
+
+    void OnDisable()
+    {
+      GameMechanic.GameStarted -= SetCamera;
+      GameMechanic.VotingEnded -= DisableGameplayCameras;
+
+    }
+
+    #endregion
+
+
+    #region private methods
+
+
+    void SetCamera()
+    {
+      foreach (Camera cam in camerasStack)
+        cam.gameObject.SetActive(false);
+      if (currentCameraIndex >= 0 && currentCameraIndex < camerasStack.Count)
+      {
+        currentCamera = camerasStack[currentCameraIndex];
+        currentCamera.gameObject.SetActive(true);
+      }
+    }
+
+    void NextCamera()
     {
 
       foreach (Camera cam in camerasStack)
@@ -81,10 +98,13 @@ namespace Workbench.ProjectDilemma
       if (currentCameraIndex >= camerasStack.Count - 1)
         currentCameraIndex = -1;
       if (camerasStack.Count > 0)
-        camerasStack[++currentCameraIndex].gameObject.SetActive(true);
+      {
+        currentCamera = camerasStack[++currentCameraIndex];
+        currentCamera.gameObject.SetActive(true);
+      }
     }
 
-    private void PrevCam()
+    void PrevCam()
     {
 
       foreach (Camera cam in camerasStack)
@@ -94,7 +114,10 @@ namespace Workbench.ProjectDilemma
       if (currentCameraIndex <= 0)
         currentCameraIndex = camerasStack.Count;
       if (camerasStack.Count > 0)
-        camerasStack[--currentCameraIndex].gameObject.SetActive(true);
+      {
+        currentCamera = camerasStack[--currentCameraIndex];
+        currentCamera.gameObject.SetActive(true);
+      }
     }
 
     bool CanSwitch()

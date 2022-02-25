@@ -20,6 +20,11 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   [Header("Chat settings")]
   [Tooltip("The time the chat is blocked after a massage is sent in lobby and in-game chat")]
   public float spamProtectInterval = 3f;
+  [Header("Points legend")]
+  public int pointsForWin = 50;
+  public int pointsForLoss = -50;
+  public int pointsForBothWon = 10;
+  public int pointsForBothLost = -50;
 
   [Header("Sound")]
   public AudioMixerGroup defaultSFXMixerGroup;

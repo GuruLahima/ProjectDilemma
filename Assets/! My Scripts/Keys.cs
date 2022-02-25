@@ -5,6 +5,8 @@ namespace Workbench.ProjectDilemma
     // exposed room properties
     public const string MAP_PROP_KEY = "map"; // 0 is Lobby, 1 is Gameplay level
     // custom properties
+    public const string SKIP_INTRO = "Skip_intro";
+    public const string PLAYER_POINTS = "PLAYER_POINTS";
     public const string PLAYER_COLOR = "NameplateColor_index";
     public const string PLAYER_NUMBER = "Player_Number";
     public const string IS_WOLF = "IsWerewolf";
@@ -23,6 +25,7 @@ namespace Workbench.ProjectDilemma
 
     // player prefs
 
+    public const string PLAYER_POINTS_PREF = "playerPoints";
     public const string SHOULD_OVERRIDE_ROLE = "overrideRole";
     public const string OVERRIDE_ROLE = "roleToStartAs";
     public const string MASTER_ISWOLF = "roomCreatorIsWolf";

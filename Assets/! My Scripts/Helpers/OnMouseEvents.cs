@@ -12,42 +12,42 @@ namespace GuruLaghima
   {
     public UnityEvent _OnMouseEnter;
 
-    private void OnMouseEnter()
+    public void OnMouseEnter()
     {
       _OnMouseEnter?.Invoke();
     }
 
     public UnityEvent _OnMouseOver;
 
-    private void OnMouseOver()
+    public void OnMouseOver()
     {
       _OnMouseOver?.Invoke();
     }
 
     public UnityEvent _OnMouseDown;
 
-    private void OnMouseDown()
+    public void OnMouseDown()
     {
       _OnMouseDown?.Invoke();
     }
 
     public UnityEvent _OnMouseDrag;
 
-    private void OnMouseDrag()
+    public void OnMouseDrag()
     {
       _OnMouseDrag?.Invoke();
     }
 
     public UnityEvent _OnMouseUp;
 
-    private void OnMouseUp()
+    public void OnMouseUp()
     {
       _OnMouseUp?.Invoke();
     }
 
     public UnityEvent _OnMouseExit;
 
-    private void OnMouseExit()
+    public void OnMouseExit()
     {
       _OnMouseExit?.Invoke();
     }

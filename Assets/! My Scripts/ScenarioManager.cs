@@ -23,20 +23,21 @@ namespace Workbench.ProjectDilemma
 
     #region public fields
     public static ScenarioManager instance;
+    public bool debugMode;
     #endregion
 
 
     #region exposed fields
-    [SerializeField] GameObject gameplayCamera;
 #if UNITY_EDITOR
     [Scene]
 #endif
     [SerializeField] string mainMenuScene;
+    [SerializeField] public Scenario thisScenario;
+
     #endregion
 
 
     #region private fields
-    PlayableDirector director;
     #endregion
 
     #region Unity Events
@@ -44,10 +45,7 @@ namespace Workbench.ProjectDilemma
     [Foldout("Visual Feedback Events")]
 #endif
     public UnityEvent OnLoadOfScenario;
-#if UNITY_EDITOR
-    [Foldout("Visual Feedback Events")]
-#endif
-    public UnityEvent OnEndOfCinematic;
+
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]
 #endif
@@ -57,35 +55,13 @@ namespace Workbench.ProjectDilemma
 #endif
     public UnityEvent OnOtherPlayerLeftTheRoom;
     private int playersLoadedScene;
+
     #endregion
 
 
     #region public methods
-    public void StartGame()
-    {
-      // if there is a timeline wait for the end of it to start the game, else start it now
-      if (director.playableAsset != null)
-        StartTimeline();
-      else
-      {
-        InitializePlayers();
-      }
-    }
 
-    private void InitializePlayers()
-    {
-      // initialize players in their spots
-      if (PhotonNetwork.IsConnected)
-      {
-        int playerSpot = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_NUMBER];
-        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(playerSpot);
-      }
-    }
 
-    public void StartTimeline()
-    {
-      director.Play();
-    }
     #endregion
 
 
@@ -97,9 +73,7 @@ namespace Workbench.ProjectDilemma
       else
         Destroy(this.gameObject);
 
-      director = GetComponent<PlayableDirector>();
-      director.played += Director_Played;
-      director.stopped += Director_Stopped;
+
     }
 
 
@@ -112,10 +86,39 @@ namespace Workbench.ProjectDilemma
     public override void OnDisable()
     {
       base.OnDisable();
-      director.played -= Director_Played;
-      director.stopped -= Director_Stopped;
+
       SceneManager.sceneLoaded -= OnSceneLoaded;
     }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+      if (debugMode)
+        GetComponent<GameMechanic>().StartGameCycle();
+    }
+
+    // Update is called once per frame
+    // void Update()
+    // {
+
+
+    // }
+    #endregion
+
+
+    #region private methods
+
+    Hashtable ResetCustomProperties(Hashtable properties)
+    {
+      Hashtable temphashtable = new Hashtable();
+      foreach (var item in properties)
+      {
+        temphashtable.Add(item.Key, null);
+      }
+      return temphashtable;
+    }
+
+
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -133,47 +136,15 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.LocalPlayer.SetCustomProperties(hashtable);
 
 
-      if (GetComponent<PlayableDirector>().playableAsset == null)
-      {
-        Director_Stopped(null);
-      }
+
+      // if (GetComponent<PlayableDirector>().playableAsset == null)
+      // {
+      //   GetComponent<GameMechanic>().Director_Stopped(null);
+      // }
 
 
     }
 
-    // Start is called before the first frame update
-    // void Start()
-    // {
-
-    // }
-
-    // Update is called once per frame
-    // void Update()
-    // {
-
-    // }
-    #endregion
-
-
-    #region private methods
-    private void Director_Stopped(PlayableDirector obj)
-    {
-      MyDebug.Log("Cinematic stopped");
-      // reset timeline
-      director.time = 0;
-      director.Stop();
-      director.Evaluate();
-
-      OnEndOfCinematic?.Invoke();
-
-      InitializePlayers();
-    }
-
-    private void Director_Played(PlayableDirector obj)
-    {
-      MyDebug.Log("Cinematic played");
-
-    }
 
 
     #endregion
@@ -198,7 +169,12 @@ namespace Workbench.ProjectDilemma
 
       OnDisconnectedEvent?.Invoke();
 
-
+      // clear photon properties so next game starts with clean slate
+      if (PhotonNetwork.IsMasterClient)
+      {
+        PhotonNetwork.CurrentRoom.SetCustomProperties(ResetCustomProperties(PhotonNetwork.CurrentRoom.CustomProperties));
+      }
+      PhotonNetwork.LocalPlayer.SetCustomProperties(ResetCustomProperties(PhotonNetwork.LocalPlayer.CustomProperties));
 
       // if we are not in main menu load main menu
       if (SceneManager.GetActiveScene().name != mainMenuScene)
@@ -224,9 +200,14 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    [HideInInspector] public Player otherPlayer;
+
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
+
       MyDebug.Log("OnPlayerPropertiesUpdate", targetPlayer.NickName);
+      if (targetPlayer != PhotonNetwork.LocalPlayer)
+        otherPlayer = targetPlayer;
 
       if (changedProps.ContainsKey(Keys.MAP_PROP_KEY))
       {
@@ -234,11 +215,17 @@ namespace Workbench.ProjectDilemma
 
         if (playersLoadedScene == 2)
         {
-          StartGame();
+          GetComponent<GameMechanic>().StartGameCycle();
         }
       }
 
-
+      // skip intro when both players agree
+      if (changedProps.ContainsKey(Keys.SKIP_INTRO))
+      {
+        if (otherPlayer != null)
+          if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(Keys.SKIP_INTRO) && otherPlayer.CustomProperties.ContainsKey(Keys.SKIP_INTRO))
+            GetComponent<GameMechanic>().Director_Stopped(null);
+      }
 
     }
 

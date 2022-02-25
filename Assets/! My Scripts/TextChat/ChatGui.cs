@@ -64,6 +64,8 @@ namespace Workbench.ProjectDilemma
     public RectTransform ChatPanel;     // set in inspector (to enable/disable panel)
     public GameObject UserIdFormPanel;
     public InputField InputFieldChat;   // set in inspector
+    public List<InputField> inputFields;   // set in inspector
+    public InputField currentInputField;   // set in inspector
     public GameObject InputFieldChat_outline1;   // set in inspector
     public GameObject InputFieldChat_outline2;   // set in inspector
     public Text InputFieldChat_placeholder;   // set in inspector
@@ -121,9 +123,8 @@ namespace Workbench.ProjectDilemma
 
     public void Start()
     {
-      DontDestroyOnLoad(this.gameObject);
 
-      this.spamInterval = MiscelaneousSettings.Instance.spamProtectInterval;
+      // this.spamInterval = MiscelaneousSettings.Instance.spamProtectInterval;
       this.UserIdText.text = "";
       this.StateText.text = "";
       // this.StateText.gameObject.SetActive(true); // demo design leftover
@@ -247,6 +248,17 @@ namespace Workbench.ProjectDilemma
 
     public void ToggleChat(bool inChat)
     {
+      // which chat is active in hierarchy currently
+      // foreach (InputField chatBox in inputFields)
+      // {
+      //   if (chatBox.gameObject.activeInHierarchy)
+      //   {
+      //     currentInputField = chatBox;
+      //     MyDebug.Log(currentInputField.name);
+      //     break;
+      //   }
+      // }
+
       if (inChat)
       {
         MyDebug.Log(this.GetType().ToString(), "Enter Chat ");
@@ -261,6 +273,7 @@ namespace Workbench.ProjectDilemma
         // StartCoroutine(MoveTextEnd_NextFrame()); // might use it, might not. kinda makes sense to have the text selected in case we wanna delete it
         this.InputFieldChat_outline1.SetActive(true);
         this.InputFieldChat_outline2.SetActive(true);
+
       }
       else
       {
@@ -273,7 +286,6 @@ namespace Workbench.ProjectDilemma
         this.InputFieldChat.DeactivateInputField();
         this.InputFieldChat_outline1.SetActive(false);
         this.InputFieldChat_outline2.SetActive(false);
-
       }
     }
 
@@ -723,6 +735,8 @@ namespace Workbench.ProjectDilemma
       if (channel != null)
       {
         channel.Add("Bot", msg, 0); //TODO: how to use msgID?
+
+        this.ShowChannel(this.selectedChannelName);
       }
     }
 
@@ -803,7 +817,7 @@ namespace Workbench.ProjectDilemma
       string nickname = PhotonNetwork.NickName;
       for (int i = 0; i < channel.Messages.Count; i++)
       {
-        MyDebug.Log(channel.Senders[i]);
+        // MyDebug.Log(channel.Senders[i]);
         processedMessages.Add("<color=#" + ColorUtility.ToHtmlStringRGBA(channel.Senders[i] == nickname ? PlayerColor_1 : PlayerColor_2) + ">" + ((string)(channel.Messages[i])) + "</color>");
       }
 

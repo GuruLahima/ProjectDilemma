@@ -5,6 +5,8 @@ using Photon.Pun;
 using UnityEditor;
 using System;
 using DG.Tweening;
+using UnityEngine.Events;
+using NaughtyAttributes;
 
 namespace GuruLaghima
 {
@@ -357,6 +359,42 @@ namespace GuruLaghima
 
     }
   }
+
+  [Serializable]
+  public class MyGenericDictionary<K, V>
+  {
+    [ReorderableList]
+    [SerializeField] List<KeyValuePair> list = new List<KeyValuePair>();
+
+    private Dictionary<K, V> dictionary = new Dictionary<K, V>();
+
+    public Dictionary<K, V> GetItems()
+    {
+      if (dictionary.Count > 0)
+        return dictionary;
+
+      foreach (KeyValuePair entry in list)
+      {
+        if (!dictionary.ContainsKey(entry.key))
+          dictionary.Add(entry.key, entry.value);
+      }
+      return dictionary;
+    }
+    public void AddRange(MyGenericDictionary<K, V> dic)
+    {
+      list.AddRange(dic.list);
+    }
+
+    [Serializable]
+    public class KeyValuePair
+    {
+      public K key;
+      public V value;
+
+    }
+  }
+
+
   [Serializable]
   public class MyEventsDictionary
   {
@@ -414,5 +452,33 @@ namespace GuruLaghima
   {
     public T Value { get; set; }
     public ValueWrapper(T value) { this.Value = value; }
+  }
+
+  [Serializable]
+  public class EventEnclosure
+  {
+    public string name;
+    public float BeforePause;
+    public UnityEvent OnStarted;
+    public float Interval;
+    public UnityEvent OnEnded;
+    public float AfterPause;
+
+  }
+
+  [Serializable]
+  public class EventSequence
+  {
+    public float BeforePause;
+    public UnityEvent OnStarted;
+#if UNITY_EDITOR
+    [ReorderableList]
+#endif
+
+    public List<EventEnclosure> eventSequence;
+    public UnityEvent OnEnded;
+    public float AfterPause;
+
+
   }
 }

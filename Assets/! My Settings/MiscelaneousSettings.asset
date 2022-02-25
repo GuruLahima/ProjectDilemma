@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isDefault: 0
   DefaultSettings: {fileID: 11400000, guid: 180e48f4c5f43804b87b85358055cbed, type: 2}
-  gameplayScene: TestMenu
-  mainMenuScene: TestMenu
+  gameplayScene: Main Menu
+  mainMenuScene: Main Menu
   spamProtectInterval: 3
+  pointsForWin: 65
+  pointsForLoss: -45
+  pointsForBothWon: 20
+  pointsForBothLost: -60
   defaultSFXMixerGroup: {fileID: 0}

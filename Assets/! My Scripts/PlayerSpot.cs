@@ -5,20 +5,38 @@ using TMPro;
 using NaughtyAttributes;
 using UnityEngine.Events;
 using GuruLaghima;
+using UnityEngine.UI;
 
 namespace Workbench.ProjectDilemma
 {
   public class PlayerSpot : MonoBehaviour
   {
     #region public fields
+    public Camera deathCam;
+    public Camera surviveCam;
+    public GameObject suspenseCam;
     public GameObject gameplayCamerasParent;
     public GameObject playerCam;
+    [HorizontalLine(color: EColor.White)]
     public GameObject playerModelSpawnPos;
+    public GameObject playerModel;
+    public GameObject endScenePlayerModelLeft;
+    public GameObject endScenePlayerModelRight;
+    [HorizontalLine(color: EColor.White)]
+    public GameObject votingMechanism;
     public Collider killButton;
     public Collider saveButton;
     public TextMeshProUGUI timer;
-    public GameObject playerModel;
+    public GameObject decisionTextSave;
+    public GameObject decisionTextBetray;
     public GameTimer gameTimer;
+    [HorizontalLine(color: EColor.White)]
+    public GameObject deathBookForPlayerCam;
+    public GameObject deathBookForEnemyCam;
+    public GameObject myDeathBook;
+    public Image deathBookLeftPage;
+    public Image deathBookRightPage;
+    public DeathSequence_UI_Item deathItemPrefab;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]
@@ -62,7 +80,25 @@ namespace Workbench.ProjectDilemma
 
 
     #region public methods
-
+    public void PopulateDeathBook(List<OwnableDeathSequence> collection)
+    {
+      foreach (OwnableDeathSequence item in collection)
+      {
+        DeathSequence_UI_Item tmpItem = Instantiate(deathItemPrefab.gameObject, deathBookLeftPage.transform, false).GetComponent<DeathSequence_UI_Item>();
+        tmpItem.deathSequence = item.deathSequence;
+        if (tmpItem.backgroundImg)
+          tmpItem.backgroundImg.sprite = item.deathSequence.backgroundSprite;
+        if (tmpItem.label)
+          tmpItem.label.text = item.deathSequence.labelText;
+        if (!item.owned)
+        {
+          tmpItem.backgroundImg.material = tmpItem.unavailableMat;
+          tmpItem.GetComponent<Button>().interactable = false;
+        }
+        else
+          tmpItem.GetComponent<Button>().onClick.AddListener(delegate () { GameMechanic.Instance.ChooseDeathSequence(tmpItem.deathSequence); });
+      }
+    }
     #endregion
 
 
@@ -84,20 +120,15 @@ namespace Workbench.ProjectDilemma
     {
       decisionMatrix = new Dictionary<Choice, Dictionary<Choice, UnityEvent>>(){
         {Choice.Kill, new Dictionary<Choice, UnityEvent>(){
-          {Choice.Kill, Outcomes.GetItems()["Kill Each Other"]},
-          {Choice.Save, Outcomes.GetItems()["I kill they save"]}
+/*           {Choice.Kill, Outcomes.GetItems()["Kill Each Other"]},
+          {Choice.Save, Outcomes.GetItems()["I kill they save"]} */
         }},
         {Choice.Save, new Dictionary<Choice, UnityEvent>(){
-          {Choice.Kill, Outcomes.GetItems()["They kill I save"]},
-          {Choice.Save, Outcomes.GetItems()["Save each other"]}
+/*           {Choice.Kill, Outcomes.GetItems()["They kill I save"]},
+          {Choice.Save, Outcomes.GetItems()["Save each other"]} */
         }}
       };
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
   }
 }

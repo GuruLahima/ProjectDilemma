@@ -126,6 +126,7 @@ namespace Workbench.ProjectDilemma
     [Foldout("Visual Feedback Events")]
     public UnityEvent OnDisconnectedEvent;
     private Player otherPlayer;
+    private static int lastScenario;
     #endregion
 
 
@@ -191,6 +192,32 @@ namespace Workbench.ProjectDilemma
             } */
 
       PhotonNetwork.NickName = defaultName;
+    }
+
+    bool muted;
+    private void Update()
+    {
+      // debug commands
+      if (Input.GetKey("left ctrl"))
+      {
+
+        if (Input.GetKeyDown("h"))
+        {
+          MyDebug.Log("Clear player prefs", "h");
+          PlayerPrefs.DeleteAll();
+        }
+        if (Input.GetKeyDown("m"))
+        {
+          MyDebug.Log("Mute shit", "l");
+          muted = !muted;
+          Object[] objs = GameObject.FindObjectsOfType(typeof(AudioListener));
+          foreach (Object item in objs)
+          {
+            MyDebug.Log("Mute shit", item.name);
+            ((AudioListener)item).enabled = false;
+          }
+        }
+      }
     }
 
     #endregion
@@ -301,6 +328,11 @@ namespace Workbench.ProjectDilemma
       LogFeedback("<Color=Green>OnJoinedRoom</Color> with " + PhotonNetwork.CurrentRoom.PlayerCount + " Player(s)");
       OnJoinedRoomEvent?.Invoke();
 
+      // send points info about player
+      Hashtable temphashtable = new Hashtable();
+      temphashtable.Add(Keys.PLAYER_POINTS, PlayerPrefs.GetInt(Keys.PLAYER_POINTS_PREF, 0));
+      PhotonNetwork.LocalPlayer.SetCustomProperties(temphashtable);
+
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
       {
         // visual stuff. probably for triggering transition between main menu and scenario
@@ -325,6 +357,9 @@ namespace Workbench.ProjectDilemma
     public override void OnPlayerEnteredRoom(Player player)
     {
       otherPlayer = player;
+
+      Hashtable temphashtable = new Hashtable();
+
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
       {
         // visual stuff. probably for triggering transition between main menu and scenario
@@ -336,10 +371,9 @@ namespace Workbench.ProjectDilemma
       {
         // determine who sits where (player number can be  1 or 2)
         int my_player_number = Random.Range(0, 2);
-        Hashtable temphashtable = new Hashtable();
+        temphashtable = new Hashtable();
         temphashtable.Add(Keys.PLAYER_NUMBER, (my_player_number) + 1);
         PhotonNetwork.LocalPlayer.SetCustomProperties(temphashtable);
-
         temphashtable = new Hashtable();
         temphashtable.Add(Keys.PLAYER_NUMBER, (1 - my_player_number) + 1);
         otherPlayer.SetCustomProperties(temphashtable);
@@ -350,6 +384,8 @@ namespace Workbench.ProjectDilemma
          };
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
         PhotonNetwork.CurrentRoom.IsOpen = false; // other players shouldnt be able to join it after the game started
+
+        // 
 
         Invoke("LoadRandomScenario", loadScenarioDelay);
       }
@@ -410,12 +446,28 @@ namespace Workbench.ProjectDilemma
     private void LoadRandomScenario()
     {
       // determine scenario to load
-      string scenarioName = PickRandomScenario();
+      // string scenarioName = PickRandomScenario();
+      string scenarioName = RotateScenarios();
       MyDebug.Log("We are loading ", scenarioName);
 
       // #Critical
       // Load the Room Level. 
       PhotonNetwork.LoadLevel(scenarioName);
+    }
+
+    private string RotateScenarios()
+    {
+      if (loadDebugScenario)
+        return debugScenario;
+
+      lastScenario = lastScenario == 1 ? 0 : 1;
+      string chosenScenario = "";
+
+      if (ScenariosManager.Instance.approvedScenariosNames.Count > 0)
+      {
+        chosenScenario = ScenariosManager.Instance.approvedScenariosNames[lastScenario];
+      }
+      return chosenScenario;
     }
 
     private string PickRandomScenario()
