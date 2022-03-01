@@ -169,6 +169,22 @@ namespace Workbench.ProjectDilemma
     [SerializeField] SplitScreenAnim enemySplitScreenAnim;
     [SerializeField] SplitScreenAnim defaultDeathCamAnim;
     [SerializeField] SplitScreenAnim defaultBothWonCamAnim;
+    [SerializeField] Ease camSlideTypeForSuspense;
+    [Range(0, 10)]
+    [SerializeField] float camSlideDurationForSuspense;
+    [SerializeField] Ease camSlideTypeForBothLost;
+    [Range(0, 10)]
+    [SerializeField] float camSlideDurationForBothLost;
+    [SerializeField] Ease camSlideTypeForBothWon;
+    [Range(0, 10)]
+    [SerializeField] float camSlideDurationForBothWon;
+    [SerializeField] Ease camSlideTypeForPlayerWon;
+    [Range(0, 10)]
+    [SerializeField] float camSlideDurationForPlayerWon;
+    [SerializeField] Ease camSlideTypeForEnemyWon;
+    [Range(0, 10)]
+    [SerializeField] float camSlideDurationForEnemyWon;
+
     [HorizontalLine(color: EColor.White)]
     [SerializeField] GameObject otherPlayerDecisionTextBetray;
     [SerializeField] GameObject otherPlayerDecisionTextSave;
@@ -313,6 +329,7 @@ namespace Workbench.ProjectDilemma
         otherPlayerSpot = playerOneSpot;
       }
 
+      localPlayerSpot.playerUsingThisSpot = PhotonNetwork.LocalPlayer;
       localPlayerSpot.playerModel.SetActive(true);
       localPlayerSpot.gameplayCamerasParent.SetActive(true);
       localPlayerSpot.playerCam.SetActive(true);
@@ -333,6 +350,7 @@ namespace Workbench.ProjectDilemma
 
       // localPlayerSpot.playerModel = Instantiate(playerOnePrefab, localPlayerSpot.playerModelSpawnPos.transform.position, localPlayerSpot.playerModelSpawnPos.transform.rotation, localPlayerSpot.transform);
 
+      otherPlayerSpot.playerUsingThisSpot = ScenarioManager.instance.otherPlayer;
       if (otherPlayerSpot.gameplayCamerasParent)
       {
         otherPlayerSpot.gameplayCamerasParent.SetActive(false);
@@ -363,8 +381,8 @@ namespace Workbench.ProjectDilemma
     public void AnimateSplitScreen()
     {
       playerSplitScreenAnim.cam = localPlayerSpot.GetComponent<PlayerSpot>().playerCam.GetComponent<Camera>();
-      playerSplitScreenAnim.AnimateCameraWidth(1f, 0.5f, 0f, 0f, 0f, 0f);
-      enemySplitScreenAnim.AnimateCameraWidth(0f, 0.5f, 1f, 0.5f, 0f, 0f);
+      playerSplitScreenAnim.AnimateCameraWidth(1f, 0.5f, 0f, 0f, 0f, 0f, camSlideTypeForSuspense, camSlideDurationForSuspense);
+      enemySplitScreenAnim.AnimateCameraWidth(0f, 0.5f, 1f, 0.5f, 0f, 0f, camSlideTypeForSuspense, camSlideDurationForSuspense);
     }
 
     public void SetupOtherPlayerCamForSplitScreen()
@@ -604,7 +622,7 @@ namespace Workbench.ProjectDilemma
         postcardTextField.ActivateInputField();
 
         if (!ScenarioManager.instance.debugMode)
-          postcardNameField.text = ScenarioManager.instance.otherPlayer.NickName;
+          postcardNameField.text = otherPlayerSpot.playerUsingThisSpot.NickName.Substring(0, otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
       }
     }
 
@@ -663,10 +681,89 @@ namespace Workbench.ProjectDilemma
           break;
       }
     }
+    public void CalculateXPAfterOutcome()
+    {
+      // set up some stuff depending on outcome
+      switch (votingOutcome)
+      {
+        case Outcome.Won:
+          //calculate points for each player
+          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForWin);
+          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForWin;
+          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForLoss;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForWin;
+          break;
+        case Outcome.Lost:
+          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForLoss);
+          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForLoss;
+          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForWin;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForLoss;
+          break;
+        case Outcome.BothWon:
+          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothWon);
+          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForBothWon;
+          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForBothWon;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForBothWon;
+          break;
+        case Outcome.BothLost:
+          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothLost);
+          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForBothLost;
+          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForBothLost;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForBothLost;
+          break;
+        default:
+          break;
+      }
+    }
+    public void CalculateRankAfterOutcome()
+    {
+      // set up some stuff depending on outcome
+      switch (votingOutcome)
+      {
+        case Outcome.Won:
+          //calculate points for each player
+          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForWin);
+          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForWin;
+          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForLoss;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForWin;
+          break;
+        case Outcome.Lost:
+          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForLoss);
+          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForLoss;
+          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForWin;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForLoss;
+          break;
+        case Outcome.BothWon:
+          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothWin);
+          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForBothWin;
+          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForBothWin;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForBothWin;
+          break;
+        case Outcome.BothLost:
+          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothLost);
+          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForBothLost;
+          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForBothLost;
+          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForBothLost;
+          break;
+        default:
+          break;
+      }
+    }
 
     public void DisableFog()
     {
       RenderSettings.fog = false;
+    }
+
+    public void ShowNameplates()
+    {
+      if (localPlayerSpot.playerUsingThisSpot != null)
+        localPlayerSpot.nameplateText.text = localPlayerSpot.playerUsingThisSpot.NickName.Substring(0, localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
+      localPlayerSpot.nameplateCanvas.SetActive(true);
+
+      if (otherPlayerSpot.playerUsingThisSpot != null)
+        otherPlayerSpot.nameplateText.text = otherPlayerSpot.playerUsingThisSpot.NickName.Substring(0, otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
+      otherPlayerSpot.nameplateCanvas.SetActive(true);
     }
     #endregion
 
@@ -1103,10 +1200,10 @@ namespace Workbench.ProjectDilemma
     {
       MyDebug.Log("Both lost");
       defaultDeathCamAnim.cam.gameObject.SetActive(true);
-      defaultDeathCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f);
-      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f);
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f);
-      yield return new WaitForSeconds(defaultDeathCamAnim.durationOfSlide);
+      defaultDeathCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+      yield return new WaitForSeconds(camSlideDurationForBothLost);
       // fade out screen
       transitionToDeathSequenceScreen.SetActive(true);
       yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
@@ -1128,10 +1225,10 @@ namespace Workbench.ProjectDilemma
     {
       MyDebug.Log("Both won");
       defaultBothWonCamAnim.cam.gameObject.SetActive(true);
-      defaultBothWonCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f);
-      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f);
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f);
-      yield return new WaitForSeconds(defaultBothWonCamAnim.durationOfSlide);
+      defaultBothWonCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForBothWon, camSlideDurationForBothWon);
+      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForBothWon, camSlideDurationForBothWon);
+      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForBothWon, camSlideDurationForBothWon);
+      yield return new WaitForSeconds(camSlideDurationForBothWon);
       // fade out screen
       transitionToSalvationSequenceScreen.SetActive(true);
       yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
@@ -1152,9 +1249,9 @@ namespace Workbench.ProjectDilemma
     IEnumerator YouLost()
     {
       MyDebug.Log("You lost");
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 1f, 0f, 0f, 0f, 0f);
-      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f);
-      yield return new WaitForSeconds(playerSplitScreenAnim.durationOfSlide);
+      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 1f, 0f, 0f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
+      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
+      yield return new WaitForSeconds(camSlideDurationForEnemyWon);
       // fade out screen
       transitionToDeathSequenceScreen.SetActive(true);
       yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
@@ -1167,16 +1264,17 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       // play chosen death scene (by other player)
-      Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      if (chosenDeathPrefab != null)
+        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
     }
 
     IEnumerator YouWon()
     {
       MyDebug.Log("You won");
       // animate camera
-      enemySplitScreenAnim.AnimateCameraWidth(enemySplitScreenAnim.cam.rect.width, 1f, 0.5f, 0f, 0f, 0f);
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f);
-      yield return new WaitForSeconds(enemySplitScreenAnim.durationOfSlide);
+      enemySplitScreenAnim.AnimateCameraWidth(enemySplitScreenAnim.cam.rect.width, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
+      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
+      yield return new WaitForSeconds(camSlideDurationForPlayerWon);
       // fade out screen
       transitionToDeathSequenceScreen.SetActive(true);
       yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
@@ -1189,7 +1287,8 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       // play chosen death scene
-      Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      if (chosenDeathPrefab != null)
+        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
     }
 
     void OtherPlayerOutcome()
@@ -1242,25 +1341,26 @@ namespace Workbench.ProjectDilemma
 
     private void FinalNoteEventFunc(EventData photonEvent)
     {
-      {
-        // extract info from received data
-        object[] data = (object[])photonEvent.CustomData;
-        int senderID = (int)data[0];
-        string textSent = (string)data[1];
-        string nickname = (string)data[2];
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      string textSent = (string)data[1];
+      string nickname = (string)data[2];
 
-        // who's choice it was
-        if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
-        {
-          // play animation for sending mail
-          postcardObj.SetActive(false);
-        }
-        else
-        {
-          // save the text locally. in json maybe? could do, could do.
-          MyDebug.Log("FinalNote text", textSent);
-          MyDebug.Log("FinalNote nickname", nickname);
-        }
+      // who's choice it was
+      if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
+      {
+        // play animation for sending mail
+        postcardObj.SetActive(false);
+      }
+      else
+      {
+        // save the text locally. in json maybe? could do, could do.
+        MyDebug.Log("FinalNote text", textSent);
+        MyDebug.Log("FinalNote nickname", nickname);
+
+        FinalNote newNote = new FinalNote(nickname, textSent);
+        FinalNoteCardHandler.SaveFinalNote(newNote);
       }
     }
 

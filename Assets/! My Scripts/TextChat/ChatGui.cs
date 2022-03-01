@@ -814,11 +814,11 @@ namespace Workbench.ProjectDilemma
             MyDebug.Log(text);
             text = string.Concat(textSplitted); */
       List<object> processedMessages = new List<object>();
-      string nickname = PhotonNetwork.NickName;
+      string nicknameWithColor = PhotonNetwork.NickName;
       for (int i = 0; i < channel.Messages.Count; i++)
       {
         // MyDebug.Log(channel.Senders[i]);
-        processedMessages.Add("<color=#" + ColorUtility.ToHtmlStringRGBA(channel.Senders[i] == nickname ? PlayerColor_1 : PlayerColor_2) + ">" + ((string)(channel.Messages[i])) + "</color>");
+        processedMessages.Add("<color=#" + ColorUtility.ToHtmlStringRGBA(channel.Senders[i] == nicknameWithColor ? PlayerColor_1 : PlayerColor_2) + ">" + ((string)(channel.Messages[i])) + "</color>");
       }
 
       return processedMessages;

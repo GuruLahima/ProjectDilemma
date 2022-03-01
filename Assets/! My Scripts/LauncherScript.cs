@@ -52,6 +52,16 @@ namespace Workbench.ProjectDilemma
     [Tooltip("The input field for the nickname")]
     [SerializeField]
     TMP_InputField _inputField;
+    [SerializeField]
+    TMP_Text idCardNickname;
+    [SerializeField]
+    TMP_Text idCardXPLabel;
+    [SerializeField]
+    Slider idCardXPSlider;
+    [SerializeField]
+    TMP_Text idCardRank;
+    [SerializeField]
+    TMP_Text idCardPoints;
 
     [Tooltip("The input field for the nickname")]
     [SerializeField]
@@ -180,18 +190,48 @@ namespace Workbench.ProjectDilemma
     private void Start()
     {
 
-      string defaultName = (Input.mousePosition.x * Input.mousePosition.y).ToString();
+      // string defaultName = (Input.mousePosition.x * Input.mousePosition.y).ToString();
+      string defaultName = "";
 
-      /*       if (_inputField != null)
-            {
-              if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
-              {
-                defaultName = PlayerPrefs.GetString(Keys.PLAYER_NAME);
-                _inputField.text = defaultName;
-              }
-            } */
+      if (_inputField != null)
+      {
+        if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
+        {
+          defaultName = PlayerPrefs.GetString(Keys.PLAYER_NAME);
+          _inputField.text = defaultName;
+        }
+      }
+      // initialize idcard details
+      if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
+      {
+        idCardNickname.text = PlayerPrefs.GetString(Keys.PLAYER_NAME);
+      }
+      int xp = PlayerPrefs.GetInt(Keys.PLAYER_XP, 0);
+      int accumulatedLevelThreshold = 0;
+      int currentLevel = 0;
+      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count; i++)
+      {
+        int levelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
+        accumulatedLevelThreshold += levelThreshold;
+        if (xp >= accumulatedLevelThreshold)
+        {
+          currentLevel = i;
+        }
+        else
+        {
+          break;
+        }
+      }
+      idCardXPSlider.minValue = 0;
+      idCardXPSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[currentLevel];
+      idCardXPSlider.value = MiscelaneousSettings.Instance.levelsDistribution[currentLevel + 1] - (accumulatedLevelThreshold - xp);
+      idCardXPLabel.text = "Level " + currentLevel;
+      idCardRank.text = "Rank. " + PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0).ToString();
+      idCardPoints.text = "Points: " + PlayerPrefs.GetInt(Keys.PLAYER_POINTS_PREF, 0).ToString();
 
-      PhotonNetwork.NickName = defaultName;
+
+      // we are appending a deliminator and a random color to prevent duplicate of nicknames (because my colored chat system depends on unique nicknames)
+      PhotonNetwork.NickName = defaultName + "#" + Random.ColorHSV();
     }
 
     bool muted;
@@ -237,7 +277,8 @@ namespace Workbench.ProjectDilemma
         MyDebug.LogError("Player Name is null or empty");
         return;
       }
-      PhotonNetwork.NickName = value;
+      PhotonNetwork.NickName = value + "#" + Random.ColorHSV();
+      idCardNickname.text = value; // sync id card nickname as well
 
       PlayerPrefs.SetString(Keys.PLAYER_NAME, value);
     }

@@ -6,7 +6,8 @@ using NaughtyAttributes;
 using UnityEngine.Events;
 using GuruLaghima;
 using UnityEngine.UI;
-
+using Photon.Realtime;
+using TMPro;
 namespace Workbench.ProjectDilemma
 {
   public class PlayerSpot : MonoBehaviour
@@ -17,6 +18,9 @@ namespace Workbench.ProjectDilemma
     public GameObject suspenseCam;
     public GameObject gameplayCamerasParent;
     public GameObject playerCam;
+    public GameObject nameplateCanvas;
+    public TextMeshProUGUI nameplateText;
+
     [HorizontalLine(color: EColor.White)]
     public GameObject playerModelSpawnPos;
     public GameObject playerModel;
@@ -70,7 +74,7 @@ namespace Workbench.ProjectDilemma
 
 
     #region exposed fields
-
+    [HideInInspector] public Player playerUsingThisSpot;
     #endregion
 
 

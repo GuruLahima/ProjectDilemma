@@ -21,4 +21,13 @@ MonoBehaviour:
   pointsForLoss: -45
   pointsForBothWon: 20
   pointsForBothLost: -60
+  xpForWin: 50
+  xpForLoss: 25
+  xpForBothWon: 35
+  xpForBothLost: 25
+  levelsDistribution: 000000003200000032000000410000004600000050000000
+  rankForWin: 0
+  rankForLoss: 0
+  rankForBothWin: 0
+  rankForBothLost: 0
   defaultSFXMixerGroup: {fileID: 0}
