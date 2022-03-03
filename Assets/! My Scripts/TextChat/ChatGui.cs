@@ -233,19 +233,24 @@ namespace Workbench.ProjectDilemma
         return;
       }
 
-      if (GameMechanic.Instance.canChoose)
-      {
-        // toggle chat mode 
-        if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
-        {
-          // notify other scripts that keyboard input will be expected to go into chat box
-          ToggleChat(!this.InputFieldChat_outline1.activeSelf);
-        }
-      }
+      // !deprecated. we no longer trigger chat on enter, but by clicking console
+      // if (GameMechanic.Instance.canChoose)
+      // {
+      //   // toggle chat mode 
+      //   if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
+      //   {
+      //     // notify other scripts that keyboard input will be expected to go into chat box
+      //     ToggleChat(!this.InputFieldChat_outline1.activeSelf);
+      //   }
+      // }
 
       // this.StateText.gameObject.SetActive(this.ShowState); // this could be handled more elegantly, but for the demo it's ok.
     }
 
+    /// <summary>
+    /// can be called via UnityEvent or through keyboard input
+    /// </summary>
+    /// <param name="inChat"></param>
     public void ToggleChat(bool inChat)
     {
       // which chat is active in hierarchy currently
