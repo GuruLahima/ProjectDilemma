@@ -26,7 +26,7 @@ public class CursorManager : MonoBehaviour
   [ShowIf("setCursorOnDisable")]
   [SerializeField] CursorLockMode lockModeOnDisable;
 
-  private void Start()
+  /*private void Start()
   {
     if (toggleCursorOnStart)
     {
@@ -38,8 +38,21 @@ public class CursorManager : MonoBehaviour
       SetLockMode(lockModeOnStart);
       SetVisibility(visibilityOnStart);
     }
-  }
-  private void OnDisable()
+  } */
+    private void OnEnable()
+    {
+        if (toggleCursorOnStart)
+        {
+            ToggleLockMode();
+            ToggleVisibility();
+        }
+        if (setCursorOnStart)
+        {
+            SetLockMode(lockModeOnStart);
+            SetVisibility(visibilityOnStart);
+        }
+    }
+    private void OnDisable()
   {
     if (toggleCursorOnDisable)
     {

@@ -62,6 +62,9 @@ namespace Workbench.ProjectDilemma
     TMP_Text idCardRank;
     [SerializeField]
     TMP_Text idCardPoints;
+    [SerializeField]
+    GameObject chooseFateCanvas;
+
 
     [Tooltip("The input field for the nickname")]
     [SerializeField]
@@ -209,7 +212,7 @@ namespace Workbench.ProjectDilemma
       int xp = PlayerPrefs.GetInt(Keys.PLAYER_XP, 0);
       int accumulatedLevelThreshold = 0;
       int currentLevel = 0;
-      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count; i++)
+      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
       {
         int levelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
         accumulatedLevelThreshold += levelThreshold;
@@ -232,9 +235,25 @@ namespace Workbench.ProjectDilemma
 
       // we are appending a deliminator and a random color to prevent duplicate of nicknames (because my colored chat system depends on unique nicknames)
       PhotonNetwork.NickName = defaultName + "#" + Random.ColorHSV();
+
+      // if player hasn't yet chosen a card deck show him the card deck canvas
+      if (PlayerPrefs.GetString(Keys.CARD_DECK_CHOSEN, "false") == "false")
+      {
+        chooseFateCanvas.SetActive(true);
+      }
+      else
+      {
+        chooseFateCanvas.SetActive(false);
+      }
+    }
+
+    public void FateChosen()
+    {
+      PlayerPrefs.SetString(Keys.CARD_DECK_CHOSEN, "true");
     }
 
     bool muted;
+
     private void Update()
     {
       // debug commands

@@ -14,14 +14,20 @@ namespace Workbench.ProjectDilemma
 
     // public DeathSequence_UI_Item ui_for_deathBook;
     public string labelText;
+    public float duration;
     public Sprite backgroundSprite;
     [SerializeField] Camera deathCam;
 
     // // Start is called before the first frame update
-    // void Start()
-    // {
+    void Start()
+    {
+      Invoke("SelfDestruct", duration);
+    }
 
-    // }
+    void SelfDestruct()
+    {
+      Destroy(this.gameObject);
+    }
 
     // // Update is called once per frame
     // void Update()

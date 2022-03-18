@@ -24,6 +24,7 @@ namespace Workbench.ProjectDilemma
     public const string HAS_IMMUNITY = "HasImmunity";
 
     // player prefs
+    public const string CARD_DECK_CHOSEN = "card_deck_chosen";
     public const string PLAYER_XP = "Player_XP";
     public const string PLAYER_RANK = "Player_Rank";
     public const string PLAYER_POINTS_PREF = "playerPoints";
@@ -47,6 +48,5 @@ namespace Workbench.ProjectDilemma
 
     // input bindings
     public const string PUSH_TO_TALK = "Push to talk";
-
   }
 }

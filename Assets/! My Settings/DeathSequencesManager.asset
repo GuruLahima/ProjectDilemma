@@ -29,3 +29,9 @@ MonoBehaviour:
   - owned: 1
     deathSequence: {fileID: -5481254061679384345, guid: 8103e7de6d2bcf840b618a843853e505,
       type: 3}
+  - owned: 1
+    deathSequence: {fileID: -7352861745873795599, guid: 370005efa09039340ad124e7697e5c57,
+      type: 3}
+  - owned: 1
+    deathSequence: {fileID: 8096140542398586925, guid: 3d16638ccc6ff3941aa541182a0c287b,
+      type: 3}

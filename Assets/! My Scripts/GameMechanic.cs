@@ -13,13 +13,16 @@ using GuruLaghima;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.Animations.Rigging;
+using Photon.Voice.PUN;
 
 namespace Workbench.ProjectDilemma
 {
   public enum Choice
   {
     Kill,
-    Save
+    Save,
+    None
   }
   public enum Outcome
   {
@@ -57,6 +60,10 @@ namespace Workbench.ProjectDilemma
     [BoxGroup("Visual Feedback Events - Phases")]
 #endif
     public EventEnclosure TransitionPhaseEvents;
+#if UNITY_EDITOR
+    [BoxGroup("Visual Feedback Events - Phases")]
+#endif
+    public EventEnclosure TransitionPhaseOneVoteEvents;
 
 
 #if UNITY_EDITOR
@@ -159,10 +166,12 @@ namespace Workbench.ProjectDilemma
     [SerializeField] float fadeInToDeathSequenceInterval;
     [BoxGroup("Death sequences params")]
     [SerializeField] float fadeOutToDeathSequenceInterval;
+
     [BoxGroup("Death sequences params")]
-    [SerializeField] PlayableDirector defaultWinDirector;
+    [SerializeField] GameObject defaultWinPrefab;
+
     [BoxGroup("Death sequences params")]
-    [SerializeField] PlayableDirector defaultLossDirector;
+    [SerializeField] GameObject defaultLossPrefab;
 
     [HorizontalLine(color: EColor.White)]
     [SerializeField] SplitScreenAnim playerSplitScreenAnim;
@@ -225,6 +234,7 @@ namespace Workbench.ProjectDilemma
     public const byte DecisionEvent = 1;
     public const byte DeathChoiceEvent = 2;
     public const byte FinalNoteEvent = 3;
+    public const byte AnimationEvent = 4;
     #endregion
 
     #region private fields
@@ -329,6 +339,8 @@ namespace Workbench.ProjectDilemma
         otherPlayerSpot = playerOneSpot;
       }
 
+      localPlayerSpot.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
+      Invoke("InitVoice", 2f);
       localPlayerSpot.playerUsingThisSpot = PhotonNetwork.LocalPlayer;
       localPlayerSpot.playerModel.SetActive(true);
       localPlayerSpot.gameplayCamerasParent.SetActive(true);
@@ -373,6 +385,11 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    void InitVoice()
+    {
+      localPlayerSpot.GetComponent<PhotonVoiceView>().Init();
+    }
+
     public void SpawnDeathPrefab()
     {
       Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
@@ -408,7 +425,10 @@ namespace Workbench.ProjectDilemma
     public void ShowOtherPlayerDecisionAnim()
     {
       // either through animator or through coded IK motions, animate the voting movement
-      otherPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("decision");
+      if (theirChoice == Choice.Kill)
+        otherPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("betray_owl");
+      else if (theirChoice == Choice.Save)
+        otherPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("cooperate_owl");
     }
     public void ShowOtherPlayerDecisionText()
     {
@@ -435,7 +455,10 @@ namespace Workbench.ProjectDilemma
     public void ShowLocalPlayerDecisionAnim()
     {
       // either through animator or through coded IK motions, animate the voting movement
-      localPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("decision");
+      if (myChoice == Choice.Kill)
+        localPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("betray_owl");
+      else if (myChoice == Choice.Save)
+        localPlayerSpot.playerModel.GetComponent<Animator>().SetTrigger("cooperate_owl");
     }
     public void HideDecisionTexts()
     {
@@ -497,23 +520,23 @@ namespace Workbench.ProjectDilemma
       if (theirChoice == Choice.Kill && myChoice == Choice.Save)
         otherPlayerSpot.suspenseCam.GetComponent<Animator>().Play("Zoom out on enemy");
     }
-    public void ShowDeathSequence()
+    IEnumerator ShowDeathSequence()
     {
       if (madeChoice && theyMadeChoice)
       {
         switch (votingOutcome)
         {
           case Outcome.Won:
-            StartCoroutine(YouWon());
+            yield return StartCoroutine(YouWon());
             break;
           case Outcome.Lost:
-            StartCoroutine(YouLost());
+            yield return StartCoroutine(YouLost());
             break;
           case Outcome.BothWon:
-            StartCoroutine(BothWon());
+            yield return StartCoroutine(BothWon());
             break;
           case Outcome.BothLost:
-            StartCoroutine(BothLost());
+            yield return StartCoroutine(BothLost());
             break;
         }
       }
@@ -521,15 +544,15 @@ namespace Workbench.ProjectDilemma
       {
         if (theyMadeChoice)
         {
-          StartCoroutine(YouLost());
+          yield return StartCoroutine(YouLost());
         }
         else if (madeChoice)
         {
-          StartCoroutine(YouWon());
+          yield return StartCoroutine(YouWon());
         }
         else
         {
-          StartCoroutine(BothLost());
+          yield return StartCoroutine(BothLost());
         }
       }
     }
@@ -635,6 +658,15 @@ namespace Workbench.ProjectDilemma
       object[] content = new object[] { senderID, postcardTextField.text, postcardNameField.text };
       RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
       PhotonNetwork.RaiseEvent(FinalNoteEvent, content, raiseEventOptions, SendOptions.SendReliable);
+    }
+    public void AnimatePlayer(string animation)
+    {
+      MyDebug.Log("Animating player over the network");
+
+      int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+      object[] content = new object[] { senderID, animation, "Trigger", null, localPlayerSpot.playerSpot };
+      RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+      PhotonNetwork.RaiseEvent(AnimationEvent, content, raiseEventOptions, SendOptions.SendReliable);
     }
 
     public void ActivateProperModelForEndScreen()
@@ -758,12 +790,18 @@ namespace Workbench.ProjectDilemma
     public void ShowNameplates()
     {
       if (localPlayerSpot.playerUsingThisSpot != null)
-        localPlayerSpot.nameplateText.text = localPlayerSpot.playerUsingThisSpot.NickName.Substring(0, localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
+        localPlayerSpot.nameplateText.text = localPlayerSpot.playerUsingThisSpot.NickName.Substring(0, localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#") < 0 ? 0 : localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
       localPlayerSpot.nameplateCanvas.SetActive(true);
 
       if (otherPlayerSpot.playerUsingThisSpot != null)
-        otherPlayerSpot.nameplateText.text = otherPlayerSpot.playerUsingThisSpot.NickName.Substring(0, otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
+        otherPlayerSpot.nameplateText.text = otherPlayerSpot.playerUsingThisSpot.NickName.Substring(0, otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#") < 0 ? 0 : otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
       otherPlayerSpot.nameplateCanvas.SetActive(true);
+    }
+
+    public void Disconnect()
+    {
+      PhotonNetwork.Disconnect();
+
     }
     #endregion
 
@@ -874,18 +912,22 @@ namespace Workbench.ProjectDilemma
       // game started. start timer
       GameStarted?.Invoke();
       yield return StartCoroutine(DiscussionPhase());
-      yield return StartCoroutine(TransitionPhase());
       if (madeChoice && theyMadeChoice)
       {
+        yield return StartCoroutine(TransitionPhase());
         yield return StartCoroutine(SuspensePhase());
         // if both players saved or killed don't start DeathChoicePhase
         if (!((theirChoice == Choice.Kill && myChoice == Choice.Kill) || (theirChoice == Choice.Save && myChoice == Choice.Save)))
           yield return StartCoroutine(DeathChoicePhase());
       }
-      else if (madeChoice || theyMadeChoice)
-        yield return StartCoroutine(SomebodyVotedPhase());
       else
-        yield return StartCoroutine(NobodyVotedPhase());
+      {
+        yield return StartCoroutine(TransitionPhaseOneVote());
+        if (madeChoice || theyMadeChoice)
+          yield return StartCoroutine(SomebodyVotedPhase());
+        else
+          yield return StartCoroutine(NobodyVotedPhase());
+      }
 
       yield return StartCoroutine(DeathSequencePhase());
       yield return StartCoroutine(PostGameScreenPhase());
@@ -1009,6 +1051,24 @@ namespace Workbench.ProjectDilemma
 
       yield return new WaitForSeconds(TransitionPhaseEvents.AfterPause);
     }
+    IEnumerator TransitionPhaseOneVote()
+    {
+      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.BeforePause);
+
+      MyDebug.Log("TransitionPhaseOneVote", "started");
+
+      // show feedback stuff
+      TransitionPhaseOneVoteEvents.OnStarted?.Invoke();
+
+      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.Interval);
+
+      MyDebug.Log("TransitionPhaseOneVote", "ended");
+
+      // show feedback stuff
+      TransitionPhaseOneVoteEvents.OnEnded?.Invoke();
+
+      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.AfterPause);
+    }
     IEnumerator SuspensePhase()
     {
       yield return new WaitForSeconds(SuspensePhaseSequence.BeforePause);
@@ -1119,6 +1179,16 @@ namespace Workbench.ProjectDilemma
       // show feedback stuff
       DeathSequencePhaseEvents.OnStarted?.Invoke();
 
+      yield return StartCoroutine(ShowDeathSequence());
+
+      // we wait for the sequence to end to show the end screen
+      if (chosenDeathPrefab)
+      {
+        MyDebug.Log("DeathSequencePhase", "chosen death sequence started");
+        yield return new WaitForSeconds(chosenDeathPrefab.GetComponent<DeathSequence>().duration);
+        MyDebug.Log("DeathSequencePhase", "chosen death sequence ended");
+      }
+
       yield return new WaitForSeconds(DeathSequencePhaseEvents.Interval);
 
       MyDebug.Log("DeathSequencePhase", "ended");
@@ -1148,7 +1218,7 @@ namespace Workbench.ProjectDilemma
 
       yield return new WaitForSeconds(PostGameScreenPhaseEvents.AfterPause);
 
-      ReturnToMainMenu();
+      Disconnect();
     }
 
     IEnumerator StartTimeline()
@@ -1199,16 +1269,20 @@ namespace Workbench.ProjectDilemma
     IEnumerator BothLost()
     {
       MyDebug.Log("Both lost");
-      defaultDeathCamAnim.cam.gameObject.SetActive(true);
-      defaultDeathCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
-      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
-      yield return new WaitForSeconds(camSlideDurationForBothLost);
-      // fade out screen
-      transitionToDeathSequenceScreen.SetActive(true);
-      yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
-      transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
-      yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      if (madeChoice && theyMadeChoice)
+      {
+
+        defaultDeathCamAnim.cam.gameObject.SetActive(true);
+        defaultDeathCamAnim.AnimateCameraWidth(0f, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+        enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+        playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForBothLost, camSlideDurationForBothLost);
+        yield return new WaitForSeconds(camSlideDurationForBothLost);
+        // fade out screen
+        transitionToDeathSequenceScreen.SetActive(true);
+        yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
+        transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
+        yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      }
       // disable all other cameras
       otherPlayerSpot.playerCam.SetActive(false);
       localPlayerSpot.playerCam.SetActive(false);
@@ -1217,8 +1291,12 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       // play commn death
       // Instantiate(defaultDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      if (defaultLossDirector)
-        defaultLossDirector.Play();
+      if (defaultLossPrefab)
+      {
+        chosenDeathPrefab = defaultLossPrefab;
+        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      }
+
     }
 
     IEnumerator BothWon()
@@ -1242,53 +1320,83 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       // play victory
       // Instantiate(defaultWinPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      if (defaultWinDirector)
-        defaultWinDirector.Play();
+      if (defaultWinPrefab)
+      {
+        chosenDeathPrefab = defaultWinPrefab;
+        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      }
     }
 
     IEnumerator YouLost()
     {
       MyDebug.Log("You lost");
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 1f, 0f, 0f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
-      enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
-      yield return new WaitForSeconds(camSlideDurationForEnemyWon);
-      // fade out screen
-      transitionToDeathSequenceScreen.SetActive(true);
-      yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
-      transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
-      yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      if (madeChoice)
+      {
+        playerSplitScreenAnim.AnimateCameraWidth(0.5f, 1f, 0f, 0f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
+        enemySplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0.5f, 1f, 0f, 0f, camSlideTypeForEnemyWon, camSlideDurationForEnemyWon);
+        yield return new WaitForSeconds(camSlideDurationForEnemyWon);
+        // fade out screen
+        transitionToDeathSequenceScreen.SetActive(true);
+        yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
+        transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
+        yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      }
       // disable all other cameras
       otherPlayerSpot.playerCam.SetActive(false);
       localPlayerSpot.playerCam.SetActive(false);
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      // play chosen death scene (by other player)
-      if (chosenDeathPrefab != null)
+      if (madeChoice)
+      {
+        // play chosen death scene (by other player)
+        if (chosenDeathPrefab != null)
+          Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      }
+      else
+      {
+        chosenDeathPrefab = defaultLossPrefab;
         Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        // if (defaultLossDirector)
+        //   defaultLossDirector.Play();
+      }
     }
 
     IEnumerator YouWon()
     {
       MyDebug.Log("You won");
-      // animate camera
-      enemySplitScreenAnim.AnimateCameraWidth(enemySplitScreenAnim.cam.rect.width, 1f, 0.5f, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
-      playerSplitScreenAnim.AnimateCameraWidth(0.5f, 0f, 0f, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
-      yield return new WaitForSeconds(camSlideDurationForPlayerWon);
-      // fade out screen
-      transitionToDeathSequenceScreen.SetActive(true);
-      yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
-      transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
-      yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      if (theyMadeChoice)
+      {
+        // animate camera
+        enemySplitScreenAnim.AnimateCameraWidth(enemySplitScreenAnim.cam.rect.width, 1f, enemySplitScreenAnim.cam.rect.min.x, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
+        playerSplitScreenAnim.AnimateCameraWidth(playerSplitScreenAnim.cam.rect.width, 0f, 0f, 0f, 0f, 0f, camSlideTypeForPlayerWon, camSlideDurationForPlayerWon);
+        yield return new WaitForSeconds(camSlideDurationForPlayerWon);
+        // fade out screen
+        transitionToDeathSequenceScreen.SetActive(true);
+        yield return new WaitForSeconds(fadeInToDeathSequenceInterval);
+        transitionToDeathSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
+        yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
+      }
       // disable all other cameras
       otherPlayerSpot.playerCam.SetActive(false);
       localPlayerSpot.playerCam.SetActive(false);
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      // play chosen death scene
-      if (chosenDeathPrefab != null)
+      if (theyMadeChoice)
+      {
+        // play chosen death scene
+        if (chosenDeathPrefab != null)
+          Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      }
+      else
+      {
+        // if (defaultWinDirector)
+        //   defaultWinDirector.Play();
+        chosenDeathPrefab = defaultLossPrefab;
         Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      }
+
     }
 
     void OtherPlayerOutcome()
@@ -1300,11 +1408,7 @@ namespace Workbench.ProjectDilemma
     {
       if (postGameScreen) postGameScreen.SetActive(true);
     }
-    void ReturnToMainMenu()
-    {
-      PhotonNetwork.Disconnect();
 
-    }
 
     private void DeathChoiceEventFunc(EventData photonEvent)
     {
@@ -1361,6 +1465,57 @@ namespace Workbench.ProjectDilemma
 
         FinalNote newNote = new FinalNote(nickname, textSent);
         FinalNoteCardHandler.SaveFinalNote(newNote);
+      }
+    }
+    private void AnimationEventFunc(EventData photonEvent)
+    {
+      MyDebug.Log("AnimationEvent triggered");
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      string animatorParameter = (string)data[1];
+      string parameterType = (string)data[2];
+      object parameterValue = (object)data[3];
+      int playerSpot = (int)data[4];
+      // Rig playerRig;
+      Animator anim;
+      MyDebug.Log("Parameters:");
+      MyDebug.Log("animatorParameter:", animatorParameter);
+      MyDebug.Log("parameterType:", parameterType);
+      // MyDebug.Log("parameterValue:", parameterValue.ToString());
+      MyDebug.Log("playerSpot:", playerSpot.ToString());
+
+      if (playerSpot == 1)
+      {
+        // playerRig = playerOneSpot.playerRig;
+        anim = playerOneSpot.playerModel.GetComponent<Animator>();
+      }
+      else
+      {
+        // playerRig = playerTwoSpot.playerRig;
+        anim = playerTwoSpot.playerModel.GetComponent<Animator>();
+      }
+
+      switch (parameterType)
+      {
+        case "Trigger":
+          anim.SetTrigger(animatorParameter);
+          // playerRig.weight = 1f; // I decided to animate this value within the animation itself
+          break;
+        case "Bool":
+          anim.SetBool(animatorParameter, (bool)parameterValue);
+          // playerRig.weight = 1f;
+          break;
+        case "Float":
+          anim.SetFloat(animatorParameter, (float)parameterValue);
+          // playerRig.weight = 1f;
+          break;
+        case "Int":
+          anim.SetInteger(animatorParameter, (int)parameterValue);
+          // playerRig.weight = 1f;
+          break;
+        default:
+          break;
       }
     }
 
@@ -1430,6 +1585,9 @@ namespace Workbench.ProjectDilemma
           break;
         case FinalNoteEvent:
           FinalNoteEventFunc(photonEvent);
+          break;
+        case AnimationEvent:
+          AnimationEventFunc(photonEvent);
           break;
         default:
           break;

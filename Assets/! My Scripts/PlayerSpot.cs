@@ -8,11 +8,14 @@ using GuruLaghima;
 using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.Animations.Rigging;
+
 namespace Workbench.ProjectDilemma
 {
   public class PlayerSpot : MonoBehaviour
   {
     #region public fields
+    public int playerSpot;
     public Camera deathCam;
     public Camera surviveCam;
     public GameObject suspenseCam;
@@ -24,6 +27,7 @@ namespace Workbench.ProjectDilemma
     [HorizontalLine(color: EColor.White)]
     public GameObject playerModelSpawnPos;
     public GameObject playerModel;
+    public Rig playerRig;
     public GameObject endScenePlayerModelLeft;
     public GameObject endScenePlayerModelRight;
     [HorizontalLine(color: EColor.White)]

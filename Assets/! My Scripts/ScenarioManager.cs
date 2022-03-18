@@ -73,7 +73,9 @@ namespace Workbench.ProjectDilemma
       else
         Destroy(this.gameObject);
 
-
+      // this ensures no matter what we do during testing and debugging when we run the game from main menu it doesn't enter debug
+      if (PhotonNetwork.IsConnected)
+        debugMode = false;
     }
 
 

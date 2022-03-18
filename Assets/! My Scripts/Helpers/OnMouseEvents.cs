@@ -2,18 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-
+using UnityEngine.EventSystems;
 
 namespace GuruLaghima
 {
 
-  [RequireComponent(typeof(Collider))]
+  // [RequireComponent(typeof(Collider))]
   public class OnMouseEvents : MonoBehaviour
   {
     public UnityEvent _OnMouseEnter;
 
     public void OnMouseEnter()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseEnter?.Invoke();
     }
 
@@ -21,6 +27,12 @@ namespace GuruLaghima
 
     public void OnMouseOver()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseOver?.Invoke();
     }
 
@@ -28,6 +40,12 @@ namespace GuruLaghima
 
     public void OnMouseDown()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseDown?.Invoke();
     }
 
@@ -35,6 +53,12 @@ namespace GuruLaghima
 
     public void OnMouseDrag()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseDrag?.Invoke();
     }
 
@@ -42,6 +66,12 @@ namespace GuruLaghima
 
     public void OnMouseUp()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseUp?.Invoke();
     }
 
@@ -49,6 +79,12 @@ namespace GuruLaghima
 
     public void OnMouseExit()
     {
+      // Check if the mouse was clicked over a UI element
+      if (EventSystem.current.IsPointerOverGameObject())
+      {
+        Debug.Log("There is UI in front of game object");
+        return;
+      }
       _OnMouseExit?.Invoke();
     }
 

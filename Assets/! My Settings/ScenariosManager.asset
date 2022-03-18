@@ -16,9 +16,9 @@ MonoBehaviour:
   DefaultSettings: {fileID: 11400000, guid: 1d3bf83491423624ca02fb22f0514a8b, type: 2}
   approvedScenariosNames:
   - Cemetary
+  - China Town
   - Motel-Scene
   approvedScenesPath: Assets/! My Scenes/ApprovedScenarios
   playableScenarios:
-  - {fileID: 102900000, guid: 8deef09df2d3b7b4ea2fb807e68b942b, type: 3}
+  - {fileID: 102900000, guid: cd97a7d1c8880d34dbafadfc75e0d9ac, type: 3}
   - {fileID: 102900000, guid: 567b948946e22e1459f54a46545687cd, type: 3}
-  - {fileID: 102900000, guid: 17743802a87cf624bb9ec1b9a0518d51, type: 3}
