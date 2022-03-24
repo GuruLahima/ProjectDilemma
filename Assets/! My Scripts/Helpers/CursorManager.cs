@@ -39,20 +39,20 @@ public class CursorManager : MonoBehaviour
       SetVisibility(visibilityOnStart);
     }
   } */
-    private void OnEnable()
+  private void OnEnable()
+  {
+    if (toggleCursorOnStart)
     {
-        if (toggleCursorOnStart)
-        {
-            ToggleLockMode();
-            ToggleVisibility();
-        }
-        if (setCursorOnStart)
-        {
-            SetLockMode(lockModeOnStart);
-            SetVisibility(visibilityOnStart);
-        }
+      ToggleLockMode();
+      ToggleVisibility();
     }
-    private void OnDisable()
+    if (setCursorOnStart)
+    {
+      SetLockMode(lockModeOnStart);
+      SetVisibility(visibilityOnStart);
+    }
+  }
+  private void OnDisable()
   {
     if (toggleCursorOnDisable)
     {

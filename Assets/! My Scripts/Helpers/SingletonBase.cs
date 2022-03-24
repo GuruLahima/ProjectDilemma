@@ -59,10 +59,12 @@ public class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
       MyDebug.Log("No instance of this type yet " + transform.name);
       m_Instance = gameObject.GetComponent<T>();
       DontDestroyOnLoad(gameObject);
+      MyDebug.Log("Singleton id is " + m_Instance.GetInstanceID());
     }
     else if (m_Instance.GetInstanceID() != GetInstanceID())
     {
       MyDebug.Log("Duplicate instance of this type " + transform.name);
+      MyDebug.Log("Duplicate id is " + gameObject.GetInstanceID());
       Destroy(gameObject);
       // throw new System.Exception(string.Format("Instance of {0} already exists, removing {1}", GetType().FullName, ToString()));
     }
