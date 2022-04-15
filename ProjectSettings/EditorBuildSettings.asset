@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/! My Scenes/VoiceTest.unity
     guid: 0ec836e40481c0d40b9a08213ee193a4
+  - enabled: 1
+    path: Assets/Stefan Folder/TeST TEST TEST scene.unity
+    guid: e49312fd74995854ebf362f21e8c3498
   m_configObjects: {}

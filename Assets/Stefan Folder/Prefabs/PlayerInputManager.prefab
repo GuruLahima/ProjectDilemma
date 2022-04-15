@@ -1,0 +1,244 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &9213589925889946324
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8272056783756831839}
+  - component: {fileID: 6565542565003733128}
+  m_Layer: 0
+  m_Name: PlayerInputManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8272056783756831839
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9213589925889946324}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2515192506227933871}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6565542565003733128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9213589925889946324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b19c42a48973894fbb6703bd93a70ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Inputs:
+  - InputHotkey: Shift
+    InputMode: 1
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: ProjectileAim
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: Shift
+    InputMode: 2
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: ProjectileThrow
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: 
+    InputMode: 0
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: PerkActivate
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: 
+    InputMode: 0
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: MagnifyingGlass
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: 
+    InputMode: 1
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: EmoteChoose
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: 
+    InputMode: 2
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: EmoteActivate
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  inputConditions: []
+  projectileThrow: {fileID: 448073317262120467}
+--- !u!1001 &5475811060181963315
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 8272056783756831839}
+    m_Modifications:
+    - target: {fileID: 623052617852612779, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_Name
+      value: ThrowablePrefab !todo
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a7436b9c65e93ed40a7372275f6d399f, type: 3}
+--- !u!4 &2515192506227933871 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7573435437276844188, guid: a7436b9c65e93ed40a7372275f6d399f,
+    type: 3}
+  m_PrefabInstance: {fileID: 5475811060181963315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &448073317262120467 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5605325033626944544, guid: a7436b9c65e93ed40a7372275f6d399f,
+    type: 3}
+  m_PrefabInstance: {fileID: 5475811060181963315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9985e82cad663054db03ad59b99af1aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

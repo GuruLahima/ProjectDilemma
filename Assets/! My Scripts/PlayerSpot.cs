@@ -44,6 +44,8 @@ namespace Workbench.ProjectDilemma
     public Image deathBookLeftPage;
     public Image deathBookRightPage;
     public DeathSequence_UI_Item deathItemPrefab;
+    [Space(10)]
+    public ProjectileThrow projectileThrow;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]

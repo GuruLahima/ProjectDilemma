@@ -21,3 +21,4 @@ MonoBehaviour:
   approvedScenesPath: Assets/! My Scenes/ApprovedScenarios
   playableScenarios:
   - {fileID: 102900000, guid: 567b948946e22e1459f54a46545687cd, type: 3}
+  - {fileID: 102900000, guid: e49312fd74995854ebf362f21e8c3498, type: 3}
