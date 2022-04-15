@@ -96,7 +96,7 @@ namespace Workbench.ProjectDilemma
     void Start()
     {
       if (debugMode)
-        GetComponent<GameMechanic>().StartGameCycle();
+        GetComponent<GameMechanic>().StartGameSequence();
     }
 
     // Update is called once per frame
@@ -218,7 +218,7 @@ namespace Workbench.ProjectDilemma
 
         if (playersLoadedScene == 2)
         {
-          GetComponent<GameMechanic>().StartGameCycle();
+          GetComponent<GameMechanic>().StartGameSequence();
         }
       }
 

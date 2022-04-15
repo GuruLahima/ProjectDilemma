@@ -30,9 +30,6 @@ namespace Workbench.ProjectDilemma
     Lost,
     BothWon,
     BothLost,
-    // TheyDidntVote,
-    // YouDidntVote,
-    // BothDidntVote
   }
   public class GameMechanic : MonoBehaviourPunCallbacks
   {
@@ -109,26 +106,27 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    [Header("Sequences conditions")]
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference bothVotedCondition;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference oneVotedCondition;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference noneVotedCondition;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference oneBetrayedOneSaved;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference bothBetrayedCondition;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference bothSavedCondition;
-    [BoxGroup("Sequences conditions")]
+    [Foldout("Sequences conditions")]
     [SerializeField] BoolReference localPlayerWonCondition;
 
     public static GameMechanic Instance;
 
     public static Action GameStarted;
     public static Action VotingEnded;
+    public static Action DiscussionStarted;
+    public static Action DiscussionEnded;
 
     public ControllableSequence gameSequence;
 
@@ -136,46 +134,7 @@ namespace Workbench.ProjectDilemma
     [Header("Visual Feedback Events - Phases")]
 
     [HorizontalLine(color: EColor.Blue)]
-    #region Unity Events  
-
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure DiscussionPhaseEvents;
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure TransitionPhaseEvents;
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure TransitionPhaseOneVoteEvents;
-
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventSequence SuspensePhaseSequence;
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventSequence NobodyVotedPhaseSequence;
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventSequence SomebodyVotedPhaseSequence;
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure DeathChoiceScreenPhaseEvents;
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure DeathSequencePhaseEvents;
-
-
-
-    [BoxGroup("Visual Feedback Events - Phases")]
-    public EventEnclosure PostGameScreenPhaseEvents;
-
+    #region Unity Events 
 
     [HorizontalLine(color: EColor.Red)]
 
@@ -187,16 +146,13 @@ namespace Workbench.ProjectDilemma
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnYourChoiceMade;
 
-
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnTheirChoiceMade;
 
-
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnBothPlayersChose;
-
 
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
@@ -220,8 +176,9 @@ namespace Workbench.ProjectDilemma
 
     [HorizontalLine(color: EColor.White)]
 
-    [Foldout("Transition screens")]
-    [SerializeField] GameObject postGameScreen;
+    /// <summary>
+    /// ! refactor  this using the loading screens package
+    /// </summary>
     [Foldout("Transition screens")]
     [SerializeField] GameObject bothVotedScreen;
 
@@ -238,10 +195,6 @@ namespace Workbench.ProjectDilemma
     [SerializeField] Transform deathPrefabSpawnPos;
     [Foldout("Death sequences params")]
     [SerializeField] DeathSequence outcomeSequence;
-    // [Foldout("Death sequences params")]
-    // [SerializeField] GameObject defaultDeathPrefab;
-    // [Foldout("Death sequences params")]
-    // [SerializeField] GameObject defaultWinPrefab;
     [Foldout("Death sequences params")]
     [SerializeField] GameObject transitionToDeathSequenceScreen;
     [Foldout("Death sequences params")]
@@ -322,10 +275,8 @@ namespace Workbench.ProjectDilemma
     [ReadOnly]
     public bool canChoose = false;
     // If you have multiple custom events, it is recommended to define them in the used class
-#if UNITY_EDITOR
     [HorizontalLine(color: EColor.Green)]
     [HideInInspector]
-#endif
     public MyEventsDictionary Outcomes;
     [HideInInspector] public PlayerSpot localPlayerSpot;
     [HideInInspector] public PlayerSpot otherPlayerSpot;
@@ -334,6 +285,9 @@ namespace Workbench.ProjectDilemma
     [Foldout("Debug")]
     public int otherPlayerPoints;
 
+    #endregion
+
+    #region photon events
     public const byte DecisionEvent = 1;
     public const byte UniversalDeathChoiceEvent = 2;
     public const byte FinalNoteEvent = 3;
@@ -345,8 +299,6 @@ namespace Workbench.ProjectDilemma
 
     #region private fields
     IEnumerator gameTimerCoroutine;
-    IEnumerator gameCycleCor;
-
     [Foldout("Debug")]
     [Dropdown("intValues")]
     [SerializeField] int debugPlayerSpot;
@@ -399,15 +351,24 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region public methods
-    public void StartGameCycle()
+    public void StartGameSequence()
     {
-
-      // !old way
-      // gameCycleCor = GameCycle();
-      // StartCoroutine(gameCycleCor);
-
-      // *new way
       StartCoroutine(gameSequence.RunSequence());
+    }
+
+    public void InitializePlayers()
+    {
+      MyDebug.Log("Initializing players");
+      // initialize players in their spots
+      if (PhotonNetwork.IsConnected)
+      {
+        int playerSpot = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_NUMBER];
+        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(playerSpot);
+      }
+      else if (ScenarioManager.instance.debugMode)
+      {
+        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(debugPlayerSpot);
+      }
     }
 
     public void Director_Stopped(PlayableDirector obj)
@@ -419,10 +380,7 @@ namespace Workbench.ProjectDilemma
       timelineDirector.Evaluate();
 
       OnEndOfCinematic?.Invoke();
-
-      InitializePlayers();
     }
-
 
     /// <summary>
     /// Choose whether to kill or save the other player. True for kill, false for save
@@ -485,6 +443,7 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.killButton.enabled = true;
       localPlayerSpot.saveButton.enabled = true;
       localPlayerSpot.timer.enabled = true;
+      PlayerInputManager.Instance.projectileThrow = localPlayerSpot.projectileThrow;
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -497,7 +456,6 @@ namespace Workbench.ProjectDilemma
       MyDebug.Log("localPlayerPoints", localPlayerPoints.ToString());
       localPlayerPointsCounter.Text.text = localPlayerPoints.ToString();
 
-      // localPlayerSpot.playerModel = Instantiate(playerOnePrefab, localPlayerSpot.playerModelSpawnPos.transform.position, localPlayerSpot.playerModelSpawnPos.transform.rotation, localPlayerSpot.transform);
 
       otherPlayerSpot.playerUsingThisSpot = ScenarioManager.instance.otherPlayer;
       if (otherPlayerSpot.gameplayCamerasParent)
@@ -518,13 +476,7 @@ namespace Workbench.ProjectDilemma
       }
       MyDebug.Log("otherPlayerPoints", otherPlayerPoints.ToString());
       otherPlayerPointsCounter.Text.text = otherPlayerPoints.ToString();
-      // otherPlayerSpot.playerModel = Instantiate(playerTwoPrefab, otherPlayerSpot.playerModelSpawnPos.transform.position, otherPlayerSpot.playerModelSpawnPos.transform.rotation, playerTwoSpot.transform);
 
-    }
-
-    void InitVoice()
-    {
-      localPlayerSpot.GetComponent<PhotonVoiceView>().Init();
     }
 
     public void SpawnDeathPrefab()
@@ -656,42 +608,6 @@ namespace Workbench.ProjectDilemma
     {
       if (theirChoice == Choice.Kill && myChoice == Choice.Save)
         otherPlayerSpot.suspenseCam.GetComponent<Animator>().Play("Zoom out on enemy");
-    }
-    IEnumerator ShowOutcomeSequence()
-    {
-      if (madeChoice && theyMadeChoice)
-      {
-        switch (votingOutcome)
-        {
-          case Outcome.Won:
-            yield return StartCoroutine(YouWon());
-            break;
-          case Outcome.Lost:
-            yield return StartCoroutine(YouLost());
-            break;
-          case Outcome.BothWon:
-            yield return StartCoroutine(BothWon());
-            break;
-          case Outcome.BothLost:
-            yield return StartCoroutine(BothLost());
-            break;
-        }
-      }
-      else
-      {
-        if (theyMadeChoice)
-        {
-          yield return StartCoroutine(YouLost());
-        }
-        else if (madeChoice)
-        {
-          yield return StartCoroutine(YouWon());
-        }
-        else
-        {
-          yield return StartCoroutine(BothLost());
-        }
-      }
     }
 
     public void ShowEndOfDiscussionScreen()
@@ -964,27 +880,15 @@ namespace Workbench.ProjectDilemma
         case Outcome.Won:
           //calculate points for each player
           PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForWin);
-          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForWin;
-          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForLoss;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForWin;
           break;
         case Outcome.Lost:
           PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForLoss);
-          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForLoss;
-          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForWin;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForLoss;
           break;
         case Outcome.BothWon:
           PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothWon);
-          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForBothWon;
-          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForBothWon;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForBothWon;
           break;
         case Outcome.BothLost:
           PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothLost);
-          // localPlayerXPCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.xpForBothLost;
-          // otherPlayerXPCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.xpForBothLost;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.xpForBothLost;
           break;
         default:
           break;
@@ -998,27 +902,15 @@ namespace Workbench.ProjectDilemma
         case Outcome.Won:
           //calculate points for each player
           PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForWin);
-          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForWin;
-          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForLoss;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForWin;
           break;
         case Outcome.Lost:
           PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForLoss);
-          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForLoss;
-          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForWin;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForLoss;
           break;
         case Outcome.BothWon:
           PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothWin);
-          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForBothWin;
-          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForBothWin;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForBothWin;
           break;
         case Outcome.BothLost:
           PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothLost);
-          // localPlayerRankCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.rankForBothLost;
-          // otherPlayerRankCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.rankForBothLost;
-          // victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.rankForBothLost;
           break;
         default:
           break;
@@ -1152,8 +1044,6 @@ namespace Workbench.ProjectDilemma
       }
       if (gameTimerCoroutine != null)
         StopCoroutine(gameTimerCoroutine);
-      if (gameCycleCor != null)
-        StopCoroutine(gameCycleCor);
 
       // return fog to normal state
       RenderSettings.fog = true;
@@ -1194,50 +1084,14 @@ namespace Workbench.ProjectDilemma
           localPlayerSpot.GetComponent<CameraSwitcher>().SwitchCamera();
     }
     #endregion
-    #region private methods
+
+    #region coroutines
     IEnumerator GameSequence()
     {
+      GameStarted?.Invoke();
       yield return gameSequence.RunSequence();
     }
-    IEnumerator GameCycle()
-    {
-      // if there is a timeline wait for the end of it to start the game, else start it now
-      if (timelineDirector != null && timelineDirector.playableAsset != null)
-        yield return StartCoroutine(StartTimeline());
-      // initialie players
-      InitializePlayers();
-      // game started. start timer
-      GameStarted?.Invoke();
-      yield return StartCoroutine(DiscussionPhase());
-      if (madeChoice && theyMadeChoice)
-      {
-        yield return StartCoroutine(TransitionPhase());
-        yield return StartCoroutine(SuspensePhase());
-        // if both players saved or killed don't start DeathChoicePhase
-        if (!((theirChoice == Choice.Kill && myChoice == Choice.Kill) || (theirChoice == Choice.Save && myChoice == Choice.Save)))
-          yield return StartCoroutine(DeathChoicePhase());
-        else
-        {
-          // didnt know where else to put this.
-          if (myChoice == Choice.Kill)
-            SelectRandomDefaultBothLoseSequence();
-          else
-            SelectRandomDefaultWinSequence();
-        }
-      }
-      else
-      {
-        yield return StartCoroutine(TransitionPhaseOneVote());
-        if (madeChoice || theyMadeChoice)
-          yield return StartCoroutine(SomebodyVotedPhase());
-        else
-          yield return StartCoroutine(NobodyVotedPhase());
-      }
 
-      yield return StartCoroutine(DeathSequencePhase());
-      yield return StartCoroutine(PostGameScreenPhase());
-
-    }
     IEnumerator SkipIntroCoroutine()
     {
 
@@ -1260,98 +1114,13 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    public void InitializePlayers()
-    {
-      MyDebug.Log("Initializing players");
-      // initialize players in their spots
-      if (PhotonNetwork.IsConnected)
-      {
-        int playerSpot = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_NUMBER];
-        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(playerSpot);
-      }
-      else if (ScenarioManager.instance.debugMode)
-      {
-        GetComponent<GameMechanic>().InitializeLocalPlayerSpot(debugPlayerSpot);
-      }
-    }
-    IEnumerator DiscussionPhase()
-    {
-      yield return new WaitForSeconds(DiscussionPhaseEvents.BeforePause);
-
-      MyDebug.Log("DiscussionPhase", "started");
-      canChoose = true;
-
-      // show feedback stuff
-      try
-      {
-        DiscussionPhaseEvents.OnStarted?.Invoke(); // two of these are probably unnecessary
-      }
-      catch (System.Exception ex)
-      {
-        MyDebug.Log(ex.ToString());
-      }
-      localPlayerSpot.TimerStarted?.Invoke(); // two of these are probably unnecessary
-      localPlayerSpot.gameTimer.StartTimer(DiscussionPhaseEvents.Interval); // two of these are probably unnecessary
-
-      // this phase lasts until time runs out or both players choose
-      float timer = DiscussionPhaseEvents.Interval;
-      while (!(madeChoice && theyMadeChoice) && timer > 0)
-      {
-        timer -= Time.deltaTime;
-        yield return null;
-      }
-
-      MyDebug.Log("DiscussionPhase", "ended");
-      canChoose = false;
-
-      // show feedback stuff
-      try
-      {
-        DiscussionPhaseEvents.OnEnded?.Invoke();
-      }
-      catch (System.Exception ex)
-      {
-        MyDebug.Log(ex.ToString());
-      }
-      localPlayerSpot.TimerFinished?.Invoke();
-
-      // force decision if no decision was made
-      // if (!madeChoice)
-      //   ForceDecisionForLocalPlayer();
-
-      // handle case when someone (or both) didnt vote
-      if (!madeChoice)
-      {
-        if (theyMadeChoice)
-          votingOutcome = Outcome.Lost;
-        else
-          votingOutcome = Outcome.BothLost;
-      }
-      else if (!theyMadeChoice)
-      {
-        if (madeChoice)
-          votingOutcome = Outcome.Won;
-        else
-          votingOutcome = Outcome.BothLost;
-      }
-
-      yield return new WaitForSeconds(DiscussionPhaseEvents.AfterPause);
-    }
     IEnumerator DiscussionPhaseCoroutine(float duration)
     {
-
       MyDebug.Log("DiscussionPhase coroutine started");
-      // show feedback stuff
-      // try
-      // {
-      //   DiscussionPhaseEvents.OnStarted?.Invoke(); // two of these are probably unnecessary
-      // }
-      // catch (System.Exception ex)
-      // {
-      //   MyDebug.Log(ex.ToString());
-      // }
-      // localPlayerSpot.TimerStarted?.Invoke(); // two of these are probably unnecessary
-      // localPlayerSpot.gameTimer.StartTimer(DiscussionPhaseEvents.Interval); // two of these are probably unnecessary
+
+      DiscussionStarted?.Invoke();
+      localPlayerSpot.TimerStarted?.Invoke(); // one of these are probably unnecessary
+      localPlayerSpot.gameTimer.StartTimer(duration); // one of these are probably unnecessary
 
       canChoose = true;
 
@@ -1367,160 +1136,13 @@ namespace Workbench.ProjectDilemma
 
       MyDebug.Log("DiscussionPhase coroutine ended");
 
+      localPlayerSpot.TimerFinished?.Invoke();
 
-      // show feedback stuff
-      // try
-      // {
-      //   DiscussionPhaseEvents.OnEnded?.Invoke();
-      // }
-      // catch (System.Exception ex)
-      // {
-      //   MyDebug.Log(ex.ToString());
-      // }
-      // localPlayerSpot.TimerFinished?.Invoke();
+      // if no decision was made maybe hook up some visuals
+      if (!madeChoice)
+        OnRanOutOfTime?.Invoke();
 
-      // force decision if no decision was made
-      // if (!madeChoice)
-      //   ForceDecisionForLocalPlayer();
-
-    }
-
-    IEnumerator TransitionPhase()
-    {
-      yield return new WaitForSeconds(TransitionPhaseEvents.BeforePause);
-
-      MyDebug.Log("TransitionPhase", "started");
-
-      // show feedback stuff
-      TransitionPhaseEvents.OnStarted?.Invoke();
-
-      yield return new WaitForSeconds(TransitionPhaseEvents.Interval);
-
-      MyDebug.Log("TransitionPhase", "ended");
-
-      // show feedback stuff
-      TransitionPhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(TransitionPhaseEvents.AfterPause);
-    }
-    IEnumerator TransitionPhaseOneVote()
-    {
-      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.BeforePause);
-
-      MyDebug.Log("TransitionPhaseOneVote", "started");
-
-      // show feedback stuff
-      TransitionPhaseOneVoteEvents.OnStarted?.Invoke();
-
-      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.Interval);
-
-      MyDebug.Log("TransitionPhaseOneVote", "ended");
-
-      // show feedback stuff
-      TransitionPhaseOneVoteEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(TransitionPhaseOneVoteEvents.AfterPause);
-    }
-    IEnumerator SuspensePhase()
-    {
-      yield return new WaitForSeconds(SuspensePhaseSequence.BeforePause);
-
-      MyDebug.Log("SuspensePhase", "started");
-
-      // show feedback stuff
-      SuspensePhaseSequence.OnStarted?.Invoke();
-
-      foreach (EventEnclosure evEn in SuspensePhaseSequence.eventSequence)
-      {
-        yield return new WaitForSeconds(evEn.BeforePause);
-        evEn.OnStarted?.Invoke();
-        yield return new WaitForSeconds(evEn.Interval);
-        evEn.OnEnded?.Invoke();
-        yield return new WaitForSeconds(evEn.BeforePause);
-      }
-
-      MyDebug.Log("SuspensePhase", "ended");
-
-      // show feedback stuff
-      SuspensePhaseSequence.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(SuspensePhaseSequence.AfterPause);
-    }
-
-    IEnumerator NobodyVotedPhase()
-    {
-      yield return new WaitForSeconds(NobodyVotedPhaseSequence.BeforePause);
-
-      MyDebug.Log("NobodyVotedPhase", "started");
-
-      // show feedback stuff
-      NobodyVotedPhaseSequence.OnStarted?.Invoke();
-
-      foreach (EventEnclosure evEn in NobodyVotedPhaseSequence.eventSequence)
-      {
-        yield return new WaitForSeconds(evEn.BeforePause);
-        evEn.OnStarted?.Invoke();
-        yield return new WaitForSeconds(evEn.Interval);
-        evEn.OnEnded?.Invoke();
-        yield return new WaitForSeconds(evEn.BeforePause);
-      }
-
-      MyDebug.Log("NobodyVotedPhase", "ended");
-
-      // show feedback stuff
-      DeathSequencePhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(NobodyVotedPhaseSequence.AfterPause);
-    }
-    IEnumerator SomebodyVotedPhase()
-    {
-      yield return new WaitForSeconds(SomebodyVotedPhaseSequence.BeforePause);
-
-      MyDebug.Log("SomebodyVotedPhase", "started");
-
-      // show feedback stuff
-      SomebodyVotedPhaseSequence.OnStarted?.Invoke();
-
-      foreach (EventEnclosure evEn in SomebodyVotedPhaseSequence.eventSequence)
-      {
-        yield return new WaitForSeconds(evEn.BeforePause);
-        evEn.OnStarted?.Invoke();
-        yield return new WaitForSeconds(evEn.Interval);
-        evEn.OnEnded?.Invoke();
-        yield return new WaitForSeconds(evEn.BeforePause);
-      }
-
-      MyDebug.Log("SomebodyVotedPhase", "ended");
-
-      // show feedback stuff
-      DeathSequencePhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(SomebodyVotedPhaseSequence.AfterPause);
-    }
-
-    IEnumerator DeathChoicePhase()
-    {
-      yield return new WaitForSeconds(DeathChoiceScreenPhaseEvents.BeforePause);
-
-      MyDebug.Log("DeathChoicePhase", "started");
-
-      // show feedback stuff
-      DeathChoiceScreenPhaseEvents.OnStarted?.Invoke();
-
-      // this phase lasts until time runs out or player chooses death
-      float timer = DeathChoiceScreenPhaseEvents.Interval;
-      while (!winnerChoseDeath && timer > 0)
-      {
-        timer -= Time.deltaTime;
-        yield return null;
-      }
-
-      MyDebug.Log("DeathChoicePhase", "ended");
-
-      // show feedback stuff
-      DeathChoiceScreenPhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(DeathChoiceScreenPhaseEvents.AfterPause);
+      DiscussionEnded?.Invoke();
     }
     IEnumerator DeathChoiceCoroutine(float chooseDuration)
     {
@@ -1537,34 +1159,6 @@ namespace Workbench.ProjectDilemma
 
       MyDebug.Log("DeathChoicePhase", "ended");
 
-    }
-    IEnumerator DeathSequencePhase()
-    {
-      yield return new WaitForSeconds(DeathSequencePhaseEvents.BeforePause);
-
-      MyDebug.Log("DeathSequencePhase", "started");
-
-      // show feedback stuff
-      DeathSequencePhaseEvents.OnStarted?.Invoke();
-
-      yield return StartCoroutine(ShowOutcomeSequence());
-
-      // we wait for the sequence to end to show the end screen
-      if (outcomeSequence)
-      {
-        MyDebug.Log("DeathSequencePhase", "chosen death sequence started");
-        yield return new WaitForSeconds(outcomeSequence.GetComponent<DeathSequence>().duration);
-        MyDebug.Log("DeathSequencePhase", "chosen death sequence ended");
-      }
-
-      yield return new WaitForSeconds(DeathSequencePhaseEvents.Interval);
-
-      MyDebug.Log("DeathSequencePhase", "ended");
-
-      // show feedback stuff
-      DeathSequencePhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(DeathSequencePhaseEvents.AfterPause);
     }
     IEnumerator OutcomeSequencePhase()
     {
@@ -1583,28 +1177,6 @@ namespace Workbench.ProjectDilemma
 
       MyDebug.Log("OutcomeSequencePhase", "ended");
 
-    }
-    IEnumerator PostGameScreenPhase()
-    {
-      yield return new WaitForSeconds(PostGameScreenPhaseEvents.BeforePause);
-
-      MyDebug.Log("PostGameScreenPhase", "started");
-
-      // show feedback stuff
-      PostGameScreenPhaseEvents.OnStarted?.Invoke();
-
-      ShowPostGameScreen();
-
-      yield return new WaitForSeconds(PostGameScreenPhaseEvents.Interval);
-
-      MyDebug.Log("PostGameScreenPhase", "ended");
-
-      // show feedback stuff
-      PostGameScreenPhaseEvents.OnEnded?.Invoke();
-
-      yield return new WaitForSeconds(PostGameScreenPhaseEvents.AfterPause);
-
-      Disconnect();
     }
 
     IEnumerator StartTimeline()
@@ -1643,16 +1215,41 @@ namespace Workbench.ProjectDilemma
       // then show book of death
     }
 
-    private void Director_Played(PlayableDirector obj)
+    IEnumerator ShowOutcomeSequence()
     {
-      MyDebug.Log("Cinematic played");
-
-    }
-
-    private void ForceDecisionForLocalPlayer()
-    {
-      MakeDecision(true);
-      OnRanOutOfTime?.Invoke();
+      if (madeChoice && theyMadeChoice)
+      {
+        switch (votingOutcome)
+        {
+          case Outcome.Won:
+            yield return StartCoroutine(YouWon());
+            break;
+          case Outcome.Lost:
+            yield return StartCoroutine(YouLost());
+            break;
+          case Outcome.BothWon:
+            yield return StartCoroutine(BothWon());
+            break;
+          case Outcome.BothLost:
+            yield return StartCoroutine(BothLost());
+            break;
+        }
+      }
+      else
+      {
+        if (theyMadeChoice)
+        {
+          yield return StartCoroutine(YouLost());
+        }
+        else if (madeChoice)
+        {
+          yield return StartCoroutine(YouWon());
+        }
+        else
+        {
+          yield return StartCoroutine(BothLost());
+        }
+      }
     }
 
     IEnumerator BothLost()
@@ -1789,23 +1386,32 @@ namespace Workbench.ProjectDilemma
           cam.enabled = false;
         }
         Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-
       }
+    }
+    #endregion
+
+    #region private methods
+
+    void InitVoice()
+    {
+      localPlayerSpot.GetComponent<PhotonVoiceView>().Init();
+    }
+    void Director_Played(PlayableDirector obj)
+    {
+      MyDebug.Log("Cinematic played");
 
     }
-
     void OtherPlayerOutcome()
     {
       otherPlayerSpot.decisionMatrix[theirChoice][myChoice]?.Invoke();
     }
 
-    void ShowPostGameScreen()
-    {
-      if (postGameScreen) postGameScreen.SetActive(true);
-    }
+    /*     void ShowPostGameScreen()
+        {
+          if (postGameScreen) postGameScreen.SetActive(true);
+        } */
 
-
-    private void UniversalDeathChoiceEventFunc(EventData photonEvent)
+    void UniversalDeathChoiceEventFunc(EventData photonEvent)
     {
 
       {
@@ -1838,7 +1444,7 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    private void ScenarioDeathChoiceEventFunc(EventData photonEvent)
+    void ScenarioDeathChoiceEventFunc(EventData photonEvent)
     {
 
       // extract info from received data
@@ -1870,7 +1476,7 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    private void CooperateSequenceChoiceEventFunc(EventData photonEvent)
+    void CooperateSequenceChoiceEventFunc(EventData photonEvent)
     {
 
       // extract info from received data
@@ -1887,7 +1493,7 @@ namespace Workbench.ProjectDilemma
         outcomeSequence = currentScenario.defaultBothCooperateSequences[cooperateSequenceIndex].deathSequence;
 
     }
-    private void BothLoseSequenceChoiceEventFunc(EventData photonEvent)
+    void BothLoseSequenceChoiceEventFunc(EventData photonEvent)
     {
 
       // extract info from received data
@@ -1905,7 +1511,7 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    private void FinalNoteEventFunc(EventData photonEvent)
+    void FinalNoteEventFunc(EventData photonEvent)
     {
       // extract info from received data
       object[] data = (object[])photonEvent.CustomData;
@@ -1934,7 +1540,7 @@ namespace Workbench.ProjectDilemma
         FinalNoteCardHandler.SaveFinalNote(newNote);
       }
     }
-    private void AnimationEventFunc(EventData photonEvent)
+    void AnimationEventFunc(EventData photonEvent)
     {
       MyDebug.Log("AnimationEvent triggered");
       // extract info from received data
@@ -1986,7 +1592,7 @@ namespace Workbench.ProjectDilemma
       }
     }
 
-    private void DecisionEventFunc(EventData photonEvent)
+    void DecisionEventFunc(EventData photonEvent)
     {
       // extract info from received data
       object[] data = (object[])photonEvent.CustomData;
@@ -2016,26 +1622,12 @@ namespace Workbench.ProjectDilemma
       // update the outcome so we can control code flow
       votingOutcome = outcomeMatrix[myChoice][theirChoice];
 
-      // if both players made the choice execute the outcome
+      // if both players made the choice
       if (decisionsMade >= 2)
       {
-        // we'll need to know the outcome so we can decide flows
-        // votingOutcome = outcomeMatrix[myChoice][theirChoice];
-
         // visual feedback
         OnBothPlayersChose?.Invoke();
-
-
-        // visual feedback
-        // decisionMatrix[myChoice][theirChoice]?.Invoke();
-        // localPlayerSpot.decisionMatrix[myChoice][theirChoice]?.Invoke();
-        // call other choices with delay
-        // Invoke("OtherPlayerOutcome", otherPlayerOutcomeDelay);
-
-        // logic event
-        // VotingEnded?.Invoke();
       }
-
     }
 
     void OnAnyEvent(EventData photonEvent)
