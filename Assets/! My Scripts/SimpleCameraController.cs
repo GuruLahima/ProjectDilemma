@@ -20,7 +20,6 @@ public class SimpleCameraController : MonoBehaviour
   private void Start()
   {
     rotation = transform.eulerAngles;
-    MyDebug.Log(rotation.ToString());
     yMin = rotation.y + yMin;
     yMax = rotation.y + yMax;
     xMin = rotation.x + xMin;
@@ -49,7 +48,11 @@ public class SimpleCameraController : MonoBehaviour
     rotation.y = Mathf.Clamp(rotation.y, yMin, yMax);
     rotation.x = Mathf.Clamp(rotation.x, xMin, xMax);
 
-    // transform.eulerAngles = (Vector2)rotation * speed;
-    transform.rotation = Quaternion.AngleAxis(rotation.y, Vector3.up) * Quaternion.AngleAxis(rotation.x, Vector3.right);
+    Quaternion smoothRotation = Quaternion.AngleAxis(rotation.y, Vector3.up) * Quaternion.AngleAxis(rotation.x, Vector3.right);
+
+    // smooth out rotation
+    transform.rotation = Quaternion.Slerp(transform.rotation, smoothRotation, Time.deltaTime * speed);
+
+
   }
 }

@@ -57,7 +57,7 @@ namespace Workbench.ProjectDilemma
     void Start()
     {
       GameMechanic.GameStarted += SetCamera;
-      GameMechanic.VotingEnded += DisableGameplayCameras;
+      // GameMechanic.VotingEnded += DisableGameplayCameras;
 
 
       // register this script's code that needs to run at certain input with the input processor
@@ -67,7 +67,7 @@ namespace Workbench.ProjectDilemma
     void OnDisable()
     {
       GameMechanic.GameStarted -= SetCamera;
-      GameMechanic.VotingEnded -= DisableGameplayCameras;
+      // GameMechanic.VotingEnded -= DisableGameplayCameras;
 
     }
 

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daadead187afcc544ae172c1236ff011, type: 3}
+  m_Name: Motel
+  m_EditorClassIdentifier: 
+  defaultDeathSequences:
+  - owned: 1
+    deathSequence: {fileID: 5698047604189052584, guid: f973be8cf07aa4d4fb57fbf78923d007,
+      type: 3}
+  - owned: 1
+    deathSequence: {fileID: 1144251701250299948, guid: edd3924f4cda1174e924cafdc2827e11,
+      type: 3}
+  defaultBothLoseSequences:
+  - owned: 1
+    deathSequence: {fileID: -6871725951456166525, guid: f960aa277dafafb41b2ddc1500ca569a,
+      type: 3}
+  defaultBothCooperateSequences:
+  - owned: 1
+    deathSequence: {fileID: 3501182890858146759, guid: 1fa9d6a894506084f938eeecafd190f5,
+      type: 3}

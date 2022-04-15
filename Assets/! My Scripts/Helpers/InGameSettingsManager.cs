@@ -24,7 +24,7 @@ public class InGameSettingsManager : MonoBehaviour
       if (Instance != this)
         Destroy(this);
     }
-    DontDestroyOnLoad(this.gameObject);
+    // DontDestroyOnLoad(this.gameObject);
   }
 
   private void OnEnable()

@@ -244,6 +244,17 @@ namespace Workbench.ProjectDilemma
       //   }
       // }
 
+      // ensures text input is always focused when player has chosen text chat as communication method
+      // even when clicking around in the scene
+      if (isInChatMode)
+      {
+        if (!this.InputFieldChat.isFocused)
+        {
+          this.InputFieldChat.ActivateInputField();
+          this.InputFieldChat.Select();
+        }
+      }
+
       // this.StateText.gameObject.SetActive(this.ShowState); // this could be handled more elegantly, but for the demo it's ok.
     }
 
@@ -272,12 +283,7 @@ namespace Workbench.ProjectDilemma
         isInChatMode = true;
 
         // focus the chat field
-        this.InputFieldChat.ActivateInputField();
-        this.InputFieldChat.Select();
-        // deselect text (for some reason text is selected when we toggle chat on while in spam interval)
-        // StartCoroutine(MoveTextEnd_NextFrame()); // might use it, might not. kinda makes sense to have the text selected in case we wanna delete it
-        this.InputFieldChat_outline1.SetActive(true);
-        this.InputFieldChat_outline2.SetActive(true);
+        FocusChat();
 
       }
       else
@@ -292,6 +298,16 @@ namespace Workbench.ProjectDilemma
         this.InputFieldChat_outline1.SetActive(false);
         this.InputFieldChat_outline2.SetActive(false);
       }
+    }
+
+    private void FocusChat()
+    {
+      this.InputFieldChat.ActivateInputField();
+      this.InputFieldChat.Select();
+      // deselect text (for some reason text is selected when we toggle chat on while in spam interval)
+      // StartCoroutine(MoveTextEnd_NextFrame()); // might use it, might not. kinda makes sense to have the text selected in case we wanna delete it
+      this.InputFieldChat_outline1.SetActive(true);
+      this.InputFieldChat_outline2.SetActive(true);
     }
 
     System.Collections.IEnumerator MoveTextEnd_NextFrame()
@@ -309,6 +325,7 @@ namespace Workbench.ProjectDilemma
         {
           this.SendChatMessage(this.InputFieldChat.text);
           this.InputFieldChat.text = "";
+          FocusChat();
           // disable chat for a while so players cant spam
           if (spamCoroutine != null)
             StopCoroutine(spamCoroutine);

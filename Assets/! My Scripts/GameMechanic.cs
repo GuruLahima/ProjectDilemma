@@ -36,104 +36,179 @@ namespace Workbench.ProjectDilemma
   }
   public class GameMechanic : MonoBehaviourPunCallbacks
   {
+    IEnumerator currentCoroutine;
+
+    [Serializable]
+    public class ControllableSequence
+    {
+      public string name;
+      public BoolReference condition;
+      // public bool inParallel; // the code does not allow parallel sequences because I only maintain one coroutine at a time right now
+#if UNITY_EDITOR
+      [ReorderableList]
+#endif
+      public List<EventWithDuration> eventSequence;
+      public List<ControllableSequence> nextSequences;
+
+      public IEnumerator RunSequence()
+      {
+        if (condition && condition.boolWrapper.Value)
+        {
+          // execute the events that comprise this sequence one by one
+          yield return GameMechanic.Instance.SequenceCoroutine(eventSequence, this.name); // !massive coupling here
+
+          // run next sequences (in sequence)
+          foreach (ControllableSequence seq in nextSequences)
+          {
+            yield return seq.RunSequence();
+          }
+        }
+      }
+
+      [Serializable]
+      public class EventWithDuration
+      {
+        public bool shouldExecute = true;
+        public bool isCoroutine;
+        public UnityEvent theEvent;
+        public float duration;
+      }
+
+    }
+
+    IEnumerator SequenceCoroutine(List<ControllableSequence.EventWithDuration> eventSequence, string name)
+    {
+      MyDebug.Log($"[{name}]", "started");
+
+      foreach (ControllableSequence.EventWithDuration ev in eventSequence)
+      {
+        if (ev.shouldExecute)
+        {
+          ev.theEvent?.Invoke();
+          if (ev.isCoroutine)
+          {
+            if (currentCoroutine != null)
+            {
+              StopCoroutine(currentCoroutine);
+              yield return StartCoroutine(currentCoroutine);
+            }
+            else
+            {
+              MyDebug.Log("There is no current coroutine. Assign it in the UnityEvent handler by calling a void function");
+              yield return new WaitForSeconds(ev.duration);
+            }
+          }
+          else
+          {
+            yield return new WaitForSeconds(ev.duration);
+          }
+        }
+      }
+
+      MyDebug.Log($"[{name}]", "ended");
+
+    }
+
+    [Header("Sequences conditions")]
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference bothVotedCondition;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference oneVotedCondition;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference noneVotedCondition;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference oneBetrayedOneSaved;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference bothBetrayedCondition;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference bothSavedCondition;
+    [BoxGroup("Sequences conditions")]
+    [SerializeField] BoolReference localPlayerWonCondition;
+
     public static GameMechanic Instance;
 
     public static Action GameStarted;
     public static Action VotingEnded;
 
-    [Header("Visual Feedback Events - Phases")]
-#if UNITY_EDITOR
-    [HorizontalLine(color: EColor.Blue)]
-#endif
-    #region Unity Events  
-#if UNITY_EDITOR
-    [BoxGroup("Visual Feedback Events - Phases")]
-#endif
-    public UnityEvent OnEndOfCinematic;
+    public ControllableSequence gameSequence;
 
-#if UNITY_EDITOR
+
+    [Header("Visual Feedback Events - Phases")]
+
+    [HorizontalLine(color: EColor.Blue)]
+    #region Unity Events  
+
+
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure DiscussionPhaseEvents;
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure TransitionPhaseEvents;
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure TransitionPhaseOneVoteEvents;
 
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventSequence SuspensePhaseSequence;
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventSequence NobodyVotedPhaseSequence;
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventSequence SomebodyVotedPhaseSequence;
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure DeathChoiceScreenPhaseEvents;
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure DeathSequencePhaseEvents;
 
 
-#if UNITY_EDITOR
+
     [BoxGroup("Visual Feedback Events - Phases")]
-#endif
     public EventEnclosure PostGameScreenPhaseEvents;
 
-#if UNITY_EDITOR
+
     [HorizontalLine(color: EColor.Red)]
-#endif
 
     /***************** delineator (obviously) ***************/
 
     [Header("Visual Feedback Events - Choices")]
-#if UNITY_EDITOR
+
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
-#endif
     public UnityEvent OnYourChoiceMade;
 
-#if UNITY_EDITOR
+
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
-#endif
     public UnityEvent OnTheirChoiceMade;
 
-#if UNITY_EDITOR
+
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
-#endif
     public UnityEvent OnBothPlayersChose;
 
-#if UNITY_EDITOR
+
     [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
-#endif
     public UnityEvent OnRanOutOfTime;
     #endregion
 
     #region exposed fields
-    [SerializeField] PlayableDirector introDirector;
-#if UNITY_EDITOR
+    [SerializeField] PlayableDirector timelineDirector;
+    [SerializeField] PlayableAsset introTimeline;
+
+
     [InputAxis]
-#endif
     [SerializeField] private string skipIntroButton;
     [SerializeField] GameObject skipIntroText;
     [SerializeField] GameObject waitingOnOtherPlayerToSkipIntroText;
@@ -141,57 +216,74 @@ namespace Workbench.ProjectDilemma
     [SerializeField] PlayerSpot playerOneSpot;
     [SerializeField] PlayerSpot playerTwoSpot;
     [HorizontalLine(color: EColor.White)]
+    public UnityEvent OnEndOfCinematic;
 
+    [HorizontalLine(color: EColor.White)]
+
+    [Foldout("Transition screens")]
     [SerializeField] GameObject postGameScreen;
+    [Foldout("Transition screens")]
     [SerializeField] GameObject bothVotedScreen;
+
+    [Foldout("Transition screens")]
     [SerializeField] GameObject theyDidntVoteScreen;
+    [Foldout("Transition screens")]
     [SerializeField] GameObject youDidntVoteScreen;
+    [Foldout("Transition screens")]
     [SerializeField] GameObject nobodyVotedScreen;
     [HorizontalLine(color: EColor.White)]
 
 
-    [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
     [SerializeField] Transform deathPrefabSpawnPos;
-    [BoxGroup("Death sequences params")]
-    [SerializeField] GameObject chosenDeathPrefab;
-    // [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
+    [SerializeField] DeathSequence outcomeSequence;
+    // [Foldout("Death sequences params")]
     // [SerializeField] GameObject defaultDeathPrefab;
-    // [BoxGroup("Death sequences params")]
+    // [Foldout("Death sequences params")]
     // [SerializeField] GameObject defaultWinPrefab;
-    [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
     [SerializeField] GameObject transitionToDeathSequenceScreen;
-    [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
     [SerializeField] GameObject transitionToSalvationSequenceScreen;
-    [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
     [SerializeField] float fadeInToDeathSequenceInterval;
-    [BoxGroup("Death sequences params")]
+    [Foldout("Death sequences params")]
     [SerializeField] float fadeOutToDeathSequenceInterval;
 
-    [BoxGroup("Death sequences params")]
-    [SerializeField] GameObject defaultWinPrefab;
-
-    [BoxGroup("Death sequences params")]
-    [SerializeField] GameObject defaultLossPrefab;
-
     [HorizontalLine(color: EColor.White)]
+    [Foldout("Camera transition settings")]
     [SerializeField] SplitScreenAnim playerSplitScreenAnim;
+    [Foldout("Camera transition settings")]
     [SerializeField] SplitScreenAnim enemySplitScreenAnim;
+    [Foldout("Camera transition settings")]
     [SerializeField] SplitScreenAnim defaultDeathCamAnim;
+    [Foldout("Camera transition settings")]
     [SerializeField] SplitScreenAnim defaultBothWonCamAnim;
+    [Foldout("Camera transition settings")]
     [SerializeField] Ease camSlideTypeForSuspense;
     [Range(0, 10)]
+    [Foldout("Camera transition settings")]
     [SerializeField] float camSlideDurationForSuspense;
+    [Foldout("Camera transition settings")]
     [SerializeField] Ease camSlideTypeForBothLost;
     [Range(0, 10)]
+    [Foldout("Camera transition settings")]
     [SerializeField] float camSlideDurationForBothLost;
+    [Foldout("Camera transition settings")]
     [SerializeField] Ease camSlideTypeForBothWon;
     [Range(0, 10)]
+    [Foldout("Camera transition settings")]
     [SerializeField] float camSlideDurationForBothWon;
+    [Foldout("Camera transition settings")]
     [SerializeField] Ease camSlideTypeForPlayerWon;
     [Range(0, 10)]
+    [Foldout("Camera transition settings")]
     [SerializeField] float camSlideDurationForPlayerWon;
+    [Foldout("Camera transition settings")]
     [SerializeField] Ease camSlideTypeForEnemyWon;
     [Range(0, 10)]
+    [Foldout("Camera transition settings")]
     [SerializeField] float camSlideDurationForEnemyWon;
 
     [HorizontalLine(color: EColor.White)]
@@ -200,16 +292,27 @@ namespace Workbench.ProjectDilemma
     [SerializeField] GameObject localPlayerDecisionTextBetray;
     [SerializeField] GameObject localPlayerDecisionTextSave;
     [HorizontalLine(color: EColor.White)]
+    [Foldout("End screen references")]
     [SerializeField] NumberCounter victoryPointsCounter;
+    [Foldout("End screen references")]
     [SerializeField] NumberCounter localPlayerPointsCounter;
+    [Foldout("End screen references")]
     [SerializeField] NumberCounter otherPlayerPointsCounter;
+    [Foldout("End screen references")]
     [SerializeField] PlayableDirector endScreenDirector;
+    [Foldout("End screen references")]
     [SerializeField] PlayableAsset endScreenWonTimeline;
+    [Foldout("End screen references")]
     [SerializeField] PlayableAsset endScreenLostTimeline;
+    [Foldout("End screen references")]
     [SerializeField] PlayableAsset endScreenBothWonTimeline;
+    [Foldout("End screen references")]
     [SerializeField] PlayableAsset endScreenBothLostTimeline;
+    [Foldout("End screen references")]
     [SerializeField] GameObject postcardObj;
+    [Foldout("End screen references")]
     [SerializeField] TextMeshProUGUI postcardNameField;
+    [Foldout("End screen references")]
     [SerializeField] TMP_InputField postcardTextField;
 
     #endregion
@@ -232,9 +335,12 @@ namespace Workbench.ProjectDilemma
     public int otherPlayerPoints;
 
     public const byte DecisionEvent = 1;
-    public const byte DeathChoiceEvent = 2;
+    public const byte UniversalDeathChoiceEvent = 2;
     public const byte FinalNoteEvent = 3;
     public const byte AnimationEvent = 4;
+    public const byte ScenarioDeathChoiceEvent = 5;
+    public const byte CooperateSequenceChoiceEvent = 6;
+    public const byte BothLoseSequenceChoiceEvent = 7;
     #endregion
 
     #region private fields
@@ -247,10 +353,10 @@ namespace Workbench.ProjectDilemma
     private int[] intValues = new int[] { 1, 2 };
     [Foldout("Debug")]
     [OnValueChanged("OnValueChangedCallback")]
-    [SerializeField] Choice myChoice;
+    [SerializeField] Choice myChoice = Choice.None;
     [Foldout("Debug")]
     [OnValueChanged("OnValueChangedCallback")]
-    [SerializeField] Choice theirChoice;
+    [SerializeField] Choice theirChoice = Choice.None;
     [Foldout("Debug")]
     [SerializeField] bool madeChoice = false;
     [Foldout("Debug")]
@@ -266,16 +372,21 @@ namespace Workbench.ProjectDilemma
     /// Upper level key denotes the choice of the local player, the lower level key denotes other player choice
     /// works together with the "MyEventsDictionary OutcomesOutcomes" variable
     /// </summary>
-    Dictionary<Choice, Dictionary<Choice, UnityEvent>> decisionMatrix;
-    // somewhat newer way of handling outcomes than the decisionMatrix
     Dictionary<Choice, Dictionary<Choice, Outcome>> outcomeMatrix = new Dictionary<Choice, Dictionary<Choice, Outcome>>(){
       {Choice.Kill, new Dictionary<Choice, Outcome>(){
-        {Choice.Kill, Outcome.BothLost},
-        {Choice.Save, Outcome.Won}
+        {Choice.Kill, Outcome.BothLost},// I betray, they betray
+        {Choice.Save, Outcome.Won},// I betray, they save
+        {Choice.None, Outcome.Won}// I betray, they dont vote
       }},
       {Choice.Save, new Dictionary<Choice, Outcome>(){
-        {Choice.Kill, Outcome.Lost},
-        {Choice.Save, Outcome.BothWon}
+        {Choice.Kill, Outcome.Lost},// I save, they betray
+        {Choice.Save, Outcome.BothWon},// I save, they save
+        {Choice.None, Outcome.Won}// I save, they dont vote
+      }},
+      {Choice.None, new Dictionary<Choice, Outcome>(){
+        {Choice.Kill, Outcome.Lost},// I dont vote, they betray
+        {Choice.Save, Outcome.Lost},// I dont vote, they save
+        {Choice.None, Outcome.BothLost}// I dont vote, they dont vote
       }}
     };
     private bool winnerChoseDeath;
@@ -290,17 +401,22 @@ namespace Workbench.ProjectDilemma
     #region public methods
     public void StartGameCycle()
     {
-      gameCycleCor = GameCycle();
-      StartCoroutine(gameCycleCor);
+
+      // !old way
+      // gameCycleCor = GameCycle();
+      // StartCoroutine(gameCycleCor);
+
+      // *new way
+      StartCoroutine(gameSequence.RunSequence());
     }
 
     public void Director_Stopped(PlayableDirector obj)
     {
       MyDebug.Log("Cinematic stopped");
       // reset timeline
-      introDirector.time = 0;
-      introDirector.Stop();
-      introDirector.Evaluate();
+      timelineDirector.time = 0;
+      timelineDirector.Stop();
+      timelineDirector.Evaluate();
 
       OnEndOfCinematic?.Invoke();
 
@@ -316,11 +432,32 @@ namespace Workbench.ProjectDilemma
     {
       if (!madeChoice)
       {
+        if (ScenarioManager.instance.debugMode)
+        {
+          madeChoice = true;
+          myChoice = kill ? Choice.Kill : Choice.Save;
+          // decisionsMade++;
 
-        int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
-        object[] content = new object[] { senderID, kill, };
-        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
-        PhotonNetwork.RaiseEvent(DecisionEvent, content, raiseEventOptions, SendOptions.SendReliable);
+          // if both players made the choice execute the outcome
+          // if (decisionsMade >= 2)
+          {
+            // we'll need to know the outcome so we can decide flows
+            votingOutcome = outcomeMatrix[myChoice][theirChoice];
+
+            // visual feedback
+            OnBothPlayersChose?.Invoke();
+
+          }
+        }
+        else
+        {
+          MyDebug.Log("Player made the decision to", kill ? "betray" : "save");
+          int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+          object[] content = new object[] { senderID, kill, };
+          RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+          PhotonNetwork.RaiseEvent(DecisionEvent, content, raiseEventOptions, SendOptions.SendReliable);
+        }
+
       }
     }
 
@@ -349,7 +486,7 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.saveButton.enabled = true;
       localPlayerSpot.timer.enabled = true;
       // populate list of owned death sequences
-      localPlayerSpot.PopulateDeathBook(DeathSequencesManager.Instance.universalDeathSequences);
+      localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
       // load point data about eachother
       if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(Keys.PLAYER_POINTS))
@@ -392,7 +529,7 @@ namespace Workbench.ProjectDilemma
 
     public void SpawnDeathPrefab()
     {
-      Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+      Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
     }
 
     public void AnimateSplitScreen()
@@ -520,7 +657,7 @@ namespace Workbench.ProjectDilemma
       if (theirChoice == Choice.Kill && myChoice == Choice.Save)
         otherPlayerSpot.suspenseCam.GetComponent<Animator>().Play("Zoom out on enemy");
     }
-    IEnumerator ShowDeathSequence()
+    IEnumerator ShowOutcomeSequence()
     {
       if (madeChoice && theyMadeChoice)
       {
@@ -591,14 +728,14 @@ namespace Workbench.ProjectDilemma
       endOfDiscussionScreen.GetComponent<Animator>().SetTrigger("FadeOut");
     }
 
-    public void ChooseDeathSequence(DeathSequence deathSequence)
+    public void ChooseUniversalDeathSequence(DeathSequence deathSequence)
     {
       MyDebug.Log("Chosen Death sequence is", deathSequence.labelText);
       // if (DeathSequencesManager.Instance.deathSequences.Contains(death))
       int deathSequenceIndex = DeathSequencesManager.Instance.universalDeathSequences.FindIndex((obj) => { return obj.deathSequence == deathSequence; });
       if (ScenarioManager.instance.debugMode)
       {
-        chosenDeathPrefab = deathSequence.gameObject;
+        outcomeSequence = deathSequence;
         winnerChoseDeath = true; // this should be assigned when the event is recieved, not here
       }
       else
@@ -607,8 +744,111 @@ namespace Workbench.ProjectDilemma
         int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
         object[] content = new object[] { senderID, deathSequenceIndex };
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
-        PhotonNetwork.RaiseEvent(DeathChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent(UniversalDeathChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
       }
+    }
+
+
+    public void ChooseScenarioDeathSequence(DeathSequence deathSequence)
+    {
+      MyDebug.Log("Chosen Death sequence is", deathSequence.labelText);
+      // if (DeathSequencesManager.Instance.deathSequences.Contains(death))
+      int deathSequenceIndex = ScenarioManager.instance.thisScenario.defaultDeathSequences.FindIndex((obj) => { return obj.deathSequence == deathSequence; });
+      if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
+      {
+        outcomeSequence = deathSequence;
+        winnerChoseDeath = true; // this should be assigned when the event is recieved, not here
+      }
+      else
+      {
+        // to do: notify other user AND local player of the death scenario they chose)
+        int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+        object[] content = new object[] { senderID, deathSequenceIndex };
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+        PhotonNetwork.RaiseEvent(ScenarioDeathChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
+      }
+    }
+
+    /// <summary>
+    /// Invoked through UnityEvent (one of the phases)
+    /// </summary>
+    public void SelectRandomDefaultDeathSequence()
+    {
+      // we decide which default death will occur to the loser at the master client, and then sync it with event
+      if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+      {
+        // if (DeathSequencesManager.Instance.deathSequences.Contains(death))
+        int deathSequenceIndex = UnityEngine.Random.Range(0, ScenarioManager.instance.thisScenario.defaultDeathSequences.Count);
+        if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
+        {
+          outcomeSequence = ScenarioManager.instance.thisScenario.defaultDeathSequences[deathSequenceIndex].deathSequence;
+          winnerChoseDeath = true; // this should be assigned when the event is recieved, not here
+        }
+        else
+        {
+          // to do: notify other user AND local player of the death scenario they chose)
+          int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+          object[] content = new object[] { senderID, deathSequenceIndex };
+          RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+          PhotonNetwork.RaiseEvent(ScenarioDeathChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
+        }
+      }
+
+    }
+
+    /// <summary>
+    /// Invoked through UnityEvent (one of the phases)
+    /// </summary>
+    public void SelectRandomDefaultWinSequence()
+    {
+      // we decide which default death will occur to the loser at the master client, and then sync it with event
+      if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+      {
+        // if (DeathSequencesManager.Instance.deathSequences.Contains(death))
+        int cooperateSequenceIndex = UnityEngine.Random.Range(0, ScenarioManager.instance.thisScenario.defaultBothCooperateSequences.Count);
+        if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
+        {
+          MyDebug.Log("Choosing a random default win");
+          outcomeSequence = ScenarioManager.instance.thisScenario.defaultBothCooperateSequences[cooperateSequenceIndex].deathSequence;
+          winnerChoseDeath = true; // this should be assigned when the event is recieved, not here
+        }
+        else
+        {
+          // to do: notify other user AND local player of the death scenario they chose)
+          int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+          object[] content = new object[] { senderID, cooperateSequenceIndex };
+          RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+          PhotonNetwork.RaiseEvent(CooperateSequenceChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
+        }
+      }
+
+    }
+
+    /// <summary>
+    /// Invoked through UnityEvent (one of the phases)
+    /// </summary>
+    public void SelectRandomDefaultBothLoseSequence()
+    {
+      // we decide which default death will occur to the loser at the master client, and then sync it with event
+      if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected)
+      {
+        // if (DeathSequencesManager.Instance.deathSequences.Contains(death))
+        int deathSequenceIndex = UnityEngine.Random.Range(0, ScenarioManager.instance.thisScenario.defaultBothLoseSequences.Count);
+        if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
+        {
+          outcomeSequence = ScenarioManager.instance.thisScenario.defaultBothLoseSequences[deathSequenceIndex].deathSequence;
+          winnerChoseDeath = true; // this should be assigned when the event is recieved, not here
+        }
+        else
+        {
+          // to do: notify other user AND local player of the death scenario they chose)
+          int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
+          object[] content = new object[] { senderID, deathSequenceIndex };
+          RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+          PhotonNetwork.RaiseEvent(BothLoseSequenceChoiceEvent, content, raiseEventOptions, SendOptions.SendReliable);
+        }
+      }
+
     }
 
     public void ShowPostScreenAnimations()
@@ -644,7 +884,7 @@ namespace Workbench.ProjectDilemma
         postcardTextField.Select();
         postcardTextField.ActivateInputField();
 
-        if (!ScenarioManager.instance.debugMode)
+        if (!ScenarioManager.instance.debugMode || PhotonNetwork.IsConnected)
           postcardNameField.text = otherPlayerSpot.playerUsingThisSpot.NickName.Substring(0, otherPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
       }
     }
@@ -655,8 +895,11 @@ namespace Workbench.ProjectDilemma
 
       MyDebug.Log("Sending final note");
       int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
-      object[] content = new object[] { senderID, postcardTextField.text, postcardNameField.text };
-      RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
+      string sender = "<UNKNOWN>";
+      if (localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#") >= 0)
+        sender = localPlayerSpot.playerUsingThisSpot.NickName.Substring(0, localPlayerSpot.playerUsingThisSpot.NickName.IndexOf("#"));
+      object[] content = new object[] { senderID, postcardTextField.text, sender };
+      RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others }; // You would have to set the Receivers to All in order to receive this event on the local client as well
       PhotonNetwork.RaiseEvent(FinalNoteEvent, content, raiseEventOptions, SendOptions.SendReliable);
     }
     public void AnimatePlayer(string animation)
@@ -803,8 +1046,73 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.Disconnect();
 
     }
+
+    public void DecideOutcome()
+    {
+      votingOutcome = outcomeMatrix[myChoice][theirChoice];
+      // setup outcome conditions
+      MyDebug.Log("Voting outcome", votingOutcome.ToString());
+
+      if (!madeChoice)
+      {
+        if (theyMadeChoice)
+          oneVotedCondition.boolWrapper.Value = true;
+        else
+          noneVotedCondition.boolWrapper.Value = true;
+      }
+      else if (!theyMadeChoice)
+      {
+        localPlayerWonCondition.boolWrapper.Value = true;
+        oneVotedCondition.boolWrapper.Value = true;
+      }
+      else
+      {
+        bothVotedCondition.boolWrapper.Value = true;
+        MyDebug.Log("My choice", myChoice.ToString());
+        MyDebug.Log("Their choice", theirChoice.ToString());
+        switch (votingOutcome)
+        {
+          case Outcome.Won:
+            localPlayerWonCondition.boolWrapper.Value = true;
+
+            oneBetrayedOneSaved.boolWrapper.Value = true;
+            break;
+          case Outcome.Lost:
+            oneBetrayedOneSaved.boolWrapper.Value = true;
+            break;
+          case Outcome.BothLost:
+            bothBetrayedCondition.boolWrapper.Value = true;
+            break;
+          case Outcome.BothWon:
+            bothSavedCondition.boolWrapper.Value = true;
+            break;
+          default:
+            break;
+        }
+      }
+
+    }
+
     #endregion
 
+    #region IEnumerator wrappers
+    public void STartTimelineWrapper()
+    {
+      currentCoroutine = StartTimeline();
+    }
+    public void DiscussionPhaseInvoker(float duration)
+    {
+      currentCoroutine = DiscussionPhaseCoroutine(duration);
+    }
+    public void DeathChoiceCoroutineWrapper(float interval)
+    {
+      currentCoroutine = DeathChoiceCoroutine(interval);
+    }
+    public void ShowOutcomeSequenceWrapper()
+    {
+      currentCoroutine = OutcomeSequencePhase();
+    }
+    #endregion
 
     #region Monobehaviour callbacks
 
@@ -815,10 +1123,10 @@ namespace Workbench.ProjectDilemma
       else
         Destroy(this);
 
-      if (introDirector != null)
+      if (timelineDirector != null)
       {
-        introDirector.played += Director_Played;
-        introDirector.stopped += Director_Stopped;
+        timelineDirector.played += Director_Played;
+        timelineDirector.stopped += Director_Stopped;
       }
 
       if (skipIntroText)
@@ -837,10 +1145,10 @@ namespace Workbench.ProjectDilemma
     {
       base.OnDisable();
       PhotonNetwork.NetworkingClient.EventReceived -= OnAnyEvent;
-      if (introDirector != null)
+      if (timelineDirector != null)
       {
-        introDirector.played -= Director_Played;
-        introDirector.stopped -= Director_Stopped;
+        timelineDirector.played -= Director_Played;
+        timelineDirector.stopped -= Director_Stopped;
       }
       if (gameTimerCoroutine != null)
         StopCoroutine(gameTimerCoroutine);
@@ -856,33 +1164,18 @@ namespace Workbench.ProjectDilemma
 
     private void Start()
     {
-      // initialise the decision matrix
-      decisionMatrix = new Dictionary<Choice, Dictionary<Choice, UnityEvent>>(){
-        {Choice.Kill, new Dictionary<Choice, UnityEvent>(){
-          {Choice.Kill, Outcomes.GetItems()["Kill Each Other"]},
-          {Choice.Save, Outcomes.GetItems()["I kill they save"]}
-        }},
-        {Choice.Save, new Dictionary<Choice, UnityEvent>(){
-          {Choice.Kill, Outcomes.GetItems()["They kill I save"]},
-          {Choice.Save, Outcomes.GetItems()["Save each other"]}
-        }}
-      };
-      // initialize the outcome matrix (same as decision matrix, just newer)
-      outcomeMatrix = new Dictionary<Choice, Dictionary<Choice, Outcome>>(){
-        {Choice.Kill, new Dictionary<Choice, Outcome>(){
-          {Choice.Kill, Outcome.BothLost},
-          {Choice.Save, Outcome.Won}
-        }},
-        {Choice.Save, new Dictionary<Choice, Outcome>(){
-          {Choice.Kill, Outcome.Lost},
-          {Choice.Save, Outcome.BothWon}
-        }}
-      };
 
       // initialize game properly depending if its in debug mode or not
-      if (ScenarioManager.instance.debugMode)
+      if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
       {
         votingOutcome = outcomeMatrix[myChoice][theirChoice];
+        bothBetrayedCondition.boolWrapper.Value = false;
+        bothSavedCondition.boolWrapper.Value = false;
+        bothVotedCondition.boolWrapper.Value = false;
+        noneVotedCondition.boolWrapper.Value = false;
+        oneVotedCondition.boolWrapper.Value = false;
+        oneBetrayedOneSaved.boolWrapper.Value = false;
+        localPlayerWonCondition.boolWrapper.Value = false;
       }
       else
       {
@@ -902,13 +1195,17 @@ namespace Workbench.ProjectDilemma
     }
     #endregion
     #region private methods
+    IEnumerator GameSequence()
+    {
+      yield return gameSequence.RunSequence();
+    }
     IEnumerator GameCycle()
     {
       // if there is a timeline wait for the end of it to start the game, else start it now
-      if (introDirector != null && introDirector.playableAsset != null)
+      if (timelineDirector != null && timelineDirector.playableAsset != null)
         yield return StartCoroutine(StartTimeline());
       // initialie players
-      yield return StartCoroutine(InitializePlayers());
+      InitializePlayers();
       // game started. start timer
       GameStarted?.Invoke();
       yield return StartCoroutine(DiscussionPhase());
@@ -919,6 +1216,14 @@ namespace Workbench.ProjectDilemma
         // if both players saved or killed don't start DeathChoicePhase
         if (!((theirChoice == Choice.Kill && myChoice == Choice.Kill) || (theirChoice == Choice.Save && myChoice == Choice.Save)))
           yield return StartCoroutine(DeathChoicePhase());
+        else
+        {
+          // didnt know where else to put this.
+          if (myChoice == Choice.Kill)
+            SelectRandomDefaultBothLoseSequence();
+          else
+            SelectRandomDefaultWinSequence();
+        }
       }
       else
       {
@@ -955,7 +1260,7 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    IEnumerator InitializePlayers()
+    public void InitializePlayers()
     {
       MyDebug.Log("Initializing players");
       // initialize players in their spots
@@ -968,7 +1273,6 @@ namespace Workbench.ProjectDilemma
       {
         GetComponent<GameMechanic>().InitializeLocalPlayerSpot(debugPlayerSpot);
       }
-      yield return null;
     }
     IEnumerator DiscussionPhase()
     {
@@ -1033,6 +1337,54 @@ namespace Workbench.ProjectDilemma
 
       yield return new WaitForSeconds(DiscussionPhaseEvents.AfterPause);
     }
+    IEnumerator DiscussionPhaseCoroutine(float duration)
+    {
+
+      MyDebug.Log("DiscussionPhase coroutine started");
+      // show feedback stuff
+      // try
+      // {
+      //   DiscussionPhaseEvents.OnStarted?.Invoke(); // two of these are probably unnecessary
+      // }
+      // catch (System.Exception ex)
+      // {
+      //   MyDebug.Log(ex.ToString());
+      // }
+      // localPlayerSpot.TimerStarted?.Invoke(); // two of these are probably unnecessary
+      // localPlayerSpot.gameTimer.StartTimer(DiscussionPhaseEvents.Interval); // two of these are probably unnecessary
+
+      canChoose = true;
+
+      // this phase lasts until time runs out or both players choose
+      float timer = duration;
+      while (!(madeChoice && theyMadeChoice) && timer > 0)
+      {
+        timer -= Time.deltaTime;
+        yield return null;
+      }
+
+      canChoose = false;
+
+      MyDebug.Log("DiscussionPhase coroutine ended");
+
+
+      // show feedback stuff
+      // try
+      // {
+      //   DiscussionPhaseEvents.OnEnded?.Invoke();
+      // }
+      // catch (System.Exception ex)
+      // {
+      //   MyDebug.Log(ex.ToString());
+      // }
+      // localPlayerSpot.TimerFinished?.Invoke();
+
+      // force decision if no decision was made
+      // if (!madeChoice)
+      //   ForceDecisionForLocalPlayer();
+
+    }
+
     IEnumerator TransitionPhase()
     {
       yield return new WaitForSeconds(TransitionPhaseEvents.BeforePause);
@@ -1170,6 +1522,22 @@ namespace Workbench.ProjectDilemma
 
       yield return new WaitForSeconds(DeathChoiceScreenPhaseEvents.AfterPause);
     }
+    IEnumerator DeathChoiceCoroutine(float chooseDuration)
+    {
+
+      MyDebug.Log("DeathChoicePhase", "started");
+
+      // this phase lasts until time runs out or player chooses death
+      float timer = chooseDuration;
+      while (!winnerChoseDeath && timer > 0)
+      {
+        timer -= Time.deltaTime;
+        yield return null;
+      }
+
+      MyDebug.Log("DeathChoicePhase", "ended");
+
+    }
     IEnumerator DeathSequencePhase()
     {
       yield return new WaitForSeconds(DeathSequencePhaseEvents.BeforePause);
@@ -1179,13 +1547,13 @@ namespace Workbench.ProjectDilemma
       // show feedback stuff
       DeathSequencePhaseEvents.OnStarted?.Invoke();
 
-      yield return StartCoroutine(ShowDeathSequence());
+      yield return StartCoroutine(ShowOutcomeSequence());
 
       // we wait for the sequence to end to show the end screen
-      if (chosenDeathPrefab)
+      if (outcomeSequence)
       {
         MyDebug.Log("DeathSequencePhase", "chosen death sequence started");
-        yield return new WaitForSeconds(chosenDeathPrefab.GetComponent<DeathSequence>().duration);
+        yield return new WaitForSeconds(outcomeSequence.GetComponent<DeathSequence>().duration);
         MyDebug.Log("DeathSequencePhase", "chosen death sequence ended");
       }
 
@@ -1197,6 +1565,24 @@ namespace Workbench.ProjectDilemma
       DeathSequencePhaseEvents.OnEnded?.Invoke();
 
       yield return new WaitForSeconds(DeathSequencePhaseEvents.AfterPause);
+    }
+    IEnumerator OutcomeSequencePhase()
+    {
+
+      MyDebug.Log("OutcomeSequencePhase", "started");
+
+      yield return StartCoroutine(ShowOutcomeSequence());
+
+      // we wait for the sequence to end to show the end screen
+      if (outcomeSequence)
+      {
+        MyDebug.Log("OutcomeSequencePhase", "chosen death sequence started");
+        yield return new WaitForSeconds(outcomeSequence.GetComponent<DeathSequence>().duration);
+        MyDebug.Log("OutcomeSequencePhase", "chosen death sequence ended");
+      }
+
+      MyDebug.Log("OutcomeSequencePhase", "ended");
+
     }
     IEnumerator PostGameScreenPhase()
     {
@@ -1223,8 +1609,11 @@ namespace Workbench.ProjectDilemma
 
     IEnumerator StartTimeline()
     {
-      introDirector.Play();
+      MyDebug.Log("StartTimelineCoroutine Start");
+      timelineDirector.playableAsset = introTimeline;
+      timelineDirector.Play();
       yield return StartCoroutine(SkipIntroCoroutine());
+      MyDebug.Log("StartTimelineCoroutine end");
     }
 
     IEnumerator OtherPlayerChoosesDeath(float delay)
@@ -1289,12 +1678,17 @@ namespace Workbench.ProjectDilemma
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      // play commn death
-      // Instantiate(defaultDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      if (defaultLossPrefab)
+
+      // play random Both Lost death (the choice should already have been made when the voting ended)
+      if (outcomeSequence != null)
       {
-        chosenDeathPrefab = defaultLossPrefab;
-        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        //before the death prefab is spawned we must disable all other active cameras.
+        // I don't care much for this particular implementation. should be better
+        foreach (Camera cam in Camera.allCameras)
+        {
+          cam.enabled = false;
+        }
+        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
       }
 
     }
@@ -1319,11 +1713,15 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       // play victory
-      // Instantiate(defaultWinPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      if (defaultWinPrefab)
+      if (outcomeSequence)
       {
-        chosenDeathPrefab = defaultWinPrefab;
-        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        //before the death prefab is spawned we must disable all other active cameras.
+        // I don't care much for this particular implementation. should be better
+        foreach (Camera cam in Camera.allCameras)
+        {
+          cam.enabled = false;
+        }
+        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
       }
     }
 
@@ -1347,18 +1745,16 @@ namespace Workbench.ProjectDilemma
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      if (madeChoice)
+      // play chosen death scene (by other player, or a random default one)
+      if (outcomeSequence != null)
       {
-        // play chosen death scene (by other player)
-        if (chosenDeathPrefab != null)
-          Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      }
-      else
-      {
-        chosenDeathPrefab = defaultLossPrefab;
-        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-        // if (defaultLossDirector)
-        //   defaultLossDirector.Play();
+        //before the death prefab is spawned we must disable all other active cameras.
+        // I don't care much for this particular implementation. should be better
+        foreach (Camera cam in Camera.allCameras)
+        {
+          cam.enabled = false;
+        }
+        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
       }
     }
 
@@ -1383,18 +1779,17 @@ namespace Workbench.ProjectDilemma
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      if (theyMadeChoice)
+      // play chosen death scene (or a random default one if the other player didnt vote)
+      if (outcomeSequence != null)
       {
-        // play chosen death scene
-        if (chosenDeathPrefab != null)
-          Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
-      }
-      else
-      {
-        // if (defaultWinDirector)
-        //   defaultWinDirector.Play();
-        chosenDeathPrefab = defaultLossPrefab;
-        Instantiate(chosenDeathPrefab, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        //before the death prefab is spawned we must disable all other active cameras.
+        // I don't care much for this particular implementation. should be better
+        foreach (Camera cam in Camera.allCameras)
+        {
+          cam.enabled = false;
+        }
+        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+
       }
 
     }
@@ -1410,7 +1805,7 @@ namespace Workbench.ProjectDilemma
     }
 
 
-    private void DeathChoiceEventFunc(EventData photonEvent)
+    private void UniversalDeathChoiceEventFunc(EventData photonEvent)
     {
 
       {
@@ -1424,7 +1819,7 @@ namespace Workbench.ProjectDilemma
         if (DeathSequencesManager.Instance.universalDeathSequences.Count > 0
         && DeathSequencesManager.Instance.universalDeathSequences.Count > deathSequenceIndex
         && deathSequenceIndex >= 0)
-          chosenDeathPrefab = DeathSequencesManager.Instance.universalDeathSequences[deathSequenceIndex].deathSequence.gameObject;
+          outcomeSequence = DeathSequencesManager.Instance.universalDeathSequences[deathSequenceIndex].deathSequence;
 
         // who's choice it was
         if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
@@ -1443,6 +1838,73 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    private void ScenarioDeathChoiceEventFunc(EventData photonEvent)
+    {
+
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      int deathSequenceIndex = (int)data[1];
+
+      winnerChoseDeath = true;
+
+      Scenario currentScenario = ScenarioManager.instance.thisScenario;
+      if (currentScenario.defaultDeathSequences.Count > 0
+      && currentScenario.defaultDeathSequences.Count > deathSequenceIndex
+      && deathSequenceIndex >= 0)
+        outcomeSequence = currentScenario.defaultDeathSequences[deathSequenceIndex].deathSequence;
+
+      // who's choice it was
+      if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
+      {
+        // OnYourChoiceMade?.Invoke();
+        // localPlayerSpot.OnMyChoiceMade?.Invoke();
+        // otherPlayerSpot.OnTheirChoiceMade?.Invoke();
+      }
+      else
+      {
+        // OnTheirChoiceMade?.Invoke();
+        // otherPlayerSpot.OnMyChoiceMade?.Invoke();
+        // localPlayerSpot.OnTheirChoiceMade?.Invoke();
+      }
+
+    }
+
+    private void CooperateSequenceChoiceEventFunc(EventData photonEvent)
+    {
+
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      int cooperateSequenceIndex = (int)data[1];
+
+      // winnerChoseDeath = true;
+
+      Scenario currentScenario = ScenarioManager.instance.thisScenario;
+      if (currentScenario.defaultBothCooperateSequences.Count > 0
+      && currentScenario.defaultBothCooperateSequences.Count > cooperateSequenceIndex
+      && cooperateSequenceIndex >= 0)
+        outcomeSequence = currentScenario.defaultBothCooperateSequences[cooperateSequenceIndex].deathSequence;
+
+    }
+    private void BothLoseSequenceChoiceEventFunc(EventData photonEvent)
+    {
+
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      int deathSequenceIndex = (int)data[1];
+
+      // winnerChoseDeath = true;
+
+      Scenario currentScenario = ScenarioManager.instance.thisScenario;
+      if (currentScenario.defaultBothLoseSequences.Count > 0
+      && currentScenario.defaultBothLoseSequences.Count > deathSequenceIndex
+      && deathSequenceIndex >= 0)
+        outcomeSequence = currentScenario.defaultBothLoseSequences[deathSequenceIndex].deathSequence;
+
+    }
+
     private void FinalNoteEventFunc(EventData photonEvent)
     {
       // extract info from received data
@@ -1451,17 +1913,22 @@ namespace Workbench.ProjectDilemma
       string textSent = (string)data[1];
       string nickname = (string)data[2];
 
+      MyDebug.Log("FinalNote text", textSent);
+      MyDebug.Log("FinalNote nickname", nickname);
+
       // who's choice it was
       if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
       {
+        MyDebug.Log("I sent this note", textSent);
+
         // play animation for sending mail
         postcardObj.SetActive(false);
       }
       else
       {
+        MyDebug.Log("Other player sent this note.", textSent);
+
         // save the text locally. in json maybe? could do, could do.
-        MyDebug.Log("FinalNote text", textSent);
-        MyDebug.Log("FinalNote nickname", nickname);
 
         FinalNote newNote = new FinalNote(nickname, textSent);
         FinalNoteCardHandler.SaveFinalNote(newNote);
@@ -1521,52 +1988,52 @@ namespace Workbench.ProjectDilemma
 
     private void DecisionEventFunc(EventData photonEvent)
     {
+      // extract info from received data
+      object[] data = (object[])photonEvent.CustomData;
+      int senderID = (int)data[0];
+      Choice choice = (bool)data[1] ? Choice.Kill : Choice.Save;
+
+      // who's choice it was
+      if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
       {
-        // extract info from received data
-        object[] data = (object[])photonEvent.CustomData;
-        int senderID = (int)data[0];
-        Choice choice = (bool)data[1] ? Choice.Kill : Choice.Save;
+        myChoice = choice;
+        madeChoice = true;
+        OnYourChoiceMade?.Invoke();
+        localPlayerSpot.OnMyChoiceMade?.Invoke();
+        otherPlayerSpot.OnTheirChoiceMade?.Invoke();
+      }
+      else
+      {
+        theirChoice = choice;
+        theyMadeChoice = true;
+        OnTheirChoiceMade?.Invoke();
+        otherPlayerSpot.OnMyChoiceMade?.Invoke();
+        localPlayerSpot.OnTheirChoiceMade?.Invoke();
+      }
 
-        // who's choice it was
-        if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
-        {
-          myChoice = choice;
-          madeChoice = true;
-          OnYourChoiceMade?.Invoke();
-          localPlayerSpot.OnMyChoiceMade?.Invoke();
-          otherPlayerSpot.OnTheirChoiceMade?.Invoke();
-        }
-        else
-        {
-          theirChoice = choice;
-          theyMadeChoice = true;
-          OnTheirChoiceMade?.Invoke();
-          otherPlayerSpot.OnMyChoiceMade?.Invoke();
-          localPlayerSpot.OnTheirChoiceMade?.Invoke();
-        }
+      decisionsMade++;
 
-        decisionsMade++;
+      // update the outcome so we can control code flow
+      votingOutcome = outcomeMatrix[myChoice][theirChoice];
 
-        // if both players made the choice execute the outcome
-        if (decisionsMade >= 2)
-        {
-          // we'll need to know the outcome so we can decide flows
-          votingOutcome = outcomeMatrix[myChoice][theirChoice];
+      // if both players made the choice execute the outcome
+      if (decisionsMade >= 2)
+      {
+        // we'll need to know the outcome so we can decide flows
+        // votingOutcome = outcomeMatrix[myChoice][theirChoice];
 
-          // visual feedback
-          OnBothPlayersChose?.Invoke();
+        // visual feedback
+        OnBothPlayersChose?.Invoke();
 
 
-          // visual feedback
-          // decisionMatrix[myChoice][theirChoice]?.Invoke();
-          // localPlayerSpot.decisionMatrix[myChoice][theirChoice]?.Invoke();
-          // call other choices with delay
-          // Invoke("OtherPlayerOutcome", otherPlayerOutcomeDelay);
+        // visual feedback
+        // decisionMatrix[myChoice][theirChoice]?.Invoke();
+        // localPlayerSpot.decisionMatrix[myChoice][theirChoice]?.Invoke();
+        // call other choices with delay
+        // Invoke("OtherPlayerOutcome", otherPlayerOutcomeDelay);
 
-          // logic event
-          VotingEnded?.Invoke();
-        }
-
+        // logic event
+        // VotingEnded?.Invoke();
       }
 
     }
@@ -1580,14 +2047,23 @@ namespace Workbench.ProjectDilemma
         case DecisionEvent:
           DecisionEventFunc(photonEvent);
           break;
-        case DeathChoiceEvent:
-          DeathChoiceEventFunc(photonEvent);
+        case UniversalDeathChoiceEvent:
+          UniversalDeathChoiceEventFunc(photonEvent);
           break;
         case FinalNoteEvent:
           FinalNoteEventFunc(photonEvent);
           break;
         case AnimationEvent:
           AnimationEventFunc(photonEvent);
+          break;
+        case ScenarioDeathChoiceEvent:
+          ScenarioDeathChoiceEventFunc(photonEvent);
+          break;
+        case CooperateSequenceChoiceEvent:
+          CooperateSequenceChoiceEventFunc(photonEvent);
+          break;
+        case BothLoseSequenceChoiceEvent:
+          BothLoseSequenceChoiceEventFunc(photonEvent);
           break;
         default:
           break;

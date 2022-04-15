@@ -20,5 +20,4 @@ MonoBehaviour:
   - Motel-Scene
   approvedScenesPath: Assets/! My Scenes/ApprovedScenarios
   playableScenarios:
-  - {fileID: 102900000, guid: cd97a7d1c8880d34dbafadfc75e0d9ac, type: 3}
   - {fileID: 102900000, guid: 567b948946e22e1459f54a46545687cd, type: 3}

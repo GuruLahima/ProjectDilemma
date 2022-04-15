@@ -156,8 +156,9 @@ namespace Workbench.ProjectDilemma
 
     public override void OnPlayerLeftRoom(Player player)
     {
-      // when other player left return to main menu
-      PhotonNetwork.Disconnect();
+      if (!GameMechanic.Instance.canChoose)
+        // when other player leaves return to main menu (only if we havent reached end of discussion time)
+        PhotonNetwork.Disconnect();
 
       OnOtherPlayerLeftTheRoom?.Invoke();
     }

@@ -442,9 +442,11 @@ namespace GuruLaghima
     }
   }
 
+  [Serializable]
   public class BoolWrapper
   {
-    public bool Value { get; set; }
+    [SerializeField] bool value;
+    public bool Value { get { return this.value; } set { this.value = value; } }
     public BoolWrapper(bool value) { this.Value = value; }
   }
 
@@ -465,6 +467,76 @@ namespace GuruLaghima
     public float AfterPause;
 
   }
+
+  /*   [Serializable]
+    public class ControllableSequence
+    {
+      public string name;
+      public BoolReference condition;
+      public bool inParallel;
+  #if UNITY_EDITOR
+      [ReorderableList]
+  #endif
+      public List<EventWithDuration> eventSequence;
+      public List<ControllableSequence> nextSequences;
+
+      public IEnumerator RunSequence()
+      {
+        if (condition && condition.boolWrapper.Value)
+        {
+          yield return SequenceCoroutine();
+
+          // ruun next sequences (in sequence)
+          foreach (ControllableSequence seq in nextSequences)
+          {
+            if (seq.inParallel)
+            {
+              seq.RunSequence();
+            }
+            else
+            {
+              yield return seq.RunSequence();
+            }
+          }
+        }
+
+
+      }
+
+      IEnumerator currentCoroutine;
+      IEnumerator SequenceCoroutine()
+      {
+        MyDebug.Log($"[{name}]", "started");
+
+        foreach (EventWithDuration ev in eventSequence)
+        {
+          ev.theEvent?.Invoke();
+          if (ev.hasCoroutine)
+          {
+
+            yield return currentCoroutine.MoveNext();
+          }
+          else
+          {
+
+            yield return new WaitForSeconds(ev.duration);
+          }
+        }
+
+        MyDebug.Log($"[{name}]", "ended");
+
+      }
+
+      [Serializable]
+      public class EventWithDuration
+      {
+        public bool hasCoroutine;
+        public UnityEvent theEvent;
+        [HideIf("hasCoroutine")]
+        public float duration;
+      }
+
+    } */
 
   [Serializable]
   public class EventSequence

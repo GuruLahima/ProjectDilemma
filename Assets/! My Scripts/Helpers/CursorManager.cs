@@ -78,6 +78,31 @@ public class CursorManager : MonoBehaviour
   {
     Cursor.lockState = mode;
   }
+  /// <summary>
+  /// an overeload of SetLockMode but one that can be called via UnityEvent.
+  /// 0 = CursorLockMode.None;
+  /// 1 = CursorLockMode.Confined;
+  /// 2 = CursorLockMode.Locked;
+  /// </summary>
+  /// <param name="lockMode"></param>
+  public void SetLockMode(int lockMode)
+  {
+    switch (lockMode)
+    {
+      case 0:
+        Cursor.lockState = CursorLockMode.None;
+        break;
+      case 1:
+        Cursor.lockState = CursorLockMode.Confined;
+        break;
+      case 2:
+        Cursor.lockState = CursorLockMode.Locked;
+        break;
+      default:
+        Cursor.lockState = CursorLockMode.None;
+        break;
+    }
+  }
   public void SetVisibility(bool visible)
   {
     Cursor.visible = visible;

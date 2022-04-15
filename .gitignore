@@ -86,6 +86,10 @@ crashlytics-build.properties
 /[Aa]ssets/!My Videos/
 /[Aa]ssets/DOTween/
 /[Aa]ssets/My Packages/
+.plastic/
+/[Aa]ssets/Samples/
+/[Aa]ssets/Vasko Design Random/
+
 
 Assets/FX_Classic_Confetti/Scripts.meta
 Assets/FX_Classic_Confetti/Shaders.meta

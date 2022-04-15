@@ -14,11 +14,8 @@ namespace Workbench.ProjectDilemma
   [CreateAssetMenu(fileName = "DeathSequencesManager", menuName = "Workbench/ScriptableObjects/DeathSequencesManager", order = 1)]
   public class DeathSequencesManager : SingletonScriptableObject<DeathSequencesManager>
   {
-    public MyGenericDictionary<Scenario, GameObject> scenarioBasedDeathSequences = new MyGenericDictionary<Scenario, GameObject>();
-    // public List<DeathSequence> universalDeathSequences = new List<DeathSequence>();
+    // added to the book of death
     public List<OwnableDeathSequence> universalDeathSequences = new List<OwnableDeathSequence>();
-
-
 
 #if UNITY_EDITOR
 
@@ -33,7 +30,8 @@ namespace Workbench.ProjectDilemma
   }
 
   [System.Serializable]
-  public class OwnableDeathSequence{
+  public class OwnableDeathSequence
+  {
     public bool owned = false;
     public DeathSequence deathSequence;
   }

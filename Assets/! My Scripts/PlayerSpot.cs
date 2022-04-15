@@ -7,7 +7,6 @@ using UnityEngine.Events;
 using GuruLaghima;
 using UnityEngine.UI;
 using Photon.Realtime;
-using TMPro;
 using UnityEngine.Animations.Rigging;
 
 namespace Workbench.ProjectDilemma
@@ -88,13 +87,14 @@ namespace Workbench.ProjectDilemma
 
 
     #region public methods
-    public void PopulateDeathBook(List<OwnableDeathSequence> collection)
+    public void PopulateDeathBook(Scenario thisScenario, List<OwnableDeathSequence> universalDeathSequences)
     {
-      foreach (OwnableDeathSequence item in collection)
+      // add death sequences from this scenario to the death book
+      foreach (OwnableDeathSequence item in thisScenario.defaultDeathSequences)
       {
         DeathSequence_UI_Item tmpItem = Instantiate(deathItemPrefab.gameObject, deathBookLeftPage.transform, false).GetComponent<DeathSequence_UI_Item>();
         tmpItem.deathSequence = item.deathSequence;
-        if (tmpItem.backgroundImg)
+        if (tmpItem.backgroundImg && item.deathSequence.backgroundSprite)
           tmpItem.backgroundImg.sprite = item.deathSequence.backgroundSprite;
         if (tmpItem.label)
           tmpItem.label.text = item.deathSequence.labelText;
@@ -104,8 +104,26 @@ namespace Workbench.ProjectDilemma
           tmpItem.GetComponent<Button>().interactable = false;
         }
         else
-          tmpItem.GetComponent<Button>().onClick.AddListener(delegate () { GameMechanic.Instance.ChooseDeathSequence(tmpItem.deathSequence); });
+          tmpItem.GetComponent<Button>().onClick.AddListener(delegate () { GameMechanic.Instance.ChooseScenarioDeathSequence(tmpItem.deathSequence); });
       }
+      // add universal death sequences to the death book
+      foreach (OwnableDeathSequence item in universalDeathSequences)
+      {
+        DeathSequence_UI_Item tmpItem = Instantiate(deathItemPrefab.gameObject, deathBookLeftPage.transform, false).GetComponent<DeathSequence_UI_Item>();
+        tmpItem.deathSequence = item.deathSequence;
+        if (tmpItem.backgroundImg && item.deathSequence.backgroundSprite)
+          tmpItem.backgroundImg.sprite = item.deathSequence.backgroundSprite;
+        if (tmpItem.label)
+          tmpItem.label.text = item.deathSequence.labelText;
+        if (!item.owned)
+        {
+          tmpItem.backgroundImg.material = tmpItem.unavailableMat;
+          tmpItem.GetComponent<Button>().interactable = false;
+        }
+        else
+          tmpItem.GetComponent<Button>().onClick.AddListener(delegate () { GameMechanic.Instance.ChooseUniversalDeathSequence(tmpItem.deathSequence); });
+      }
+
     }
     #endregion
 
