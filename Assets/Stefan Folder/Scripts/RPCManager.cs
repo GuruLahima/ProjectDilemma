@@ -26,12 +26,19 @@ namespace Workbench.ProjectDilemma
     [PunRPC]
     void RPC_ThrowProjectile(int projectileIndex, Vector3 startPosition, Vector3 direction, float strength, float customGravity)
     {
-      Projectile projectile = ProjectileManager.Instance.allProjectiles[projectileIndex].Prefab;
+      Projectile projectile = MasterData.Instance.allProjectiles[projectileIndex].Prefab;
       if (projectile)
       {
         var proj = Instantiate(projectile);
         proj.SetProjectile(startPosition, direction, strength, customGravity);
       }
+    }
+
+    void RPC_UserEmote(int viewID, int emoteIndex)
+    {
+      var player = PhotonView.Find(viewID);
+      EmoteData emote = MasterData.Instance.allEmotes[emoteIndex];
+      player.GetComponent<PlayerSpot>().playerEmote.SYNC_Animation(emote);
     }
     #endregion
 

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b74b053a3a29a144fbd01145f7ff9ae1, type: 3}
+  m_Name: Test Perk 2
+  m_EditorClassIdentifier: 
+  Key: test_perk_2
+  AmountOwned: 1
+  Ownable: 1
+  Icon: {fileID: 1641441594082942601, guid: dc347f2399ce35546a59645e6439f197, type: 3}
+  ico: {fileID: 2125737359283935466, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}

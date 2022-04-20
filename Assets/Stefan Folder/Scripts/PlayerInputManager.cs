@@ -85,6 +85,12 @@ namespace Workbench.ProjectDilemma
     #region Input Actions
     [Space(20)]
     [SerializeField]public ProjectileThrow projectileThrow;
+    [Space(20)]
+    [SerializeField] public PlayerEmote playerEmote;
+    [Space(20)]
+    [SerializeField] public OperatePerk operatePerk;
+    [Space(20)]
+    [SerializeField] public MagnifyingGlass magnifyingGlass;
     public void ProjectileAim()
     {
       projectileThrow.Aim();
@@ -95,26 +101,48 @@ namespace Workbench.ProjectDilemma
       projectileThrow.Throw();
     }
 
+    public void ProjectilePick()
+    {
+      projectileThrow.Pick();
+    }
+
+    public void ProjectileSet()
+    {
+      projectileThrow.Set();
+    }
+
     public void EmoteChoose()
     {
-
+      playerEmote.Pick();
     }
 
     public void EmoteActivate()
     {
-
+      playerEmote.Emote();
     }
 
     public void MagnifyingGlass()
     {
+      magnifyingGlass.Use();
+    }
 
+    public void PerkSelect()
+    {
+      operatePerk.Pick();
     }
 
     public void PerkActivate()
     {
-
+      operatePerk.Activate();
     }
 
     #endregion
   }
+}
+
+public static class InputCondition
+{
+  public const string DISCUSSION_ENDED = "discussionEnded";
+  public const string EMOTE_PLAYING = "emotePlaying";
+  public const string USING_COMPUTER = "usingComputer";
 }

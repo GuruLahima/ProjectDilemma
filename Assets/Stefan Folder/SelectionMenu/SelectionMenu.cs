@@ -9,7 +9,7 @@ public class SelectionMenu : MonoBehaviour
   {
     get
     {
-      if (lastChildIndex > 0 & lastChildIndex < childrenList.Count)
+      if (lastChildIndex > -1 & lastChildIndex < childrenList.Count)
       {
         return childrenList[lastChildIndex].gameObject;
       }

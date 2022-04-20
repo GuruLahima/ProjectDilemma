@@ -16,3 +16,4 @@ MonoBehaviour:
   AmountOwned: 0
   Ownable: 1
   Prefab: {fileID: 1124133787949172404, guid: fbb9f3c713aff22488aabd36e934ad78, type: 3}
+  Icon: {fileID: 1641441594082942601, guid: dc347f2399ce35546a59645e6439f197, type: 3}
