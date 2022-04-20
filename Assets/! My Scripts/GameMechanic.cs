@@ -47,6 +47,8 @@ namespace Workbench.ProjectDilemma
       public List<EventWithDuration> eventSequence;
       public List<ControllableSequence> nextSequences;
 
+      public IEnumerator rootCoroutine;
+
       public IEnumerator RunSequence()
       {
         if (condition && condition.boolWrapper.Value)
@@ -129,6 +131,7 @@ namespace Workbench.ProjectDilemma
     public static Action DiscussionEnded;
 
     public ControllableSequence gameSequence;
+    public ControllableSequence postGameSequence;
 
 
     [Header("Visual Feedback Events - Phases")]
@@ -353,7 +356,8 @@ namespace Workbench.ProjectDilemma
     #region public methods
     public void StartGameSequence()
     {
-      StartCoroutine(gameSequence.RunSequence());
+      gameSequence.rootCoroutine = gameSequence.RunSequence();
+      StartCoroutine(gameSequence.rootCoroutine);
     }
 
     public void InitializePlayers()
@@ -444,6 +448,9 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.saveButton.enabled = true;
       localPlayerSpot.timer.enabled = true;
       PlayerInputManager.Instance.projectileThrow = localPlayerSpot.projectileThrow;
+      PlayerInputManager.Instance.playerEmote = localPlayerSpot.playerEmote;
+      PlayerInputManager.Instance.operatePerk = localPlayerSpot.operatePerk;
+      PlayerInputManager.Instance.magnifyingGlass = localPlayerSpot.magnifyingGlass;
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -985,6 +992,21 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    public void OnPlayerDisconnect()
+    {
+      votingOutcome = Outcome.Won;
+      ActivateProperModelForEndScreen();
+      CalculatePointsAfterOutcome();
+      CalculateRankAfterOutcome();
+      CalculateXPAfterOutcome();
+
+      // stop game sequence
+      StopCoroutine(gameSequence.rootCoroutine);
+
+      // run postgame screen sequence
+      postGameSequence.rootCoroutine = postGameSequence.RunSequence();
+      StartCoroutine(postGameSequence.rootCoroutine);
+    }
     #endregion
 
     #region IEnumerator wrappers

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0b6b4397279645cb9e8707dd52d400f, type: 3}
   m_Name: GameFoundationCatalogSettings
   m_EditorClassIdentifier: 
-  m_CatalogAsset: {fileID: 11400000, guid: 593b8d11d0f874e30a6ec8fcb0b3c99e, type: 2}
+  m_CatalogAsset: {fileID: 11400000, guid: a5e66dd05f3b16145bf012aa6a9a0f53, type: 2}

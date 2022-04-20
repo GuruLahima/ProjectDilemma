@@ -46,6 +46,9 @@ namespace Workbench.ProjectDilemma
     public DeathSequence_UI_Item deathItemPrefab;
     [Space(10)]
     public ProjectileThrow projectileThrow;
+    public PlayerEmote playerEmote;
+    public OperatePerk operatePerk;
+    public MagnifyingGlass magnifyingGlass;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]
