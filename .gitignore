@@ -87,7 +87,7 @@ crashlytics-build.properties
 /[Aa]ssets/DOTween/
 /[Aa]ssets/My Packages/
 .plastic/
-/[Aa]ssets/Samples/
+# /[Aa]ssets/Samples/
 /[Aa]ssets/Vasko Design Random/
 
 
