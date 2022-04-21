@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Linq;
 
 namespace Workbench.ProjectDilemma
 {
@@ -38,10 +39,11 @@ namespace Workbench.ProjectDilemma
     /// Temporary for testing, later we have to move this into a scriptable object of a sort that takes care of ALL projectiles,
     /// and another reference to the invenotry which lets us know which projectile we have equiped and ready to use ! tbd
     /// </summary>
-    public List<ProjectileData> ownedProjectiles;
+    List<ProjectileData> ownedProjectiles;
     public ProjectileData projectilePrefab;
     private void Start()
     {
+      ownedProjectiles = ItemSettings.Instance.throwables.Where((obj) => { return obj.Owned; }).ToList();
       canvasGroup = selectionMenu.GetComponent<CanvasGroup>();
       if (photonView.IsMine)
       {
@@ -57,7 +59,7 @@ namespace Workbench.ProjectDilemma
       }
     }
 
-    
+
     public void Pick()
     {
       canvasGroup.alpha = 1; canvasGroup.blocksRaycasts = true; canvasGroup.interactable = true;
@@ -99,8 +101,8 @@ namespace Workbench.ProjectDilemma
         if (Photon.Pun.PhotonNetwork.IsConnected)
         {
 
-         RPCManager.Instance.photonView.RPC("RPC_ThrowProjectile", Photon.Pun.RpcTarget.AllViaServer, MasterData.Instance.GetProjectileIndex(projectilePrefab), lineRenderer.transform.position,
-           lineRenderer.transform.TransformDirection(new Vector3(0, Mathf.Sin(radianAngle), Mathf.Cos(radianAngle))), strength, Physics.gravity.y);
+          RPCManager.Instance.photonView.RPC("RPC_ThrowProjectile", Photon.Pun.RpcTarget.AllViaServer, MasterData.Instance.GetProjectileIndex(projectilePrefab), lineRenderer.transform.position,
+            lineRenderer.transform.TransformDirection(new Vector3(0, Mathf.Sin(radianAngle), Mathf.Cos(radianAngle))), strength, Physics.gravity.y);
         }
         else
         {
