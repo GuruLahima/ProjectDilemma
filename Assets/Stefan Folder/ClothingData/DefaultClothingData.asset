@@ -29,7 +29,7 @@ MonoBehaviour:
     RiggableSkin: {fileID: 0}
   - equiped: 0
     Type: 3
-    Clothing: {fileID: 0}
+    Clothing: {fileID: 11400000, guid: 0f3213a6a4f12354885e453c58333200, type: 2}
     RiggableSkin: {fileID: 0}
   - equiped: 0
     Type: 4

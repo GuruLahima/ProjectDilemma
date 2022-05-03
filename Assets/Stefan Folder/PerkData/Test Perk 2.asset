@@ -15,5 +15,5 @@ MonoBehaviour:
   Key: test_perk_2
   AmountOwned: 1
   Ownable: 1
-  Icon: {fileID: 1641441594082942601, guid: dc347f2399ce35546a59645e6439f197, type: 3}
+  Icon: {fileID: -7681366787899808411, guid: dc347f2399ce35546a59645e6439f197, type: 3}
   ico: {fileID: 2125737359283935466, guid: f7043b7291f49844b9671b3d3dedcbb5, type: 3}

@@ -1,0 +1,392 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4b56f740c3f3a42be389eb116cf837, type: 3}
+  m_Name: MyInputManager
+  m_EditorClassIdentifier: 
+  inputs:
+  - AxisName: Horizontal
+    Binds:
+    - Key: 275
+      Value: 1
+    - Key: 100
+      Value: 1
+    - Key: 276
+      Value: -1
+    - Key: 97
+      Value: -1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.001
+  - AxisName: Vertical
+    Binds:
+    - Key: 273
+      Value: 1
+    - Key: 119
+      Value: 1
+    - Key: 274
+      Value: -1
+    - Key: 115
+      Value: -1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.001
+  - AxisName: Submit
+    Binds:
+    - Key: 13
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: Cancel
+    Binds:
+    - Key: 27
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: Shift
+    Binds:
+    - Key: 304
+      Value: 1
+    - Key: 303
+      Value: -1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: Action
+    Binds:
+    - Key: 101
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: SelectThrowable
+    Binds:
+    - Key: 116
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: AimThrow
+    Binds:
+    - Key: 102
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: PlayEmote
+    Binds:
+    - Key: 113
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: ActivatePerk
+    Binds:
+    - Key: 50
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  - AxisName: MagnifyingGlass
+    Binds:
+    - Key: 49
+      Value: 1
+    inputCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    SmoothingStep: 0.1
+  ListOfHotkeys:
+  - Horizontal
+  - Vertical
+  - Submit
+  - Cancel
+  - Shift
+  - Action
+  - SelectThrowable
+  - AimThrow
+  - PlayEmote
+  - ActivatePerk
+  - MagnifyingGlass
+  autoGenerateHotkeys: 1
+  customKeyMapping:
+  - TextDisplay: 0
+    IconDisplay: {fileID: 0}
+    Key: 48
+  - TextDisplay: 1
+    IconDisplay: {fileID: 0}
+    Key: 49
+  - TextDisplay: 2
+    IconDisplay: {fileID: 0}
+    Key: 50
+  - TextDisplay: 3
+    IconDisplay: {fileID: 0}
+    Key: 51
+  - TextDisplay: 4
+    IconDisplay: {fileID: 0}
+    Key: 52
+  - TextDisplay: 5
+    IconDisplay: {fileID: 0}
+    Key: 53
+  - TextDisplay: 6
+    IconDisplay: {fileID: 0}
+    Key: 54
+  - TextDisplay: 7
+    IconDisplay: {fileID: 0}
+    Key: 55
+  - TextDisplay: 8
+    IconDisplay: {fileID: 0}
+    Key: 56
+  - TextDisplay: 9
+    IconDisplay: {fileID: 0}
+    Key: 57

@@ -34,11 +34,23 @@ namespace Workbench.ProjectDilemma
       }
     }
 
+    [PunRPC]
     void RPC_UserEmote(int viewID, int emoteIndex)
     {
       var player = PhotonView.Find(viewID);
       EmoteData emote = MasterData.Instance.allEmotes[emoteIndex];
       player.GetComponent<PlayerSpot>().playerEmote.SYNC_Animation(emote);
+    }
+
+    [PunRPC]
+    void RPC_LoadOutfit(int viewID, int[] clothesId)
+    {
+      var pl = PhotonView.Find(viewID);
+      var pSpot = pl.GetComponent<PlayerSpot>();
+      if (pSpot)
+      {
+        pSpot.outfitLoader.LoadOutfit(clothesId, pSpot.character, pSpot.rigRoot);
+      }
     }
     #endregion
 

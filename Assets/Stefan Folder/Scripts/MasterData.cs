@@ -40,5 +40,12 @@ namespace Workbench.ProjectDilemma
       int index = allPerks.IndexOf(perk);
       return index;
     }
+
+    public List<RigData> allRigs = new List<RigData>();
+    public int GetRigIndex(RigData rig)
+    {
+      int index = allRigs.IndexOf(rig);
+      return index;
+    }
   }
 }

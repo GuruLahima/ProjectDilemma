@@ -37,7 +37,7 @@ ModelImporter:
     isReadable: 0
   meshes:
     lODScreenPercentages: []
-    globalScale: 1
+    globalScale: 5
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
@@ -529,7 +529,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKFollowRoot
       parentName: FKSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRoot_M
@@ -549,7 +549,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingerOffset_M
       parentName: FKRoot_M
-      position: {x: -0.027165882, y: -2.718651e-11, z: -0.08334721}
+      position: {x: -0.001358294, y: -1.3593254e-12, z: -0.0041673603}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwinger_M
@@ -559,47 +559,47 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingerStabilizerTarget
       parentName: FKRoot_M
-      position: {x: -0.027165882, y: -2.718651e-11, z: -0.08334721}
+      position: {x: -0.001358294, y: -1.3593254e-12, z: -0.0041673603}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReverse
       parentName: FKRoot_M
-      position: {x: -0.054331765, y: 1.5099032e-16, z: -4.3327085e-17}
+      position: {x: -0.002716588, y: 7.549515e-18, z: -2.1663542e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReversePart1
       parentName: HipSwingReverse
-      position: {x: 0.018110588, y: 0, z: 0}
+      position: {x: 0.00090552936, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReversePart2
       parentName: HipSwingReversePart1
-      position: {x: 0.018110588, y: 0, z: 0}
+      position: {x: 0.00090552936, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReverseRoot
       parentName: HipSwingReversePart2
-      position: {x: 0.018110588, y: -1.598721e-16, z: 4.3327085e-17}
+      position: {x: 0.00090552936, y: -7.993605e-18, z: 2.1663542e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReverseXPart1
       parentName: HipSwingReverse
-      position: {x: 0.018110588, y: 0, z: 0}
+      position: {x: 0.00090552936, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HipSwingReverseXPart2
       parentName: HipSwingReverse
-      position: {x: 0.036221176, y: 8.881784e-18, z: 0}
+      position: {x: 0.0018110587, y: 4.440892e-19, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKXRoot_M
       parentName: FKExtraRoot_M
-      position: {x: -0, y: -8.881784e-18, z: -1.5777218e-32}
+      position: {x: -0, y: -4.440892e-19, z: -7.8886085e-34}
       rotation: {x: 3.700744e-17, y: -3.700744e-17, z: -3.700744e-17, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRootPart1_M
       parentName: FKXRoot_M
-      position: {x: -0.018110588, y: 5.3290704e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 2.664535e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRootPart1_M
@@ -619,7 +619,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRootPart2_M
       parentName: FKXRootPart1_M
-      position: {x: -0.018110588, y: 5.3290704e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 2.664535e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRootPart2_M
@@ -644,7 +644,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetSpine1_M
       parentName: HipSwingerStabilizer
-      position: {x: -0.018110588, y: 6.217249e-17, z: -2.599625e-17}
+      position: {x: -0.00090552936, y: 3.1086244e-18, z: -1.2998124e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraSpine1_M
@@ -664,7 +664,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetSpine1Part1_M
       parentName: FKXSpine1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraSpine1Part1_M
@@ -684,7 +684,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetSpine1Part2_M
       parentName: FKXSpine1Part1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraSpine1Part2_M
@@ -704,7 +704,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetChest_M
       parentName: FKXSpine1Part2_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -2.2371656e-17}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -1.1185827e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraChest_M
@@ -724,12 +724,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToRoot_M
       parentName: FKSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetHip_R
       parentName: FKParentConstraintToRoot_M
-      position: {x: 0.013534675, y: -0.002779971, z: -0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: -0.0010122512}
       rotation: {x: 0.07603295, y: 0.994076, z: -0.077230714, w: -0.008204995}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraHip_R
@@ -749,7 +749,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetKnee_R
       parentName: FKXHip_R
-      position: {x: -0.15459687, y: -4.496403e-17, z: -2.0428103e-16}
+      position: {x: -0.007729843, y: -2.2482014e-18, z: -1.0214051e-17}
       rotation: {x: 0, y: 0, z: 0.029249467, w: 0.99957216}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraKnee_R
@@ -769,7 +769,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetAnkle_R
       parentName: FKXKnee_R
-      position: {x: -0.15729053, y: 4.8849813e-17, z: -1.8207656e-16}
+      position: {x: -0.0078645265, y: 2.4424904e-18, z: -9.103827e-18}
       rotation: {x: 0.012333002, y: -0.0026452567, z: -0.029049633, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraAnkle_R
@@ -789,7 +789,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetToes_R
       parentName: FKXAnkle_R
-      position: {x: -0.018064, y: 0.06460275, z: 2.959607e-11}
+      position: {x: -0.00090319995, y: 0.0032301373, z: 1.4798034e-12}
       rotation: {x: -0.0019460821, y: 0.017511604, z: -0.7140281, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraToes_R
@@ -809,7 +809,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetHip_L
       parentName: FKParentConstraintToRoot_M
-      position: {x: 0.013534675, y: -0.002779971, z: 0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: 0.0010122512}
       rotation: {x: 0.994076, y: -0.07603296, z: 0.008204994, w: -0.077230714}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraHip_L
@@ -829,7 +829,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetKnee_L
       parentName: FKXHip_L
-      position: {x: 0.15459687, y: 8.77076e-17, z: 2.4424907e-16}
+      position: {x: 0.007729843, y: 4.38538e-18, z: 1.2212453e-17}
       rotation: {x: 0, y: 0, z: 0.029249467, w: 0.99957216}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraKnee_L
@@ -849,7 +849,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetAnkle_L
       parentName: FKXKnee_L
-      position: {x: 0.15729053, y: -9.8809834e-17, z: 2.3092638e-16}
+      position: {x: 0.0078645265, y: -4.9404913e-18, z: 1.1546318e-17}
       rotation: {x: 0.012333002, y: -0.002645256, z: -0.02904964, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraAnkle_L
@@ -869,7 +869,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetToes_L
       parentName: FKXAnkle_L
-      position: {x: 0.018064003, y: -0.06460275, z: 2.2605028e-13}
+      position: {x: 0.0009032001, y: -0.0032301373, z: 1.1302514e-14}
       rotation: {x: -0.0019460816, y: 0.017511604, z: -0.7140281, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraToes_L
@@ -889,12 +889,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToChest_M
       parentName: FKSystem
-      position: {x: 5.4222817e-17, y: 0.43324357, z: -0.0125461435}
+      position: {x: 2.7111407e-18, y: 0.021662178, z: -0.00062730716}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetNeck_M
       parentName: FKParentConstraintToChest_M
-      position: {x: -0.03761429, y: 0.0000000011921248, z: 1.6042371e-16}
+      position: {x: -0.0018807143, y: 5.960624e-11, z: 8.021185e-18}
       rotation: {x: 0, y: -0, z: -0.17967951, w: 0.9837252}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraNeck_M
@@ -914,7 +914,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetNeckPart1_M
       parentName: FKXNeck_M
-      position: {x: -0.006144963, y: -2.3092638e-16, z: 3.1803266e-18}
+      position: {x: -0.00030724815, y: -1.1546318e-17, z: 1.5901632e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraNeckPart1_M
@@ -934,7 +934,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetNeckPart2_M
       parentName: FKXNeckPart1_M
-      position: {x: -0.006144963, y: -2.3092638e-16, z: 3.1803266e-18}
+      position: {x: -0.00030724815, y: -1.1546318e-17, z: 1.5901632e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraNeckPart2_M
@@ -954,7 +954,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetHead_M
       parentName: FKXNeckPart2_M
-      position: {x: -0.006144963, y: -1.7763565e-16, z: 3.3948768e-18}
+      position: {x: -0.00030724815, y: -8.8817815e-18, z: 1.6974383e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKGlobalStaticHead_M
@@ -964,12 +964,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKGlobalHead_M
       parentName: FKGlobalStaticHead_M
-      position: {x: 7.105427e-17, y: 0, z: -1.5777218e-32}
+      position: {x: 3.5527134e-18, y: 0, z: -7.8886085e-34}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraHead_M
       parentName: FKGlobalHead_M
-      position: {x: -7.105427e-17, y: 0, z: 3.1554436e-32}
+      position: {x: -3.5527134e-18, y: 0, z: 1.5777217e-33}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKHead_M
@@ -984,7 +984,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetJaw_M
       parentName: FKXHead_M
-      position: {x: -0.034348074, y: 0.0072435695, z: 6.604019e-18}
+      position: {x: -0.0017174036, y: 0.00036217846, z: 3.3020094e-19}
       rotation: {x: 0, y: 0, z: -0.7976716, w: 0.6030921}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraJaw_M
@@ -1004,12 +1004,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKAimEye_R
       parentName: FKXHead_M
-      position: {x: -0.06810121, y: 0.023233265, z: -0.015772998}
+      position: {x: -0.0034050604, y: 0.0011616632, z: -0.0007886499}
       rotation: {x: -1.452306e-24, y: -1.3603819e-16, z: -0.62962174, w: 0.77690184}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetEye_R
       parentName: FKAimEye_R
-      position: {x: -0, y: 7.105427e-17, z: 0}
+      position: {x: -0, y: 3.5527134e-18, z: 0}
       rotation: {x: 0.00814376, y: 0.27819648, z: 0.02810477, w: 0.9600784}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraEye_R
@@ -1029,12 +1029,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKAimEye_L
       parentName: FKXHead_M
-      position: {x: -0.06810121, y: 0.023233265, z: 0.015772998}
+      position: {x: -0.0034050604, y: 0.0011616632, z: 0.0007886499}
       rotation: {x: -1.452306e-24, y: -1.3603819e-16, z: -0.62962174, w: 0.77690184}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetEye_L
       parentName: FKAimEye_L
-      position: {x: -3.5527136e-17, y: 0, z: -4.440892e-18}
+      position: {x: -1.7763567e-18, y: 0, z: -2.220446e-19}
       rotation: {x: -0.008143763, y: -0.2781965, z: 0.028104777, w: 0.9600784}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraEye_L
@@ -1054,7 +1054,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetScapula_R
       parentName: FKParentConstraintToChest_M
-      position: {x: -0.02988683, y: -0.0012435172, z: -0.014304807}
+      position: {x: -0.0014943414, y: -0.00006217585, z: -0.0007152403}
       rotation: {x: -0.06265567, y: -0.8027515, z: -0.044166412, w: 0.59136593}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraScapula_R
@@ -1074,7 +1074,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetScapula_L
       parentName: FKParentConstraintToChest_M
-      position: {x: -0.02988683, y: -0.0012435172, z: 0.014304807}
+      position: {x: -0.0014943414, y: -0.00006217585, z: 0.0007152403}
       rotation: {x: 0.8027515, y: -0.06265567, z: 0.59136593, w: 0.044166416}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraScapula_L
@@ -1094,12 +1094,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToWrist_R
       parentName: FKSystem
-      position: {x: 0.22121416, y: 0.45283484, z: -0.018427944}
+      position: {x: 0.011060707, y: 0.02264174, z: -0.0009213971}
       rotation: {x: 0.0000033899519, y: 0.7071472, z: 0.70706636, w: 0.0000052725964}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger1_R
       parentName: FKParentConstraintToWrist_R
-      position: {x: -0.034002848, y: -1.1102228e-17, z: -4.2632563e-16}
+      position: {x: -0.0017001423, y: -5.5511134e-19, z: -2.131628e-17}
       rotation: {x: -0.0006041644, y: 0.0000042666165, z: 0.000010920454, w: 0.9999998}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger1_R
@@ -1109,7 +1109,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger1_R
       parentName: SDKFKMiddleFinger1_R
-      position: {x: -0, y: 2.220446e-18, z: 0}
+      position: {x: -0, y: 1.110223e-19, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger1_R
@@ -1124,7 +1124,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger2_R
       parentName: FKXMiddleFinger1_R
-      position: {x: -0.010047397, y: -2.57061e-14, z: 8.1712404e-15}
+      position: {x: -0.0005023698, y: -1.2853049e-15, z: 4.08562e-16}
       rotation: {x: 0.00031797233, y: -0, z: -0, w: 0.99999994}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger2_R
@@ -1134,7 +1134,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger2_R
       parentName: SDKFKMiddleFinger2_R
-      position: {x: -3.5527136e-17, y: 2.220446e-18, z: 7.105427e-17}
+      position: {x: -1.7763567e-18, y: 1.110223e-19, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger2_R
@@ -1149,7 +1149,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger3_R
       parentName: FKXMiddleFinger2_R
-      position: {x: -0.009260119, y: 0.00000008508096, z: 0.0000000351969}
+      position: {x: -0.0004630059, y: 0.000000004254048, z: 0.0000000017598449}
       rotation: {x: 0.0004659067, y: 0.000001898135, z: -0.000027636239, w: 0.9999999}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger3_R
@@ -1159,7 +1159,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger3_R
       parentName: SDKFKMiddleFinger3_R
-      position: {x: -0, y: 0, z: 7.105427e-17}
+      position: {x: -0, y: 0, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger3_R
@@ -1174,7 +1174,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger1_R
       parentName: FKParentConstraintToWrist_R
-      position: {x: -0.009080676, y: 0.00618821, z: -0.0040539014}
+      position: {x: -0.00045403378, y: 0.00030941048, z: -0.00020269505}
       rotation: {x: -0.49000221, y: -0.07927864, z: -0.32621834, w: 0.8044839}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger1_R
@@ -1194,7 +1194,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger2_R
       parentName: FKXThumbFinger1_R
-      position: {x: -0.011500116, y: 1.0658139e-15, z: -2.4868996e-16}
+      position: {x: -0.0005750058, y: 5.3290694e-17, z: -1.24344974e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKThumbFinger2_R
@@ -1204,7 +1204,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger2_R
       parentName: SDKFKThumbFinger2_R
-      position: {x: 1.9984012e-17, y: 7.105427e-17, z: -3.5527136e-17}
+      position: {x: 9.992006e-19, y: 3.5527134e-18, z: -1.7763567e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKThumbFinger2_R
@@ -1219,7 +1219,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger3_R
       parentName: FKXThumbFinger2_R
-      position: {x: -0.012363284, y: -0.00000003600902, z: -0.000000111568134}
+      position: {x: -0.00061816414, y: -0.0000000018004509, z: -0.000000005578406}
       rotation: {x: 3.0704127e-11, y: 0.000008808265, z: -0.0000034858315, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKThumbFinger3_R
@@ -1229,7 +1229,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger3_R
       parentName: SDKFKThumbFinger3_R
-      position: {x: -5.551115e-19, y: 1.4210854e-16, z: 3.5527136e-17}
+      position: {x: -2.7755574e-20, y: 7.105427e-18, z: 1.7763567e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKThumbFinger3_R
@@ -1244,7 +1244,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger1_R
       parentName: FKParentConstraintToWrist_R
-      position: {x: -0.035060387, y: 0.0083024595, z: -0.00044641623}
+      position: {x: -0.0017530193, y: 0.00041512295, z: -0.00002232081}
       rotation: {x: 0.008182965, y: 0.000006061234, z: -0.000013172092, w: 0.99996656}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger1_R
@@ -1254,7 +1254,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger1_R
       parentName: SDKFKIndexFinger1_R
-      position: {x: -0, y: 5.551115e-19, z: -7.105427e-17}
+      position: {x: -0, y: 2.7755574e-20, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger1_R
@@ -1269,7 +1269,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger2_R
       parentName: FKXIndexFinger1_R
-      position: {x: -0.008721446, y: 1.32777116e-14, z: -2.4868993e-15}
+      position: {x: -0.00043607227, y: 6.638855e-16, z: -1.2434495e-16}
       rotation: {x: -8.481115e-13, y: 0.000000118230616, z: 0.000007173366, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger2_R
@@ -1279,7 +1279,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger2_R
       parentName: SDKFKIndexFinger2_R
-      position: {x: -0, y: -1.110223e-18, z: -7.105427e-17}
+      position: {x: -0, y: -5.551115e-20, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger2_R
@@ -1294,7 +1294,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger3_R
       parentName: FKXIndexFinger2_R
-      position: {x: -0.008149071, y: -7.707723e-14, z: 2.842171e-16}
+      position: {x: -0.0004074535, y: -3.853861e-15, z: 1.4210854e-17}
       rotation: {x: -0.014845524, y: -0.0000031078976, z: 0.00003662106, w: 0.9998898}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger3_R
@@ -1304,7 +1304,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger3_R
       parentName: SDKFKIndexFinger3_R
-      position: {x: -0, y: 2.220446e-18, z: 0}
+      position: {x: -0, y: 1.110223e-19, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger3_R
@@ -1319,7 +1319,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetCup_R
       parentName: FKParentConstraintToWrist_R
-      position: {x: -0.010967072, y: -0.007235462, z: -0.0000393164}
+      position: {x: -0.0005483536, y: -0.00036177307, z: -0.0000019658198}
       rotation: {x: 0.0077963076, y: 0.004257838, z: -0.085782886, w: 0.9962743}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKCup_R
@@ -1329,7 +1329,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraCup_R
       parentName: SDKFKCup_R
-      position: {x: -3.5527136e-17, y: 0, z: 0}
+      position: {x: -1.7763567e-18, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKCup_R
@@ -1344,7 +1344,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger1_R
       parentName: FKXCup_R
-      position: {x: -0.018711347, y: -0.009141758, z: -0.00047401537}
+      position: {x: -0.0009355673, y: -0.00045708788, z: -0.000023700766}
       rotation: {x: -0.0370185, y: -0.0067629614, z: 0.08560594, w: 0.99561816}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger1_R
@@ -1354,7 +1354,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraPinkyFinger1_R
       parentName: SDKFKPinkyFinger1_R
-      position: {x: -0, y: 0, z: -7.105427e-17}
+      position: {x: -0, y: 0, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKPinkyFinger1_R
@@ -1369,7 +1369,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger2_R
       parentName: FKXPinkyFinger1_R
-      position: {x: -0.0064806053, y: -1.9539925e-16, z: 6.394884e-16}
+      position: {x: -0.00032403026, y: -9.769962e-18, z: 3.197442e-17}
       rotation: {x: 0.0023960539, y: -0.0000022576673, z: -0.000012274624, w: 0.99999714}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger2_R
@@ -1379,7 +1379,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraPinkyFinger2_R
       parentName: SDKFKPinkyFinger2_R
-      position: {x: -0, y: -1.7763568e-17, z: 0}
+      position: {x: -0, y: -8.881784e-19, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKPinkyFinger2_R
@@ -1394,7 +1394,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger3_R
       parentName: FKXPinkyFinger2_R
-      position: {x: -0.006607189, y: 5.8086864e-15, z: -1.1368684e-15}
+      position: {x: -0.0003303594, y: 2.904343e-16, z: -5.6843415e-17}
       rotation: {x: 0.019718833, y: 0.0000038400567, z: -0.0000051208094, w: 0.99980557}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger3_R
@@ -1404,7 +1404,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraPinkyFinger3_R
       parentName: SDKFKPinkyFinger3_R
-      position: {x: -0, y: -4.440892e-18, z: -7.105427e-17}
+      position: {x: -0, y: -2.220446e-19, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKPinkyFinger3_R
@@ -1419,7 +1419,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger1_R
       parentName: FKXCup_R
-      position: {x: -0.021925094, y: -0.003189723, z: 0.00024299684}
+      position: {x: -0.0010962546, y: -0.00015948614, z: 0.0000121498415}
       rotation: {x: -0.036784712, y: -0.025518248, z: 0.08685872, w: 0.9952142}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger1_R
@@ -1444,7 +1444,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger2_R
       parentName: FKXRingFinger1_R
-      position: {x: -0.00859594, y: 3.5527136e-17, z: 9.947598e-16}
+      position: {x: -0.00042979696, y: 1.7763567e-18, z: 4.973799e-17}
       rotation: {x: 0.025787795, y: 0.01871914, z: -0.0010364417, w: 0.99949163}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger2_R
@@ -1454,7 +1454,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRingFinger2_R
       parentName: SDKFKRingFinger2_R
-      position: {x: -3.5527136e-17, y: 4.440892e-18, z: 0}
+      position: {x: -1.7763567e-18, y: 2.220446e-19, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKRingFinger2_R
@@ -1469,7 +1469,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger3_R
       parentName: FKXRingFinger2_R
-      position: {x: -0.009588163, y: 2.2204456e-17, z: -1.2079226e-15}
+      position: {x: -0.00047940813, y: 1.1102227e-18, z: -6.039612e-17}
       rotation: {x: 0.004977977, y: -0.000003037676, z: 0.000039263017, w: 0.9999876}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger3_R
@@ -1479,7 +1479,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRingFinger3_R
       parentName: SDKFKRingFinger3_R
-      position: {x: -0, y: -4.440892e-18, z: -7.105427e-17}
+      position: {x: -0, y: -2.220446e-19, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKRingFinger3_R
@@ -1494,12 +1494,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToScapula_R
       parentName: FKSystem
-      position: {x: 0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: 0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: 0.10724806, y: 0.69900036, z: 0.6992036, w: 0.104931764}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetShoulder_R
       parentName: FKParentConstraintToScapula_R
-      position: {x: -0.032893375, y: -3.1885602e-15, z: 1.563194e-15}
+      position: {x: -0.0016446686, y: -1.59428e-16, z: 7.8159694e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraShoulder_R
@@ -1519,7 +1519,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetElbow_R
       parentName: FKXShoulder_R
-      position: {x: -0.09517931, y: 2.6645352e-17, z: -9.947598e-16}
+      position: {x: -0.004758965, y: 1.3322675e-18, z: -4.973799e-17}
       rotation: {x: 0, y: -0, z: -0.05189724, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraElbow_R
@@ -1539,7 +1539,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetWrist_R
       parentName: FKXElbow_R
-      position: {x: -0.0805529, y: 4.440892e-18, z: -1.4210854e-16}
+      position: {x: -0.0040276446, y: 2.220446e-19, z: -7.105427e-18}
       rotation: {x: 0.000057094603, y: -0.0000033707724, z: 0.028117696, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraWrist_R
@@ -1559,12 +1559,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToWrist_L
       parentName: FKSystem
-      position: {x: -0.22121416, y: 0.45283484, z: -0.018427944}
+      position: {x: -0.011060707, y: 0.02264174, z: -0.0009213971}
       rotation: {x: 0.000005299924, y: -0.70706636, z: 0.7071472, w: -0.0000033626272}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger1_L
       parentName: FKParentConstraintToWrist_L
-      position: {x: 0.034002848, y: 1.3322676e-17, z: 2.842171e-16}
+      position: {x: 0.0017001423, y: 6.6613377e-19, z: 1.4210854e-17}
       rotation: {x: -0.0006041644, y: 0.0000042666165, z: 0.000010920454, w: 0.9999998}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger1_L
@@ -1574,7 +1574,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger1_L
       parentName: SDKFKMiddleFinger1_L
-      position: {x: -7.105427e-17, y: 0, z: 7.105427e-17}
+      position: {x: -3.5527134e-18, y: 0, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger1_L
@@ -1589,7 +1589,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger2_L
       parentName: FKXMiddleFinger1_L
-      position: {x: 0.010047397, y: 2.5710545e-14, z: -8.1712404e-15}
+      position: {x: 0.0005023698, y: 1.2855272e-15, z: -4.08562e-16}
       rotation: {x: 0.00031797233, y: -0, z: -0, w: 0.99999994}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger2_L
@@ -1599,7 +1599,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger2_L
       parentName: SDKFKMiddleFinger2_L
-      position: {x: 3.5527136e-17, y: 0, z: -7.105427e-17}
+      position: {x: 1.7763567e-18, y: 0, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger2_L
@@ -1614,7 +1614,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetMiddleFinger3_L
       parentName: FKXMiddleFinger2_L
-      position: {x: 0.009260119, y: -0.00000008508096, z: -0.0000000351969}
+      position: {x: 0.0004630059, y: -0.000000004254048, z: -0.0000000017598449}
       rotation: {x: 0.0004659067, y: 0.000001898135, z: -0.000027636239, w: 0.9999999}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKMiddleFinger3_L
@@ -1624,7 +1624,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraMiddleFinger3_L
       parentName: SDKFKMiddleFinger3_L
-      position: {x: -3.5527136e-17, y: 0, z: 0}
+      position: {x: -1.7763567e-18, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKMiddleFinger3_L
@@ -1639,7 +1639,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger1_L
       parentName: FKParentConstraintToWrist_L
-      position: {x: 0.009080676, y: -0.00618821, z: 0.0040539014}
+      position: {x: 0.00045403378, y: -0.00030941048, z: 0.00020269505}
       rotation: {x: -0.49000221, y: -0.07927864, z: -0.32621834, w: 0.8044839}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger1_L
@@ -1659,7 +1659,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger2_L
       parentName: FKXThumbFinger1_L
-      position: {x: 0.011500116, y: -1.2079226e-15, z: 3.197442e-16}
+      position: {x: 0.0005750058, y: -6.039612e-17, z: 1.598721e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKThumbFinger2_L
@@ -1669,7 +1669,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger2_L
       parentName: SDKFKThumbFinger2_L
-      position: {x: -1.1102228e-17, y: 1.4210854e-16, z: 0}
+      position: {x: -5.5511134e-19, y: 7.105427e-18, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKThumbFinger2_L
@@ -1684,7 +1684,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetThumbFinger3_L
       parentName: FKXThumbFinger2_L
-      position: {x: 0.012363284, y: 0.00000003600902, z: 0.000000111568134}
+      position: {x: 0.00061816414, y: 0.0000000018004509, z: 0.000000005578406}
       rotation: {x: 3.0704127e-11, y: 0.000008808265, z: -0.0000034858315, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKThumbFinger3_L
@@ -1694,7 +1694,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraThumbFinger3_L
       parentName: SDKFKThumbFinger3_L
-      position: {x: 1.4988008e-17, y: 0, z: 0}
+      position: {x: 7.4940035e-19, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKThumbFinger3_L
@@ -1709,7 +1709,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger1_L
       parentName: FKParentConstraintToWrist_L
-      position: {x: 0.035060387, y: -0.0083024595, z: 0.00044641623}
+      position: {x: 0.0017530193, y: -0.00041512295, z: 0.00002232081}
       rotation: {x: 0.008182965, y: 0.000006061234, z: -0.000013172092, w: 0.99996656}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger1_L
@@ -1719,7 +1719,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger1_L
       parentName: SDKFKIndexFinger1_L
-      position: {x: -0, y: -5.551115e-19, z: 0}
+      position: {x: -0, y: -2.7755574e-20, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger1_L
@@ -1734,7 +1734,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger2_L
       parentName: FKXIndexFinger1_L
-      position: {x: 0.008721446, y: -1.327882e-14, z: 2.629008e-15}
+      position: {x: 0.00043607227, y: -6.6394095e-16, z: 1.314504e-16}
       rotation: {x: -8.481115e-13, y: 0.000000118230616, z: 0.000007173366, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger2_L
@@ -1744,7 +1744,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger2_L
       parentName: SDKFKIndexFinger2_L
-      position: {x: 3.5527136e-17, y: 5.551115e-19, z: 0}
+      position: {x: 1.7763567e-18, y: 2.7755574e-20, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger2_L
@@ -1759,7 +1759,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetIndexFinger3_L
       parentName: FKXIndexFinger2_L
-      position: {x: 0.008149071, y: 7.707723e-14, z: -6.394884e-16}
+      position: {x: 0.0004074535, y: 3.853861e-15, z: -3.197442e-17}
       rotation: {x: -0.014845524, y: -0.0000031078976, z: 0.00003662106, w: 0.9998898}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKIndexFinger3_L
@@ -1769,7 +1769,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraIndexFinger3_L
       parentName: SDKFKIndexFinger3_L
-      position: {x: -3.5527136e-17, y: 0, z: 1.4210854e-16}
+      position: {x: -1.7763567e-18, y: 0, z: 7.105427e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIndexFinger3_L
@@ -1784,7 +1784,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetCup_L
       parentName: FKParentConstraintToWrist_L
-      position: {x: 0.010967072, y: 0.007235462, z: 0.0000393164}
+      position: {x: 0.0005483536, y: 0.00036177307, z: 0.0000019658198}
       rotation: {x: 0.0077963076, y: 0.004257838, z: -0.085782886, w: 0.9962743}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKCup_L
@@ -1794,7 +1794,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraCup_L
       parentName: SDKFKCup_L
-      position: {x: -0, y: 0, z: -7.105427e-17}
+      position: {x: -0, y: 0, z: -3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKCup_L
@@ -1809,7 +1809,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger1_L
       parentName: FKXCup_L
-      position: {x: 0.018711347, y: 0.009141758, z: 0.00047401537}
+      position: {x: 0.0009355673, y: 0.00045708788, z: 0.000023700766}
       rotation: {x: -0.0370185, y: -0.0067629614, z: 0.08560594, w: 0.99561816}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger1_L
@@ -1834,7 +1834,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger2_L
       parentName: FKXPinkyFinger1_L
-      position: {x: 0.0064806053, y: 1.8651744e-16, z: -4.2632563e-16}
+      position: {x: 0.00032403026, y: 9.325872e-18, z: -2.131628e-17}
       rotation: {x: 0.0023960539, y: -0.0000022616452, z: -0.000012274848, w: 0.99999714}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger2_L
@@ -1844,7 +1844,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraPinkyFinger2_L
       parentName: SDKFKPinkyFinger2_L
-      position: {x: -3.5527136e-17, y: -8.881784e-18, z: -1.4210854e-16}
+      position: {x: -1.7763567e-18, y: -4.440892e-19, z: -7.105427e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKPinkyFinger2_L
@@ -1859,7 +1859,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetPinkyFinger3_L
       parentName: FKXPinkyFinger2_L
-      position: {x: 0.006607189, y: 2.8237855e-12, z: -5.2571777e-11}
+      position: {x: 0.0003303594, y: 1.4118927e-13, z: -2.6285888e-12}
       rotation: {x: 0.019718833, y: 0.0000038440385, z: -0.0000051206734, w: 0.99980557}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKPinkyFinger3_L
@@ -1869,7 +1869,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraPinkyFinger3_L
       parentName: SDKFKPinkyFinger3_L
-      position: {x: -0, y: 0, z: 7.105427e-17}
+      position: {x: -0, y: 0, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKPinkyFinger3_L
@@ -1884,7 +1884,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger1_L
       parentName: FKXCup_L
-      position: {x: 0.021925094, y: 0.003189723, z: -0.00024299684}
+      position: {x: 0.0010962546, y: 0.00015948614, z: -0.0000121498415}
       rotation: {x: -0.036784712, y: -0.025518248, z: 0.08685872, w: 0.9952142}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger1_L
@@ -1909,7 +1909,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger2_L
       parentName: FKXRingFinger1_L
-      position: {x: 0.00859594, y: -4.4408912e-17, z: -8.5265126e-16}
+      position: {x: 0.00042979696, y: -2.2204454e-18, z: -4.263256e-17}
       rotation: {x: 0.025787795, y: 0.018719137, z: -0.0010364418, w: 0.99949163}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger2_L
@@ -1919,7 +1919,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRingFinger2_L
       parentName: SDKFKRingFinger2_L
-      position: {x: -0, y: -4.440892e-18, z: 7.105427e-17}
+      position: {x: -0, y: -2.220446e-19, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKRingFinger2_L
@@ -1934,7 +1934,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetRingFinger3_L
       parentName: FKXRingFinger2_L
-      position: {x: 0.009588163, y: 6.467448e-13, z: -6.64599e-11}
+      position: {x: 0.00047940813, y: 3.2337238e-14, z: -3.3229949e-12}
       rotation: {x: 0.004977977, y: -0.00000303421, z: 0.000039263035, w: 0.9999876}
       scale: {x: 1, y: 1, z: 1}
     - name: SDKFKRingFinger3_L
@@ -1944,7 +1944,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraRingFinger3_L
       parentName: SDKFKRingFinger3_L
-      position: {x: -0, y: 4.440892e-18, z: 7.105427e-17}
+      position: {x: -0, y: 2.220446e-19, z: 3.5527134e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: FKRingFinger3_L
@@ -1959,12 +1959,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKParentConstraintToScapula_L
       parentName: FKSystem
-      position: {x: -0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: -0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: -0.104931764, y: 0.6992036, z: -0.69900036, w: 0.10724806}
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetShoulder_L
       parentName: FKParentConstraintToScapula_L
-      position: {x: 0.032893375, y: 3.2085443e-15, z: -1.4210852e-15}
+      position: {x: 0.0016446686, y: 1.604272e-16, z: -7.105425e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraShoulder_L
@@ -1984,7 +1984,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetElbow_L
       parentName: FKXShoulder_L
-      position: {x: 0.09517931, y: -1.1102228e-17, z: 1.3500312e-15}
+      position: {x: 0.004758965, y: -5.5511134e-19, z: 6.750156e-17}
       rotation: {x: 0, y: -0, z: -0.05189724, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraElbow_L
@@ -2004,7 +2004,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKOffsetWrist_L
       parentName: FKXElbow_L
-      position: {x: 0.0805529, y: 3.9968024e-17, z: -1.4210854e-16}
+      position: {x: 0.0040276446, y: 1.9984012e-18, z: -7.105427e-18}
       rotation: {x: 0.000057094603, y: -0.0000033707724, z: 0.028117696, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: FKExtraWrist_L
@@ -2034,147 +2034,147 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKParentConstraintHip_R
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.4604169, y: -0.53667146, z: -0.4604169, w: 0.53667146}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXOffsetHip_R
       parentName: IKParentConstraintHip_R
-      position: {x: 0.013534675, y: -0.002779971, z: -0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: -0.0010122512}
       rotation: {x: 0.07603295, y: 0.994076, z: -0.077230714, w: -0.008204995}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXHip_R
       parentName: IKXOffsetHip_R
-      position: {x: -0, y: 5.551115e-19, z: 0}
+      position: {x: -0, y: 2.7755574e-20, z: 0}
       rotation: {x: 2.3870667e-12, y: -8.0883966e-11, z: 0.000000589397, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXKnee_R
       parentName: IKXHip_R
-      position: {x: -0.15459687, y: -5.551115e-17, z: -2.842171e-16}
+      position: {x: -0.007729843, y: -2.7755574e-18, z: -1.4210854e-17}
       rotation: {x: 1.7777097e-21, y: -1.27459525e-20, z: 0.0292483, w: 0.9995722}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXAnkle_R
       parentName: IKXKnee_R
-      position: {x: -0.15729053, y: 1.9984014e-16, z: -1.9095832e-16}
+      position: {x: -0.0078645265, y: 9.992006e-18, z: -9.547916e-18}
       rotation: {x: 0.012333002, y: -0.0026452548, z: -0.029049091, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXToes_R
       parentName: IKXAnkle_R
-      position: {x: -0.018064, y: 0.06460275, z: 2.959605e-11}
+      position: {x: -0.00090319995, y: 0.0032301373, z: 1.4798025e-12}
       rotation: {x: -0.0019460865, y: 0.01751161, z: -0.71402806, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: IKMessureFromHip_R
       parentName: IKParentConstraintHip_R
-      position: {x: 0.013534675, y: -0.002779971, z: -0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: -0.0010122512}
       rotation: {x: 0.07603295, y: 0.994076, z: -0.077230714, w: -0.008204995}
       scale: {x: 1, y: 1, z: 1}
     - name: IKParentConstraintShoulder_R
       parentName: IKJoints
-      position: {x: 0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: 0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: 0.10724808, y: 0.6990005, z: 0.6992035, w: 0.10493193}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXOffsetShoulder_R
       parentName: IKParentConstraintShoulder_R
-      position: {x: -0.032893375, y: -3.1907807e-15, z: 1.563194e-15}
+      position: {x: -0.0016446686, y: -1.5953903e-16, z: 7.8159694e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXShoulder_R
       parentName: IKXOffsetShoulder_R
-      position: {x: -8.881784e-18, y: 0, z: 7.105427e-17}
+      position: {x: -4.440892e-19, y: 0, z: 3.5527134e-18}
       rotation: {x: -1.22326e-16, y: 5.8265453e-18, z: -8.924903e-31, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXElbow_R
       parentName: IKXShoulder_R
-      position: {x: -0.09517931, y: 6.661337e-17, z: -1.2079226e-15}
+      position: {x: -0.004758965, y: 3.3306684e-18, z: -6.039612e-17}
       rotation: {x: 2.3597925e-22, y: 3.9507168e-21, z: -0.051897272, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXWrist_R
       parentName: IKXElbow_R
-      position: {x: -0.0805529, y: 0, z: -7.105427e-17}
+      position: {x: -0.0040276446, y: 0, z: -3.5527134e-18}
       rotation: {x: 0.000057094603, y: -0.0000033707706, z: 0.02811773, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: IKMessureFromShoulder_R
       parentName: IKParentConstraintShoulder_R
-      position: {x: -0.032893375, y: -3.1907807e-15, z: 1.7053025e-15}
+      position: {x: -0.0016446686, y: -1.5953903e-16, z: 8.526512e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: IKParentConstraintRoot_M
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXOffsetRoot_M
       parentName: IKParentConstraintRoot_M
-      position: {x: -0, y: 0, z: -1.5777218e-32}
+      position: {x: -0, y: 0, z: -7.8886085e-34}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXRoot_M
       parentName: IKXOffsetRoot_M
-      position: {x: -7.105427e-17, y: 0, z: -3.1554436e-32}
+      position: {x: -3.5527134e-18, y: 0, z: -1.5777217e-33}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXRootPart1_M
       parentName: IKXRoot_M
-      position: {x: -0.018110588, y: 7.993605e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 3.9968023e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXRootPart2_M
       parentName: IKXRootPart1_M
-      position: {x: -0.018110588, y: 0, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 0, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXSpine1_M
       parentName: IKXRootPart2_M
-      position: {x: -0.018110588, y: 7.993605e-17, z: -2.599625e-17}
+      position: {x: -0.00090552936, y: 3.9968023e-18, z: -1.2998124e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXSpine1Part1_M
       parentName: IKXSpine1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXSpine1Part2_M
       parentName: IKXSpine1Part1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXChest_M
       parentName: IKXSpine1Part2_M
-      position: {x: -0.011144993, y: 0.0000000014833407, z: 4.5823877e-17}
+      position: {x: -0.0005572496, y: 7.416703e-11, z: 2.2911937e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKfake0Spine_M
       parentName: IKParentConstraintRoot_M
-      position: {x: -0, y: 0, z: -1.5777218e-32}
+      position: {x: -0, y: 0, z: -7.8886085e-34}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpRootPart1_M
       parentName: IKfake0Spine_M
-      position: {x: -0.018110588, y: 6.217249e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 3.1086244e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpRootPart2_M
       parentName: IKSpRootPart1_M
-      position: {x: -0.018110588, y: 1.7763568e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 8.881784e-19, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1_M
       parentName: IKSpRootPart2_M
-      position: {x: -0.018110588, y: 5.3290704e-17, z: -2.599625e-17}
+      position: {x: -0.00090552936, y: 2.664535e-18, z: -1.2998124e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1Part1_M
       parentName: IKSpSpine1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1Part2_M
       parentName: IKSpSpine1Part1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -7.4572185e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -3.7286092e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpChest_M
       parentName: IKSpSpine1Part2_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -2.2371656e-17}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -1.1185827e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKFixedOrientRoot_M
@@ -2184,152 +2184,152 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRootFollowOffset_M
       parentName: IKFixedOrientRoot_M
-      position: {x: -0, y: 0, z: -1.5777218e-32}
+      position: {x: -0, y: 0, z: -7.8886085e-34}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpRootFollowOffset_M
       parentName: IKFixedOrientRoot_M
-      position: {x: -0, y: 0, z: -3.1554436e-32}
+      position: {x: -0, y: 0, z: -1.5777217e-33}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKParentConstraintHip_L
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.4604169, y: -0.53667146, z: -0.4604169, w: 0.53667146}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXOffsetHip_L
       parentName: IKParentConstraintHip_L
-      position: {x: 0.013534675, y: -0.002779971, z: 0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: 0.0010122512}
       rotation: {x: 0.994076, y: -0.07603296, z: 0.008204994, w: -0.077230714}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXHip_L
       parentName: IKXOffsetHip_L
-      position: {x: -7.105427e-17, y: 0, z: 4.440892e-18}
+      position: {x: -3.5527134e-18, y: 0, z: 2.220446e-19}
       rotation: {x: -0.000000007444951, y: -3.0068736e-10, z: 0.000000589397, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXKnee_L
       parentName: IKXHip_L
-      position: {x: 0.15459687, y: 1.02140514e-16, z: 2.9309886e-16}
+      position: {x: 0.007729843, y: 5.1070255e-18, z: 1.4654942e-17}
       rotation: {x: 2.1274694e-21, y: -3.115668e-21, z: 0.0292483, w: 0.9995722}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXAnkle_L
       parentName: IKXKnee_L
-      position: {x: 0.15729053, y: 9.6589404e-17, z: 2.7977617e-16}
+      position: {x: 0.0078645265, y: 4.82947e-18, z: 1.3988807e-17}
       rotation: {x: 0.012333003, y: -0.0026452483, z: -0.029049097, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXToes_L
       parentName: IKXAnkle_L
-      position: {x: 0.018064003, y: -0.06460275, z: 2.260325e-13}
+      position: {x: 0.0009032001, y: -0.0032301373, z: 1.1301624e-14}
       rotation: {x: -0.0019460822, y: 0.017511604, z: -0.71402806, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: IKMessureFromHip_L
       parentName: IKParentConstraintHip_L
-      position: {x: 0.013534675, y: -0.002779971, z: 0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: 0.0010122512}
       rotation: {x: 0.994076, y: -0.07603296, z: 0.008204994, w: -0.077230714}
       scale: {x: 1, y: 1, z: 1}
     - name: IKParentConstraintShoulder_L
       parentName: IKJoints
-      position: {x: -0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: -0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: -0.10493192, y: 0.69920355, z: -0.6990004, w: 0.10724809}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXOffsetShoulder_L
       parentName: IKParentConstraintShoulder_L
-      position: {x: 0.032893375, y: 3.2085443e-15, z: -1.563194e-15}
+      position: {x: 0.0016446686, y: 1.604272e-16, z: -7.8159694e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXShoulder_L
       parentName: IKXOffsetShoulder_L
-      position: {x: -8.881784e-18, y: 2.220446e-18, z: 1.4210854e-16}
+      position: {x: -4.440892e-19, y: 1.110223e-19, z: 7.105427e-18}
       rotation: {x: 1.22326e-16, y: -5.8265453e-18, z: 6.4457603e-31, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXElbow_L
       parentName: IKXShoulder_L
-      position: {x: 0.09517931, y: -8.881784e-18, z: 1.2079226e-15}
+      position: {x: 0.004758965, y: -4.440892e-19, z: 6.039612e-17}
       rotation: {x: 1.5930064e-22, y: 5.426234e-21, z: -0.051897272, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: IKXWrist_L
       parentName: IKXElbow_L
-      position: {x: 0.0805529, y: 7.549516e-17, z: -2.842171e-16}
+      position: {x: 0.0040276446, y: 3.7747577e-18, z: -1.4210854e-17}
       rotation: {x: 0.000057094603, y: -0.0000033707706, z: 0.02811773, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: IKMessureFromShoulder_L
       parentName: IKParentConstraintShoulder_L
-      position: {x: 0.032893375, y: 3.2129853e-15, z: -1.563194e-15}
+      position: {x: 0.0016446686, y: 1.6064925e-16, z: -7.8159694e-17}
       rotation: {x: 0.0037139147, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpineOffset_M
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpRootPart1FollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.018110588, y: 6.217249e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 3.1086244e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpRootPart2FollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.036221176, y: 1.0658141e-16, z: -1.7330832e-17}
+      position: {x: -0.0018110587, y: 5.32907e-18, z: -8.6654154e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1FollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.054331765, y: 1.5099032e-16, z: -4.3327085e-17}
+      position: {x: -0.002716588, y: 7.549515e-18, z: -2.1663542e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1Part1FollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.06547675, y: 0.000000001924345, z: -5.0784304e-17}
+      position: {x: -0.0032738375, y: 9.621724e-11, z: -2.539215e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpSpine1Part2FollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.076621756, y: 0.00000000384869, z: -5.824152e-17}
+      position: {x: -0.0038310876, y: 1.9243449e-10, z: -2.912076e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpChestFollowOffset_M
       parentName: IKSpSpineOffset_M
-      position: {x: -0.08776675, y: 0.000000005773034, z: -8.0613165e-17}
+      position: {x: -0.0043883375, y: 2.8865169e-10, z: -4.030658e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpineOffset_M
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRoot_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0, y: 0, z: -1.9721522e-33}
+      position: {x: -0, y: 0, z: -9.860761e-35}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRootPart1_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.018110588, y: -1.812432e-11, z: -4.8383502e-18}
+      position: {x: -0.00090552936, y: -9.062159e-13, z: -2.419175e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRootPart2_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.036221176, y: -3.61497e-11, z: -1.28000525e-17}
+      position: {x: -0.0018110587, y: -1.8074849e-12, z: -6.4000256e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.054331765, y: 3.503425e-10, z: -2.9466827e-17}
+      position: {x: -0.002716588, y: 1.7517125e-11, z: -1.4733412e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1Part1_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.06547677, y: 0.0000000018589809, z: -3.6244834e-17}
+      position: {x: -0.0032738382, y: 9.294904e-11, z: -1.8122417e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1Part2_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.07662174, y: 0.0000000036799013, z: -3.0100014e-17}
+      position: {x: -0.003831087, y: 1.8399506e-10, z: -1.5050006e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcChest_M
       parentName: IKAcSpineOffset_M
-      position: {x: -0.08776675, y: 0.0000000052441966, z: 7.0704835e-18}
+      position: {x: -0.0043883375, y: 2.622098e-10, z: 3.5352415e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpineOffset3_M
@@ -2339,62 +2339,62 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformRootPart1_M
       parentName: IKAcSpineOffset3_M
-      position: {x: -2.0638779e-18, y: 0.36439747, z: -0.0019538736}
+      position: {x: -1.0319389e-19, y: 0.018219871, z: -0.00009769367}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformRootPart2_M
       parentName: IKAcSpineOffset3_M
-      position: {x: 5.8978242e-18, y: 0.38229743, z: -0.004707863}
+      position: {x: 2.948912e-19, y: 0.01911487, z: -0.00023539313}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformSpine1_M
       parentName: IKAcSpineOffset3_M
-      position: {x: 2.2564597e-17, y: 0.40019742, z: -0.007461852}
+      position: {x: 1.1282298e-18, y: 0.02000987, z: -0.00037309257}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformSpine1Part1_M
       parentName: IKAcSpineOffset3_M
-      position: {x: 2.9342608e-17, y: 0.4112128, z: -0.009156617}
+      position: {x: 1.4671303e-18, y: 0.020560639, z: -0.00045783084}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformSpine1Part2_M
       parentName: IKAcSpineOffset3_M
-      position: {x: 2.3197789e-17, y: 0.4222282, z: -0.010851379}
+      position: {x: 1.1598894e-18, y: 0.021111408, z: -0.0005425689}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcPociXformChest_M
       parentName: IKAcSpineOffset3_M
-      position: {x: -1.3972713e-17, y: 0.43324357, z: -0.0125461435}
+      position: {x: -6.986356e-19, y: 0.021662178, z: -0.00062730716}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpineOffset2_M
       parentName: IKJoints
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRootPart1FollowOffset_M
       parentName: IKAcSpineOffset2_M
-      position: {x: -0.018110588, y: 7.105427e-17, z: -8.665416e-18}
+      position: {x: -0.00090552936, y: 3.5527134e-18, z: -4.3327077e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcRootPart2FollowOffset_M
       parentName: IKAcSpineOffset2_M
-      position: {x: -0.036221176, y: 8.8817823e-17, z: -1.7330832e-17}
+      position: {x: -0.0018110587, y: 4.4408908e-18, z: -8.6654154e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1FollowOffset_M
       parentName: IKAcSpineOffset2_M
-      position: {x: -0.054331765, y: 1.5099032e-16, z: -4.3327085e-17}
+      position: {x: -0.002716588, y: 7.549515e-18, z: -2.1663542e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1Part1FollowOffset_M
       parentName: IKAcSpineOffset2_M
-      position: {x: -0.06547675, y: 0.000000001924345, z: -5.0784304e-17}
+      position: {x: -0.0032738375, y: 9.621724e-11, z: -2.539215e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKAcSpine1Part2FollowOffset_M
       parentName: IKAcSpineOffset2_M
-      position: {x: -0.076621756, y: 0.00000000384869, z: -5.824152e-17}
+      position: {x: -0.0038310876, y: 1.9243449e-10, z: -2.912076e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKHandle
@@ -2409,7 +2409,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetLeg_R
       parentName: IKHandleFollowMain
-      position: {x: 0.02024499, y: 0.021079406, z: -0.0090922}
+      position: {x: 0.0010122494, y: 0.0010539702, z: -0.00045460995}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraLeg_R
@@ -2424,22 +2424,22 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKLegFootRockInnerPivot_R
       parentName: IKLeg_R
-      position: {x: -0.0024274685, y: -0.021079406, z: 0.063556336}
+      position: {x: -0.00012137342, y: -0.0010539702, z: 0.0031778165}
       rotation: {x: 0, y: 0.08999345, z: -0, w: 0.99594235}
       scale: {x: 1, y: 1, z: 1}
     - name: IKLegFootRockOuterPivot_R
       parentName: IKLegFootRockInnerPivot_R
-      position: {x: 0.027562078, y: 0, z: 0.0050220285}
+      position: {x: 0.0013781039, y: 0, z: 0.00025110142}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedLeg_R
       parentName: IKLegFootRockOuterPivot_R
-      position: {x: -0.013781039, y: 0.021079406, z: -0.06711375}
+      position: {x: -0.0006890519, y: 0.0010539702, z: -0.0033556873}
       rotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetHeel_R
       parentName: IKLegFootRockOuterPivot_R
-      position: {x: -0.00974125, y: 0.0031365776, z: -0.08928507}
+      position: {x: -0.0004870625, y: 0.00015682887, z: -0.0044642533}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerHeel_R
@@ -2459,7 +2459,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetToesEnd_R
       parentName: RollHeel_R
-      position: {x: -0.0034769403, y: 0.00040417886, z: 0.112660415}
+      position: {x: -0.000173847, y: 0.000020208941, z: 0.0056330203}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerToesEnd_R
@@ -2469,7 +2469,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollExtraToesEnd_R
       parentName: RollRollerToesEnd_R
-      position: {x: -0, y: -5.551115e-19, z: 0}
+      position: {x: -0, y: -2.7755574e-20, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollToesEnd_R
@@ -2479,7 +2479,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetToes_R
       parentName: RollToesEnd_R
-      position: {x: -0.00056284905, y: -0.0005253515, z: -0.025886359}
+      position: {x: -0.00002814245, y: -0.000026267573, z: -0.0012943179}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerToes_R
@@ -2499,12 +2499,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureConstrainToLeg_R
       parentName: RollToes_R
-      position: {x: 4.595374e-11, y: 0.018064, z: -0.06460275}
+      position: {x: 2.297687e-12, y: 0.00090319995, z: -0.0032301373}
       rotation: {x: 0, y: -0.08999344, z: -0, w: 0.99594235}
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetArm_R
       parentName: IKHandleFollowMain
-      position: {x: 0.22121416, y: 0.45283484, z: -0.018427944}
+      position: {x: 0.011060707, y: 0.02264174, z: -0.0009213971}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraArm_R
@@ -2519,7 +2519,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedOffsetArm_R
       parentName: IKArm_R
-      position: {x: 3.5527136e-17, y: -7.105427e-17, z: 0}
+      position: {x: 1.7763567e-18, y: -3.5527134e-18, z: 0}
       rotation: {x: 0.000003391643, y: 0.7071472, z: 0.70706636, w: 0.0000053290096}
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedArm_R
@@ -2529,12 +2529,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureConstrainToArm_R
       parentName: IKArm_R
-      position: {x: -1.4210854e-16, y: 7.105427e-17, z: 3.774758e-17}
+      position: {x: -7.105427e-18, y: 3.5527134e-18, z: 1.8873788e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetLeg_L
       parentName: IKHandleFollowMain
-      position: {x: -0.02024499, y: 0.021079406, z: -0.009092205}
+      position: {x: -0.0010122494, y: 0.0010539702, z: -0.00045461024}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraLeg_L
@@ -2549,22 +2549,22 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKLegFootRockInnerPivot_L
       parentName: IKLeg_L
-      position: {x: 0.002427468, y: -0.021079406, z: 0.06355634}
+      position: {x: 0.0001213734, y: -0.0010539702, z: 0.003177817}
       rotation: {x: 0, y: -0.08999345, z: -0, w: 0.99594235}
       scale: {x: 1, y: 1, z: 1}
     - name: IKLegFootRockOuterPivot_L
       parentName: IKLegFootRockInnerPivot_L
-      position: {x: -0.027562078, y: 0, z: 0.0050220285}
+      position: {x: -0.0013781039, y: 0, z: 0.00025110142}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedLeg_L
       parentName: IKLegFootRockOuterPivot_L
-      position: {x: 0.013781039, y: 0.021079406, z: -0.06711376}
+      position: {x: 0.0006890519, y: 0.0010539702, z: -0.0033556877}
       rotation: {x: 0.5, y: -0.5, z: 0.5, w: -0.5}
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetHeel_L
       parentName: IKLegFootRockOuterPivot_L
-      position: {x: 0.00974125, y: 0.0031365776, z: -0.089285076}
+      position: {x: 0.0004870625, y: 0.00015682887, z: -0.0044642533}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerHeel_L
@@ -2574,7 +2574,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollExtraHeel_L
       parentName: RollRollerHeel_L
-      position: {x: -0, y: 5.551115e-19, z: 0}
+      position: {x: -0, y: 2.7755574e-20, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollHeel_L
@@ -2584,7 +2584,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetToesEnd_L
       parentName: RollHeel_L
-      position: {x: 0.0034769403, y: 0.00040417735, z: 0.112660415}
+      position: {x: 0.000173847, y: 0.000020208867, z: 0.0056330203}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerToesEnd_L
@@ -2604,7 +2604,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: RollOffsetToes_L
       parentName: RollToesEnd_L
-      position: {x: 0.00056284905, y: -0.00052535103, z: -0.025886359}
+      position: {x: 0.00002814245, y: -0.00002626755, z: -0.0012943179}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RollRollerToes_L
@@ -2624,12 +2624,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureConstrainToLeg_L
       parentName: RollToes_L
-      position: {x: -3.352642e-11, y: 0.018064003, z: -0.06460275}
+      position: {x: -1.676321e-12, y: 0.0009032001, z: -0.0032301373}
       rotation: {x: 0, y: 0.08999344, z: -0, w: 0.99594235}
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetArm_L
       parentName: IKHandleFollowMain
-      position: {x: -0.22121416, y: 0.45283484, z: -0.018427944}
+      position: {x: -0.011060707, y: 0.02264174, z: -0.0009213971}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraArm_L
@@ -2644,7 +2644,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedOffsetArm_L
       parentName: IKArm_L
-      position: {x: -0, y: -7.105427e-17, z: 2.220446e-18}
+      position: {x: -0, y: -3.5527134e-18, z: 1.110223e-19}
       rotation: {x: 0.0000053289355, y: -0.70706636, z: 0.7071472, w: -0.0000033916422}
       scale: {x: 1, y: 1, z: 1}
     - name: IKFKAlignedArm_L
@@ -2654,12 +2654,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureConstrainToArm_L
       parentName: IKArm_L
-      position: {x: -0, y: 3.552713e-16, z: 2.2204456e-17}
+      position: {x: -0, y: 1.7763563e-17, z: 1.1102227e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: PoleOffsetLeg_R
       parentName: IKHandle
-      position: {x: 0.068544365, y: 0.16921718, z: 0.3035418}
+      position: {x: 0.0034272182, y: 0.008460859, z: 0.01517709}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: PoleExtraLeg_R
@@ -2674,7 +2674,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: PoleOffsetArm_R
       parentName: IKHandle
-      position: {x: 0.14152911, y: 0.45283493, z: -0.19415848}
+      position: {x: 0.0070764553, y: 0.022641744, z: -0.009707923}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: PoleExtraArm_R
@@ -2689,7 +2689,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetcvSpine1_M
       parentName: IKHandle
-      position: {x: -2.2581696e-18, y: 0.36439747, z: -0.0019538736}
+      position: {x: -1.1290847e-19, y: 0.018219871, z: -0.00009769367}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtracvSpine1_M
@@ -2709,7 +2709,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetcvSpine2_M
       parentName: IKHandle
-      position: {x: 2.3858883e-18, y: 0.38229743, z: -0.004707863}
+      position: {x: 1.1929441e-19, y: 0.01911487, z: -0.00023539313}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtracvSpine2_M
@@ -2729,7 +2729,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetcvSpine3_M
       parentName: IKHandle
-      position: {x: 2.436078e-17, y: 0.40019742, z: -0.0074618524}
+      position: {x: 1.218039e-18, y: 0.02000987, z: -0.0003730926}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtracvSpine3_M
@@ -2749,7 +2749,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetcvSpine4_M
       parentName: IKHandle
-      position: {x: 2.9343312e-17, y: 0.4112128, z: -0.0091566155}
+      position: {x: 1.4671655e-18, y: 0.020560639, z: -0.00045783076}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtracvSpine4_M
@@ -2769,7 +2769,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetcvSpine5_M
       parentName: IKHandle
-      position: {x: 3.4325845e-17, y: 0.4222282, z: -0.010851379}
+      position: {x: 1.7162921e-18, y: 0.021111408, z: -0.0005425689}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtracvSpine5_M
@@ -2789,7 +2789,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetSpine2_M
       parentName: IKHandle
-      position: {x: 1.231567e-17, y: 0.3898788, z: -0.0058742813}
+      position: {x: 6.1578344e-19, y: 0.01949394, z: -0.00029371405}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraSpine2_M
@@ -2804,7 +2804,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine2LocalOrient1_M
       parentName: IKSpine2_M
-      position: {x: 1.7749368e-32, y: -7.105427e-17, z: 2.220446e-18}
+      position: {x: 8.874684e-34, y: -3.5527134e-18, z: 1.110223e-19}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine2LocalOrient2_M
@@ -2814,17 +2814,17 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetConstrainedSpine1_M
       parentName: IKHandle
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridOffsetSpine1_M
       parentName: IKOffsetConstrainedSpine1_M
-      position: {x: 7.888609e-33, y: 0, z: 0}
+      position: {x: 3.9443043e-34, y: 0, z: 0}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKOffsetSpine1_M
       parentName: IKhybridOffsetSpine1_M
-      position: {x: -0, y: 0, z: 7.888609e-33}
+      position: {x: -0, y: 0, z: 3.9443043e-34}
       rotation: {x: -0.46041688, y: 0.5366715, z: 0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKExtraSpine1_M
@@ -2844,7 +2844,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine1LocalOrient1_M
       parentName: IKSpine1_M
-      position: {x: 1.5777218e-32, y: 0, z: 0}
+      position: {x: 7.8886085e-34, y: 0, z: 0}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine1LocalOrient2_M
@@ -2854,7 +2854,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridFollowSpine1_M
       parentName: IKhybridOffsetSpine1_M
-      position: {x: -7.105427e-17, y: -8.881784e-18, z: 7.888609e-33}
+      position: {x: -3.5527134e-18, y: -4.440892e-19, z: 3.9443043e-34}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridExtraSpine1_M
@@ -2869,7 +2869,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridOffsetSpine2_M
       parentName: IKhybridSpine1_M
-      position: {x: -0.043891687, y: 2.7976305e-11, z: -2.896381e-17}
+      position: {x: -0.002194584, y: 1.3988152e-12, z: -1.4481904e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridExtraSpine2_M
@@ -2884,7 +2884,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridOffsetSpine3_M
       parentName: IKhybridSpine2_M
-      position: {x: -0.043875054, y: 0.0000000053918883, z: 1.6546163e-17}
+      position: {x: -0.0021937524, y: 2.695944e-10, z: 8.273081e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKhybridExtraSpine3_M
@@ -2914,12 +2914,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpineLocator6_M
       parentName: IKSpine3_M
-      position: {x: 3.2046767e-25, y: -1.33564965e-11, z: -8.681214e-11}
+      position: {x: 1.6023383e-26, y: -6.678248e-13, z: -4.340607e-12}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine3LocalOrient1_M
       parentName: IKSpine3_M
-      position: {x: 2.3665827e-32, y: 0, z: 0}
+      position: {x: 1.1832913e-33, y: 0, z: 0}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: IKSpine3LocalOrient2_M
@@ -2929,7 +2929,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: PoleOffsetLeg_L
       parentName: IKHandle
-      position: {x: -0.068544365, y: 0.16921718, z: 0.3035418}
+      position: {x: -0.0034272182, y: 0.008460859, z: 0.01517709}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: PoleExtraLeg_L
@@ -2944,7 +2944,7 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: PoleOffsetArm_L
       parentName: IKHandle
-      position: {x: -0.14152911, y: 0.45283493, z: -0.19415848}
+      position: {x: -0.0070764553, y: 0.022641744, z: -0.009707923}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: PoleExtraArm_L
@@ -3009,12 +3009,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc1Leg_R
       parentName: IKMessure
-      position: {x: 0.020245027, y: 0.33269748, z: 0.000110627196}
+      position: {x: 0.0010122512, y: 0.016634872, z: 0.0000055313594}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc2Leg_R
       parentName: IKmessureLoc1Leg_R
-      position: {x: -0.000000037427476, y: -0.3116181, z: -0.009202828}
+      position: {x: -0.0000000018713737, y: -0.015580904, z: -0.00046014137}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKdistanceLeg_R
@@ -3024,12 +3024,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc1Arm_R
       parentName: IKMessure
-      position: {x: 0.045717135, y: 0.45283526, z: -0.018427892}
+      position: {x: 0.0022858565, y: 0.022641761, z: -0.0009213945}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc2Arm_R
       parentName: IKmessureLoc1Arm_R
-      position: {x: 0.17549704, y: -0.00000041822585, z: -0.000000051835812}
+      position: {x: 0.008774851, y: -0.00000002091129, z: -0.0000000025917906}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKdistanceArm_R
@@ -3039,12 +3039,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc1Leg_L
       parentName: IKMessure
-      position: {x: -0.020245027, y: 0.33269748, z: 0.000110627196}
+      position: {x: -0.0010122512, y: 0.016634872, z: 0.0000055313594}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc2Leg_L
       parentName: IKmessureLoc1Leg_L
-      position: {x: 0.0000000381282, y: -0.3116181, z: -0.0092028305}
+      position: {x: 0.00000000190641, y: -0.015580904, z: -0.00046014148}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKdistanceLeg_L
@@ -3054,12 +3054,12 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc1Arm_L
       parentName: IKMessure
-      position: {x: -0.045717135, y: 0.45283526, z: -0.018427892}
+      position: {x: -0.0022858565, y: 0.022641761, z: -0.0009213945}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKmessureLoc2Arm_L
       parentName: IKmessureLoc1Arm_L
-      position: {x: -0.17549704, y: -0.00000041820715, z: -0.00000005185395}
+      position: {x: -0.008774851, y: -0.000000020910356, z: -0.0000000025926974}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IKdistanceArm_L
@@ -3074,52 +3074,52 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKParentConstraintLeg_R
       parentName: FKIKSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKLeg_R
       parentName: FKIKParentConstraintLeg_R
-      position: {x: 0.051280648, y: -0.01460422, z: -0.05828555}
+      position: {x: 0.0025640323, y: -0.000730211, z: -0.0029142774}
       rotation: {x: -0.46041688, y: 0.5366715, z: 0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKParentConstraintArm_R
       parentName: FKIKSystem
-      position: {x: 0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: 0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: 0.10724806, y: 0.69900036, z: 0.6992036, w: 0.104931764}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKArm_R
       parentName: FKIKParentConstraintArm_R
-      position: {x: -0.061285384, y: -0.001767246, z: 0.040881105}
+      position: {x: -0.003064269, y: -0.0000883623, z: 0.0020440551}
       rotation: {x: 0.10724815, y: 0.69900036, z: 0.6992036, w: -0.104931824}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKParentConstraintSpine_M
       parentName: FKIKSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKSpine_M
       parentName: FKIKParentConstraintSpine_M
-      position: {x: -0.03928066, y: 0, z: 0.067389846}
+      position: {x: -0.0019640329, y: 0, z: 0.003369492}
       rotation: {x: -0.46041688, y: 0.5366715, z: 0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKParentConstraintLeg_L
       parentName: FKIKSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKLeg_L
       parentName: FKIKParentConstraintLeg_L
-      position: {x: 0.051280648, y: -0.01460422, z: 0.05828555}
+      position: {x: 0.0025640323, y: -0.000730211, z: 0.0029142774}
       rotation: {x: -0.46041688, y: 0.5366715, z: 0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKParentConstraintArm_L
       parentName: FKIKSystem
-      position: {x: -0.014304807, y: 0.4625937, z: -0.018319946}
+      position: {x: -0.0007152403, y: 0.023129683, z: -0.00091599725}
       rotation: {x: -0.104931764, y: 0.6992036, z: -0.69900036, w: 0.10724806}
       scale: {x: 1, y: 1, z: 1}
     - name: FKIKArm_L
       parentName: FKIKParentConstraintArm_L
-      position: {x: 0.061285384, y: 0.001767246, z: -0.040881105}
+      position: {x: 0.003064269, y: 0.0000883623, z: -0.0020440551}
       rotation: {x: -0.10493184, y: 0.69920355, z: -0.6990004, w: -0.107248135}
       scale: {x: 1, y: 1, z: 1}
     - name: TwistSystem
@@ -3129,22 +3129,22 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: TwistFollowParentOffsetHead_M
       parentName: TwistSystem
-      position: {x: -1.06200905e-16, y: 0.47042045, z: -0.018265966}
+      position: {x: -5.310045e-18, y: 0.023521021, z: -0.0009132983}
       rotation: {x: 0.5493526, y: -0.4452098, z: -0.5493526, w: 0.4452098}
       scale: {x: 1, y: 1, z: 1}
     - name: TwistFollowParentHead_M
       parentName: TwistFollowParentOffsetHead_M
-      position: {x: -7.105427e-17, y: -1.7763568e-17, z: -1.1044053e-31}
+      position: {x: -3.5527134e-18, y: -8.881784e-19, z: -5.522026e-33}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: UnTwistHead_M
       parentName: TwistFollowParentHead_M
-      position: {x: -0.018434888, y: -6.394884e-16, z: 3.015843e-18}
+      position: {x: -0.00092174433, y: -3.197442e-17, z: 1.5079214e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: TwistBalancerHead_M
       parentName: UnTwistHead_M
-      position: {x: 7.105427e-17, y: 1.7763568e-17, z: 3.9443037e-32}
+      position: {x: 3.5527134e-18, y: 8.881784e-19, z: 1.9721517e-33}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DeformationSystem
@@ -3154,482 +3154,482 @@ ModelImporter:
       scale: {x: 1, y: 1, z: 1}
     - name: Root_M
       parentName: DeformationSystem
-      position: {x: -6.9022283e-18, y: 0.3464975, z: 0.00080011605}
+      position: {x: -3.4511138e-19, y: 0.017324874, z: 0.0000400058}
       rotation: {x: 0.46041688, y: -0.5366715, z: -0.46041688, w: 0.5366715}
       scale: {x: 1, y: 1, z: 1}
     - name: Hip_L
       parentName: Root_M
-      position: {x: 0.013534675, y: -0.002779971, z: 0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: 0.0010122512}
       rotation: {x: 0.99407595, y: -0.07603355, z: 0.008204951, w: -0.07723076}
       scale: {x: 1, y: 1, z: 1}
     - name: Knee_L
       parentName: Hip_L
-      position: {x: 0.15459687, y: 1.04360964e-16, z: -2.394874e-11}
+      position: {x: 0.007729843, y: 5.218048e-18, z: -1.197437e-12}
       rotation: {x: -2.6244884e-16, y: -4.5860336e-17, z: 0.0292483, w: 0.9995722}
       scale: {x: 1, y: 1, z: 1}
     - name: Ankle_L
       parentName: Knee_L
-      position: {x: 0.15729053, y: 8.77076e-17, z: -2.4366413e-11}
+      position: {x: 0.0078645265, y: 4.38538e-18, z: -1.2183206e-12}
       rotation: {x: 0.012333, y: -0.0026452483, z: -0.029049097, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: Toes_L
       parentName: Ankle_L
-      position: {x: 0.018064003, y: -0.06460275, z: -2.2794965e-12}
+      position: {x: 0.0009032001, y: -0.0032301373, z: -1.1397482e-13}
       rotation: {x: -0.0019460814, y: 0.017511604, z: -0.71402806, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: ToesEnd_L
       parentName: Toes_L
-      position: {x: 0.025897805, y: 7.549516e-17, z: -6.217249e-17}
+      position: {x: 0.0012948902, y: 3.7747577e-18, z: -3.1086244e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Hip_R
       parentName: Root_M
-      position: {x: 0.013534675, y: -0.002779971, z: -0.020245027}
+      position: {x: 0.00067673373, y: -0.00013899854, z: -0.0010122512}
       rotation: {x: 0.07603361, y: 0.99407595, z: -0.07723076, w: -0.008204925}
       scale: {x: 1, y: 1, z: 1}
     - name: Knee_R
       parentName: Hip_R
-      position: {x: -0.15459687, y: -5.1070257e-17, z: -3.4194866e-16}
+      position: {x: -0.007729843, y: -2.5535128e-18, z: -1.7097431e-17}
       rotation: {x: -2.6244884e-16, y: -4.5860336e-17, z: 0.0292483, w: 0.9995722}
       scale: {x: 1, y: 1, z: 1}
     - name: Ankle_R
       parentName: Knee_R
-      position: {x: -0.15729053, y: 2.0539122e-16, z: 4.1819873e-14}
+      position: {x: -0.0078645265, y: 1.0269561e-17, z: 2.0909936e-15}
       rotation: {x: 0.012333, y: -0.0026452546, z: -0.029049091, w: 0.9994984}
       scale: {x: 1, y: 1, z: 1}
     - name: Toes_R
       parentName: Ankle_R
-      position: {x: -0.018064, y: 0.06460275, z: 3.0666505e-10}
+      position: {x: -0.00090319995, y: 0.0032301373, z: 1.5333252e-11}
       rotation: {x: -0.0019460814, y: 0.017511604, z: -0.71402806, w: 0.6998953}
       scale: {x: 1, y: 1, z: 1}
     - name: ToesEnd_R
       parentName: Toes_R
-      position: {x: -0.025897805, y: -8.7568834e-17, z: 5.3290704e-17}
+      position: {x: -0.0012948902, y: -4.3784415e-18, z: 2.664535e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RootPart1_M
       parentName: Root_M
-      position: {x: -0.018110588, y: 6.217249e-17, z: -1.2686775e-17}
+      position: {x: -0.00090552936, y: 3.1086244e-18, z: -6.343387e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RootPart2_M
       parentName: RootPart1_M
-      position: {x: -0.018110588, y: 6.217249e-17, z: -1.2686775e-17}
+      position: {x: -0.00090552936, y: 3.1086244e-18, z: -6.343387e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Spine1_M
       parentName: RootPart2_M
-      position: {x: -0.018110588, y: 7.105427e-17, z: -3.001761e-17}
+      position: {x: -0.00090552936, y: 3.5527134e-18, z: -1.5008804e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Spine1Part1_M
       parentName: Spine1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -9.931904e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -4.9659514e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Spine1Part2_M
       parentName: Spine1Part1_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -9.931904e-18}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -4.9659514e-19}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Chest_M
       parentName: Spine1Part2_M
-      position: {x: -0.011144993, y: 0.000000001924345, z: -2.4846342e-17}
+      position: {x: -0.0005572496, y: 9.621724e-11, z: -1.242317e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Neck_M
       parentName: Chest_M
-      position: {x: -0.03761429, y: 0.0000000011921247, z: 1.437196e-16}
+      position: {x: -0.0018807143, y: 5.960623e-11, z: 7.185979e-18}
       rotation: {x: -3.4659285e-17, y: -5.934435e-17, z: -0.1796795, w: 0.9837252}
       scale: {x: 1, y: 1, z: 1}
     - name: NeckPart1_M
       parentName: Neck_M
-      position: {x: -0.006144963, y: -2.1316282e-16, z: 8.687939e-19}
+      position: {x: -0.00030724815, y: -1.065814e-17, z: 4.3439694e-20}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: NeckPart2_M
       parentName: NeckPart1_M
-      position: {x: -0.006144963, y: -2.4868996e-16, z: 8.687939e-19}
+      position: {x: -0.00030724815, y: -1.24344974e-17, z: 4.3439694e-20}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Head_M
       parentName: NeckPart2_M
-      position: {x: -0.006144963, y: -1.598721e-16, z: 1.0833439e-18}
+      position: {x: -0.00030724815, y: -7.993605e-18, z: 5.416719e-20}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: HeadEnd_M
       parentName: Head_M
-      position: {x: -0.14622225, y: 0.0000000020066129, z: 1.3060289e-16}
+      position: {x: -0.007311112, y: 1.0033064e-10, z: 6.530144e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Eye_R
       parentName: Head_M
-      position: {x: -0.06810121, y: 0.023233265, z: -0.015772998}
+      position: {x: -0.0034050604, y: 0.0011616632, z: -0.0007886499}
       rotation: {x: 0.18148546, y: 0.21100388, z: -0.58265156, w: 0.76358205}
       scale: {x: 1, y: 1, z: 1}
     - name: EyeEnd_R
       parentName: Eye_R
-      position: {x: -0.0070929425, y: -7.81597e-16, z: -1.9539925e-16}
+      position: {x: -0.0003546471, y: -3.9079847e-17, z: -9.769962e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Jaw_M
       parentName: Head_M
-      position: {x: -0.034348074, y: 0.0072435695, z: -4.427155e-18}
+      position: {x: -0.0017174036, y: 0.00036217846, z: -2.2135775e-19}
       rotation: {x: 7.088099e-17, y: -1.3374995e-17, z: -0.7976716, w: 0.603092}
       scale: {x: 1, y: 1, z: 1}
     - name: JawEnd_M
       parentName: Jaw_M
-      position: {x: -0.03792277, y: -2.842171e-16, z: -4.1269745e-17}
+      position: {x: -0.0018961384, y: -1.4210854e-17, z: -2.063487e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Eye_L
       parentName: Head_M
-      position: {x: -0.06810121, y: 0.023233265, z: 0.015772998}
+      position: {x: -0.0034050604, y: 0.0011616632, z: 0.0007886499}
       rotation: {x: -0.18148546, y: -0.21100388, z: -0.58265156, w: 0.76358205}
       scale: {x: 1, y: 1, z: 1}
     - name: EyeEnd_L
       parentName: Eye_L
-      position: {x: -0.0070929425, y: -5.684342e-16, z: 1.9984014e-16}
+      position: {x: -0.0003546471, y: -2.8421707e-17, z: 9.992006e-18}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Scapula_R
       parentName: Chest_M
-      position: {x: -0.02988683, y: -0.0012435172, z: -0.014304807}
+      position: {x: -0.0014943414, y: -0.00006217585, z: -0.0007152403}
       rotation: {x: -0.06265565, y: -0.8027515, z: -0.04416641, w: 0.59136593}
       scale: {x: 1, y: 1, z: 1}
     - name: Shoulder_R
       parentName: Scapula_R
-      position: {x: -0.032893375, y: -3.1907807e-15, z: 1.6342482e-15}
+      position: {x: -0.0016446686, y: -1.5953903e-16, z: 8.171241e-17}
       rotation: {x: 0.003713915, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: Elbow_R
       parentName: Shoulder_R
-      position: {x: -0.09517931, y: 6.217249e-17, z: -1.0658139e-15}
+      position: {x: -0.004758965, y: 3.1086244e-18, z: -5.3290694e-17}
       rotation: {x: 7.0428473e-17, y: 5.733946e-17, z: -0.05189724, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: Wrist_R
       parentName: Elbow_R
-      position: {x: -0.0805529, y: -1.7763568e-17, z: -1.4210854e-16}
+      position: {x: -0.0040276446, y: -8.881784e-19, z: -7.105427e-18}
       rotation: {x: 0.000057094603, y: -0.0000033707727, z: 0.028117694, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger1_R
       parentName: Wrist_R
-      position: {x: -0.034002848, y: -6.661338e-18, z: -4.2632563e-16}
+      position: {x: -0.0017001423, y: -3.3306688e-19, z: -2.131628e-17}
       rotation: {x: -0.0006041644, y: 0.0000042666165, z: 0.000010920454, w: 0.9999998}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger2_R
       parentName: MiddleFinger1_R
-      position: {x: -0.010047397, y: -2.57061e-14, z: 8.100187e-15}
+      position: {x: -0.0005023698, y: -1.2853049e-15, z: 4.0500933e-16}
       rotation: {x: 0.00031797233, y: -1.88324e-21, z: 3.3887308e-21, w: 0.99999994}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger3_R
       parentName: MiddleFinger2_R
-      position: {x: -0.009260119, y: 0.00000008508096, z: 0.0000000351969}
+      position: {x: -0.0004630059, y: 0.000000004254048, z: 0.0000000017598449}
       rotation: {x: 0.00046590672, y: 0.0000018981351, z: -0.000027636239, w: 0.9999999}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger4_R
       parentName: MiddleFinger3_R
-      position: {x: -0.007876911, y: 1.9779732e-14, z: 1.9895197e-15}
+      position: {x: -0.00039384555, y: 9.889866e-16, z: 9.947598e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger1_R
       parentName: Wrist_R
-      position: {x: -0.035060387, y: 0.0083024595, z: -0.00044641623}
+      position: {x: -0.0017530193, y: 0.00041512295, z: -0.00002232081}
       rotation: {x: 0.008182965, y: 0.0000060612338, z: -0.000013172092, w: 0.99996656}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger2_R
       parentName: IndexFinger1_R
-      position: {x: -0.008721446, y: 1.3274381e-14, z: -2.5579535e-15}
+      position: {x: -0.00043607227, y: 6.6371903e-16, z: -1.2789767e-16}
       rotation: {x: -8.4805074e-13, y: 0.000000118230616, z: 0.000007173366, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger3_R
       parentName: IndexFinger2_R
-      position: {x: -0.008149071, y: -7.707667e-14, z: 2.1316282e-16}
+      position: {x: -0.0004074535, y: -3.8538335e-15, z: 1.065814e-17}
       rotation: {x: -0.014845524, y: -0.0000031078976, z: 0.00003662106, w: 0.9998898}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger4_R
       parentName: IndexFinger3_R
-      position: {x: -0.006021156, y: -1.0165202e-14, z: -1.0658139e-15}
+      position: {x: -0.0003010578, y: -5.0826006e-16, z: -5.3290694e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger1_R
       parentName: Wrist_R
-      position: {x: -0.009080676, y: 0.00618821, z: -0.0040539014}
+      position: {x: -0.00045403378, y: 0.00030941048, z: -0.00020269505}
       rotation: {x: -0.4313237, y: 0.09883984, z: -0.34149545, w: 0.8291993}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger2_R
       parentName: ThumbFinger1_R
-      position: {x: -0.011500116, y: 1.1368684e-15, z: -2.4868996e-16}
+      position: {x: -0.0005750058, y: 5.6843415e-17, z: -1.24344974e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger3_R
       parentName: ThumbFinger2_R
-      position: {x: -0.012363284, y: -0.00000003600902, z: -0.000000111568134}
+      position: {x: -0.00061816414, y: -0.0000000018004509, z: -0.000000005578406}
       rotation: {x: 3.070427e-11, y: 0.000008808265, z: -0.0000034858315, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger4_R
       parentName: ThumbFinger3_R
-      position: {x: -0.010984744, y: -9.023892e-15, z: -2.3518962e-14}
+      position: {x: -0.0005492372, y: -4.5119455e-16, z: -1.175948e-15}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Cup_R
       parentName: Wrist_R
-      position: {x: -0.010967072, y: -0.007235462, z: -0.0000393164}
+      position: {x: -0.0005483536, y: -0.00036177307, z: -0.0000019658198}
       rotation: {x: 0.0077963076, y: 0.0042578373, z: -0.085782886, w: 0.9962743}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger1_R
       parentName: Cup_R
-      position: {x: -0.018711347, y: -0.009141758, z: -0.00047401537}
+      position: {x: -0.0009355673, y: -0.00045708788, z: -0.000023700766}
       rotation: {x: -0.0370185, y: -0.0067629614, z: 0.08560594, w: 0.99561816}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger2_R
       parentName: PinkyFinger1_R
-      position: {x: -0.0064806053, y: -2.1316282e-16, z: 7.105426e-16}
+      position: {x: -0.00032403026, y: -1.065814e-17, z: 3.5527126e-17}
       rotation: {x: 0.0023960539, y: -0.0000022576673, z: -0.000012274624, w: 0.99999714}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger3_R
       parentName: PinkyFinger2_R
-      position: {x: -0.006607189, y: 5.8086864e-15, z: -1.2789768e-15}
+      position: {x: -0.0003303594, y: 2.904343e-16, z: -6.394884e-17}
       rotation: {x: 0.019718833, y: 0.0000038400567, z: -0.0000051208094, w: 0.99980557}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger4_R
       parentName: PinkyFinger3_R
-      position: {x: -0.005206356, y: -1.2390088e-14, z: -9.6633805e-15}
+      position: {x: -0.00026031779, y: -6.195044e-16, z: -4.83169e-16}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger1_R
       parentName: Cup_R
-      position: {x: -0.021925094, y: -0.003189723, z: 0.00024299684}
+      position: {x: -0.0010962546, y: -0.00015948614, z: 0.0000121498415}
       rotation: {x: -0.036784716, y: -0.025518248, z: 0.08685872, w: 0.9952142}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger2_R
       parentName: RingFinger1_R
-      position: {x: -0.00859594, y: 4.4408912e-17, z: 1.0658139e-15}
+      position: {x: -0.00042979696, y: 2.2204454e-18, z: 5.3290694e-17}
       rotation: {x: 0.025787795, y: 0.01871914, z: -0.0010364417, w: 0.99949163}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger3_R
       parentName: RingFinger2_R
-      position: {x: -0.009588163, y: 1.7763568e-17, z: -1.2789768e-15}
+      position: {x: -0.00047940813, y: 8.881784e-19, z: -6.394884e-17}
       rotation: {x: 0.004977977, y: -0.000003037676, z: 0.000039263017, w: 0.9999876}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger4_R
       parentName: RingFinger3_R
-      position: {x: -0.0066900626, y: -3.805844e-15, z: -9.237055e-16}
+      position: {x: -0.0003345031, y: -1.9029219e-16, z: -4.6185272e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Scapula_L
       parentName: Chest_M
-      position: {x: -0.02988683, y: -0.0012435172, z: 0.014304807}
+      position: {x: -0.0014943414, y: -0.00006217585, z: 0.0007152403}
       rotation: {x: 0.8027515, y: -0.062655695, z: 0.59136593, w: 0.044166435}
       scale: {x: 1, y: 1, z: 1}
     - name: Shoulder_L
       parentName: Scapula_L
-      position: {x: 0.032893375, y: 3.2085443e-15, z: -1.4210852e-15}
+      position: {x: 0.0016446686, y: 1.604272e-16, z: -7.105425e-17}
       rotation: {x: 0.003713915, y: 0.14998683, z: 0.021888737, w: 0.9884387}
       scale: {x: 1, y: 1, z: 1}
     - name: Elbow_L
       parentName: Shoulder_L
-      position: {x: 0.09517931, y: -1.5543122e-17, z: 1.4921395e-15}
+      position: {x: 0.004758965, y: -7.771561e-19, z: 7.460697e-17}
       rotation: {x: 7.0428473e-17, y: 5.733946e-17, z: -0.05189724, w: 0.99865246}
       scale: {x: 1, y: 1, z: 1}
     - name: Wrist_L
       parentName: Elbow_L
-      position: {x: 0.0805529, y: 6.217249e-17, z: -2.842171e-16}
+      position: {x: 0.0040276446, y: 3.1086244e-18, z: -1.4210854e-17}
       rotation: {x: 0.000057094603, y: -0.0000033707727, z: 0.028117694, w: 0.99960464}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger1_L
       parentName: Wrist_L
-      position: {x: 0.034002848, y: 1.3322676e-17, z: 2.842171e-16}
+      position: {x: 0.0017001423, y: 6.6613377e-19, z: 1.4210854e-17}
       rotation: {x: -0.0006041644, y: 0.0000042666165, z: 0.000010920454, w: 0.9999998}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger2_L
       parentName: MiddleFinger1_L
-      position: {x: 0.010047397, y: 2.5710545e-14, z: -8.1712404e-15}
+      position: {x: 0.0005023698, y: 1.2855272e-15, z: -4.08562e-16}
       rotation: {x: 0.00031797233, y: -1.88324e-21, z: 3.3887308e-21, w: 0.99999994}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger3_L
       parentName: MiddleFinger2_L
-      position: {x: 0.009260119, y: -0.00000008508096, z: -0.0000000351969}
+      position: {x: 0.0004630059, y: -0.000000004254048, z: -0.0000000017598449}
       rotation: {x: 0.00046590672, y: 0.0000018981351, z: -0.000027636239, w: 0.9999999}
       scale: {x: 1, y: 1, z: 1}
     - name: MiddleFinger4_L
       parentName: MiddleFinger3_L
-      position: {x: 0.007876911, y: -1.977307e-14, z: -1.9895197e-15}
+      position: {x: 0.00039384555, y: -9.886534e-16, z: -9.947598e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger1_L
       parentName: Wrist_L
-      position: {x: 0.035060387, y: -0.0083024595, z: 0.00044641623}
+      position: {x: 0.0017530193, y: -0.00041512295, z: 0.00002232081}
       rotation: {x: 0.008182965, y: 0.0000060612338, z: -0.000013172092, w: 0.99996656}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger2_L
       parentName: IndexFinger1_L
-      position: {x: 0.008721446, y: -1.3276601e-14, z: 2.7000624e-15}
+      position: {x: 0.00043607227, y: -6.6383e-16, z: 1.3500312e-16}
       rotation: {x: -8.4805074e-13, y: 0.000000118230616, z: 0.000007173366, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger3_L
       parentName: IndexFinger2_L
-      position: {x: 0.008149071, y: 7.7080554e-14, z: -7.105426e-16}
+      position: {x: 0.0004074535, y: 3.8540274e-15, z: -3.5527126e-17}
       rotation: {x: -0.014845524, y: -0.0000031078976, z: 0.00003662106, w: 0.9998898}
       scale: {x: 1, y: 1, z: 1}
     - name: IndexFinger4_L
       parentName: IndexFinger3_L
-      position: {x: 0.006021156, y: 1.0162981e-14, z: 1.0658139e-15}
+      position: {x: 0.0003010578, y: 5.08149e-16, z: 5.3290694e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger1_L
       parentName: Wrist_L
-      position: {x: 0.009080676, y: -0.00618821, z: 0.0040539014}
+      position: {x: 0.00045403378, y: -0.00030941048, z: 0.00020269505}
       rotation: {x: -0.43132323, y: 0.09884075, z: -0.34149522, w: 0.8291995}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger2_L
       parentName: ThumbFinger1_L
-      position: {x: 0.011500116, y: -9.947598e-16, z: 3.197442e-16}
+      position: {x: 0.0005750058, y: -4.973799e-17, z: 1.598721e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger3_L
       parentName: ThumbFinger2_L
-      position: {x: 0.012363284, y: 0.00000003600902, z: 0.000000111568134}
+      position: {x: 0.00061816414, y: 0.0000000018004509, z: 0.000000005578406}
       rotation: {x: 3.070427e-11, y: 0.000008808265, z: -0.0000034858315, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ThumbFinger4_L
       parentName: ThumbFinger3_L
-      position: {x: 0.010984744, y: 9.237054e-15, z: 2.3554489e-14}
+      position: {x: 0.0005492372, y: 4.618527e-16, z: 1.1777244e-15}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Cup_L
       parentName: Wrist_L
-      position: {x: 0.010967072, y: 0.007235462, z: 0.0000393164}
+      position: {x: 0.0005483536, y: 0.00036177307, z: 0.0000019658198}
       rotation: {x: 0.0077963076, y: 0.0042578373, z: -0.085782886, w: 0.9962743}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger1_L
       parentName: Cup_L
-      position: {x: 0.018711347, y: 0.009141758, z: 0.00047401537}
+      position: {x: 0.0009355673, y: 0.00045708788, z: 0.000023700766}
       rotation: {x: -0.0370185, y: -0.0067629614, z: 0.08560594, w: 0.99561816}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger2_L
       parentName: PinkyFinger1_L
-      position: {x: 0.0064806053, y: 1.7763565e-16, z: -5.684342e-16}
+      position: {x: 0.00032403026, y: 8.8817815e-18, z: -2.8421707e-17}
       rotation: {x: 0.0023960539, y: -0.0000022616452, z: -0.000012274847, w: 0.99999714}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger3_L
       parentName: PinkyFinger2_L
-      position: {x: 0.006607189, y: -5.7109875e-15, z: -5.684342e-16}
+      position: {x: 0.0003303594, y: -2.8554936e-16, z: -2.8421707e-17}
       rotation: {x: 0.019718833, y: 0.0000038400567, z: -0.0000051208094, w: 0.99980557}
       scale: {x: 1, y: 1, z: 1}
     - name: PinkyFinger4_L
       parentName: PinkyFinger3_L
-      position: {x: 0.005206356, y: 1.2390088e-14, z: 9.592326e-15}
+      position: {x: 0.00026031779, y: 6.195044e-16, z: 4.7961626e-16}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger1_L
       parentName: Cup_L
-      position: {x: 0.021925094, y: 0.003189723, z: -0.00024299684}
+      position: {x: 0.0010962546, y: 0.00015948614, z: -0.0000121498415}
       rotation: {x: -0.036784716, y: -0.025518248, z: 0.08685872, w: 0.9952142}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger2_L
       parentName: RingFinger1_L
-      position: {x: 0.00859594, y: -5.3290704e-17, z: -8.5265126e-16}
+      position: {x: 0.00042979696, y: -2.664535e-18, z: -4.263256e-17}
       rotation: {x: 0.025787795, y: 0.018719137, z: -0.0010364418, w: 0.99949163}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger3_L
       parentName: RingFinger2_L
-      position: {x: 0.009588163, y: -4.440892e-18, z: 1.4210854e-16}
+      position: {x: 0.00047940813, y: -2.220446e-19, z: 7.105427e-18}
       rotation: {x: 0.004977977, y: -0.000003037676, z: 0.000039263017, w: 0.9999876}
       scale: {x: 1, y: 1, z: 1}
     - name: RingFinger4_L
       parentName: RingFinger3_L
-      position: {x: 0.0066900626, y: 3.814726e-15, z: 8.5265126e-16}
+      position: {x: 0.0003345031, y: 1.9073628e-16, z: 4.263256e-17}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_Brian_Characterb
       parentName: Main Base Character(Clone)
-      position: {x: -0.011900253, y: 0.008227342, z: 0.041374303}
+      position: {x: -0.0005950126, y: 0.00041136707, z: 0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Character_Skin
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_Buttons
       parentName: Geo_Brian_Characterb
-      position: {x: -0.0016407727, y: 0.0030689868, z: -0.0007949876}
+      position: {x: -0.00008203863, y: 0.00015344933, z: -0.00003974938}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Button_01
       parentName: Geo_Buttons
-      position: {x: 0.013541026, y: -0.011296328, z: -0.040579315}
+      position: {x: 0.00067705126, y: -0.00056481635, z: -0.0020289656}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Button_02
       parentName: Geo_Buttons
-      position: {x: 0.013541026, y: -0.011296328, z: -0.040579315}
+      position: {x: 0.00067705126, y: -0.00056481635, z: -0.0020289656}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Button_03
       parentName: Geo_Buttons
-      position: {x: 0.013541026, y: -0.011296328, z: -0.040579315}
+      position: {x: 0.00067705126, y: -0.00056481635, z: -0.0020289656}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Button_04
       parentName: Geo_Buttons
-      position: {x: 0.013541026, y: -0.011296328, z: -0.040579315}
+      position: {x: 0.00067705126, y: -0.00056481635, z: -0.0020289656}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Button_05
       parentName: Geo_Buttons
-      position: {x: 0.013541026, y: -0.011296328, z: -0.040579315}
+      position: {x: 0.00067705126, y: -0.00056481635, z: -0.0020289656}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_shirt
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_pants
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_vest
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_mask_fox
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_right_shoe
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_left_shoe
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_bow_tie
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_golden_chain
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_golden_chain_holder
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Geo_mafia_hat
       parentName: Geo_Brian_Characterb
-      position: {x: 0.011900253, y: -0.008227342, z: -0.041374303}
+      position: {x: 0.0005950126, y: -0.00041136707, z: -0.002068715}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     armTwist: 0.5
@@ -3639,7 +3639,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
+    globalScale: 0.049999997
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 1

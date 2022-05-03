@@ -45,7 +45,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Inputs:
   - InputHotkey: SelectThrowable
-    InputMode: 1
+    InputMode: 3
+    InputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: ProjectilePick
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    ReverseInputAction:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6565542565003733128}
+          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
+            Assembly-CSharp
+          m_MethodName: ProjectileSet
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - InputHotkey: AimThrow
+    InputMode: 3
     InputAction:
       m_PersistentCalls:
         m_Calls:
@@ -62,9 +96,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - InputHotkey: SelectThrowable
-    InputMode: 2
-    InputAction:
+    ReverseInputAction:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6565542565003733128}
@@ -80,44 +112,8 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - InputHotkey: AimThrow
-    InputMode: 0
-    InputAction:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6565542565003733128}
-          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
-            Assembly-CSharp
-          m_MethodName: PerkActivate
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - InputHotkey: AimThrow
-    InputMode: 0
-    InputAction:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6565542565003733128}
-          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
-            Assembly-CSharp
-          m_MethodName: MagnifyingGlass
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - InputHotkey: ActivatePerk
-    InputMode: 1
+    InputMode: 0
     InputAction:
       m_PersistentCalls:
         m_Calls:
@@ -134,24 +130,9 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - InputHotkey: ActivatePerk
-    InputMode: 2
-    InputAction:
+    ReverseInputAction:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6565542565003733128}
-          m_TargetAssemblyTypeName: Workbench.ProjectDilemma.PlayerInputManager,
-            Assembly-CSharp
-          m_MethodName: PerkActivate
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
   - InputHotkey: MagnifyingGlass
     InputMode: 0
     InputAction:
@@ -170,8 +151,11 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+    ReverseInputAction:
+      m_PersistentCalls:
+        m_Calls: []
   - InputHotkey: PlayEmote
-    InputMode: 1
+    InputMode: 3
     InputAction:
       m_PersistentCalls:
         m_Calls:
@@ -188,9 +172,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - InputHotkey: PlayEmote
-    InputMode: 2
-    InputAction:
+    ReverseInputAction:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6565542565003733128}
@@ -210,3 +192,4 @@ MonoBehaviour:
   projectileThrow: {fileID: 0}
   playerEmote: {fileID: 0}
   operatePerk: {fileID: 0}
+  magnifyingGlass: {fileID: 0}

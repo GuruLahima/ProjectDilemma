@@ -23,8 +23,10 @@ public class ClothingData : ScriptableObject
   [SerializeField] private List<ClothingTree> _clothes = new List<ClothingTree>();
   public void SaveClothes(List<ClothingTree> clothes)
   {
+#if UNITY_EDITOR
     EditorUtility.SetDirty(this);
     PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+#endif
     _clothes = new List<ClothingTree>();
     foreach (ClothingTree ct in clothes)
     {
@@ -33,7 +35,9 @@ public class ClothingData : ScriptableObject
       tree.Type = ct.Type;
       _clothes.Add(tree);
     }
+#if UNITY_EDITOR
     EditorUtility.SetDirty(this);
     PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+#endif
   }
 }

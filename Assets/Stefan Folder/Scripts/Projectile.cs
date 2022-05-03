@@ -2,6 +2,7 @@ using NaughtyAttributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Workbench.ProjectDilemma;
 
 public class Projectile : MonoBehaviour
 {
@@ -12,8 +13,6 @@ public class Projectile : MonoBehaviour
 
   #region Public Fields
   //[HideInInspector] public GameObject projectileOwner;
-  [InfoBox("CASE SENSITIVE", EInfoBoxType.Warning)]
-  public string ProjectileName;
   #endregion
 
   #region Exposed Private Fields
@@ -25,27 +24,30 @@ public class Projectile : MonoBehaviour
 
   [Header("Custom Properties", order = 0)]
   [HorizontalLine(order = 1)]
-  [Foldout("Impact Trigger")] [SerializeField] private bool hit;
-  [Foldout("Impact Trigger")] [SerializeField] private bool explode;
-  [Foldout("Impact Trigger")] [SerializeField] private float explodeRadius;
-  [Foldout("Impact Trigger")] [SerializeField] private bool bounce;
-  [Foldout("Impact Trigger")] [SerializeField] private bool isInfinite;
-  [Foldout("Impact Trigger")] [SerializeField] [DisableIf("isInfinite")] private int bounceAmount;
+  [Foldout("Impact Trigger")][SerializeField] private bool hit;
+  [Foldout("Impact Trigger")][SerializeField] private bool explode;
+  [Foldout("Impact Trigger")][SerializeField] private float explodeRadius;
+  [Foldout("Impact Trigger")][SerializeField] private bool bounce;
+  [Foldout("Impact Trigger")][SerializeField] private bool isInfinite;
+  [Foldout("Impact Trigger")][SerializeField][DisableIf("isInfinite")] private int bounceAmount;
   [InfoBox("If you want to preserve the initial strength leave this field to -1", EInfoBoxType.Normal)]
-  [Foldout("Impact Trigger")] [SerializeField] private float bounceStrength = -1;
+  [Foldout("Impact Trigger")][SerializeField] private float bounceStrength = -1;
   [InfoBox("Different bounce types require higher collision ignore window in order to work properly!", EInfoBoxType.Warning)]
-  [Foldout("Impact Trigger")] [SerializeField] private BounceType bounceType;
+  [Foldout("Impact Trigger")][SerializeField] private BounceType bounceType;
   [Tooltip("How long should the projectile last after initial bounce? \n" +
       "Main use of this property is for Adhesive type of projectiles")]
-  [Foldout("Impact Trigger")] [SerializeField] private float projectileAdhesiveDuration = 5f;
+  [Foldout("Impact Trigger")][SerializeField] private float projectileAdhesiveDuration = 5f;
   [Tooltip("Total lifetime of the projectile from the moment it was launched")]
-  [Foldout("Impact Trigger")] [SerializeField] private float projectileLifeLimit = 8f;
+  [Foldout("Impact Trigger")][SerializeField] private float projectileLifeLimit = 8f;
 
   [SerializeField] ProjectileType projectileType;
   [InfoBox("Rigidbody Use Gravity should be false at all times \n" +
       "This script contains built-in gravity", EInfoBoxType.Warning)]
   [SerializeField] float gravity = Physics.gravity.y;
-  //[SerializeField] GameObject vfxOnCollision;
+  [SerializeField] List<VFXWrapper> vfxOnThrown = new List<VFXWrapper>();
+  [SerializeField] List<VFXWrapper> vfxOnCollision = new List<VFXWrapper>();
+  [SerializeField] List<VFXWrapper> vfxOnTrigger = new List<VFXWrapper>();
+  [SerializeField] List<VFXWrapper> vfxOnCollisionLocal = new List<VFXWrapper>();
   //[SerializeField] [EnableIf("bounceType", BounceType.Adhesive)] GameObject vfxOnExpire;
   [SerializeField] float ignoreCollisionDuration = 0.05f;
   [SerializeField] float initialCollisionDisabledDuration = 0.05f;
@@ -76,10 +78,15 @@ public class Projectile : MonoBehaviour
     gameObject.SetActive(true);
 
     // set the projectile
-    //arenaPointsMultiplier = pointsMultiplier;
     transform.position = startPosition;
     _rb.velocity = strength * direction;
     transform.rotation = Quaternion.LookRotation(direction);
+
+    // vfx on cast
+    foreach (VFXWrapper vfx in vfxOnThrown)
+    {
+      VFXManager.Instance.GenerateVFX(vfx, transform);
+    }
 
     //
     if ((int)bounceStrength == -1) bounceStrength = strength;
@@ -110,7 +117,6 @@ public class Projectile : MonoBehaviour
   public void DisableProjectile()
   {
     projectileDisabled = true;
-    //ClearOwner();
   }
   #endregion
 
@@ -155,11 +161,24 @@ public class Projectile : MonoBehaviour
     //    objectsInRadius = Physics.OverlapSphere(transform.position, explodeRadius, explosionlayerMask);
     //  projectileOwner.SendMessage(ProjectileDataReturn(objectHit, objectsInRadius, this, arenaPointsMultiplier);
     //}
-    //
-    //if (vfxOnCollision && SceneOverlord.Instance)
-    //{
-    //  SceneOverlord.Instance.PlayInteractionEffect(vfxOnCollision, transform, 1f);
-    //}
+
+
+    // local vfx on collision
+    if (GameMechanic.Instance.localPlayerSpot.playerModel == collision.transform.gameObject)
+    {
+      foreach (VFXWrapper vfx in vfxOnCollisionLocal)
+      {
+        VFXManager.Instance.GenerateVFX(vfx, transform);
+      }
+    }
+
+
+
+    // vfx on collison
+    foreach (VFXWrapper vfx in vfxOnCollision)
+    {
+      VFXManager.Instance.GenerateVFX(vfx, transform);
+    }
 
     if (bounce && (bounceNumber < bounceAmount || isInfinite))
     {
@@ -222,11 +241,13 @@ public class Projectile : MonoBehaviour
     //    objectsInRadius = Physics.OverlapSphere(transform.position, explodeRadius, explosionlayerMask);
     //  abilityListener.ProjectileDataReturn(objectHit, objectsInRadius, this, arenaPointsMultiplier);
     //}
-    //
-    //if (vfxOnCollision && SceneOverlord.Instance)
-    //{
-    //  SceneOverlord.Instance.PlayInteractionEffect(vfxOnCollision, transform, 1f);
-    //}
+
+
+    // vfx on trigger
+    foreach (VFXWrapper vfx in vfxOnTrigger)
+    {
+      VFXManager.Instance.GenerateVFX(vfx, transform);
+    }
   }
 
   private void InitialCollisionEnable()
@@ -235,7 +256,6 @@ public class Projectile : MonoBehaviour
   }
   #endregion
 
- 
 
   // ! i used this for pooling systems in Wolfsbane, if we need to create pooling system here as well simply uncomment this and copy the pooling system from wolfsbane
   /*[System.Serializable]
@@ -254,4 +274,12 @@ public class Projectile : MonoBehaviour
         name = Prefab.ProjectileName;
     }
   }*/
+}
+
+[System.Serializable]
+public class VFXWrapper
+{
+  public GameObject VFXPrefab;
+  public float VFXDuration;
+  public bool VFXFollowsObject;
 }

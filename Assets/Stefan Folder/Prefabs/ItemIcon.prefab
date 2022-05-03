@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3500919128102826978}
   - component: {fileID: 3500919128102826977}
   - component: {fileID: 3500919128102826976}
-  - component: {fileID: 1641441594082942601}
+  - component: {fileID: -7681366787899808411}
   m_Layer: 5
   m_Name: ItemIcon
   m_TagString: Untagged
@@ -68,7 +68,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300002, guid: 358b5d9f23bc9413e87c9948acc67ee1, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1641441594082942601
+--- !u!114 &-7681366787899808411
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,6 +88,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7694a7fd8eb4d64aa58b936d2666664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Master: {fileID: 0}
   container: {fileID: 0}
   image: {fileID: 3500919128102826976}

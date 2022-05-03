@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(RectTransform))]
-public class SelectionMenuItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SelectionMenuItem : SelectionMenuContainer, IPointerEnterHandler, IPointerExitHandler
 {
   public int Index 
   { 

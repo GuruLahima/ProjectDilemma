@@ -1,4 +1,3 @@
-using NaughtyAttributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,12 +20,14 @@ namespace Workbench.ProjectDilemma
     [System.Serializable]
     public class InputWrapper
     {
-      public enum Mode{OnPress, Hold, OnRelease}
-      [InputAxis]
-      [AllowNesting]
+      public enum Mode : byte { OnPress, Hold, OnRelease, StateSwitch }
+      [InputName]
       public string InputHotkey;
       public Mode InputMode;
       public UnityEvent InputAction;
+      public UnityEvent ReverseInputAction;
+      [HideInInspector]
+      public bool? IsActivated;
     }
 
     [SerializeField] private List<InputWrapper> Inputs = new List<InputWrapper>();
@@ -42,6 +43,16 @@ namespace Workbench.ProjectDilemma
           return true;
       }
     }
+
+    private void OnEnable()
+    {
+      GameMechanic.DiscussionEnded += OnDiscussionEnded;
+    }
+    private void OnDisable()
+    {
+      GameMechanic.DiscussionEnded -= OnDiscussionEnded;
+    }
+
     private void Update()
     {
       if (InputEnabled)
@@ -56,22 +67,48 @@ namespace Workbench.ProjectDilemma
         switch (_input.InputMode)
         {
           case InputWrapper.Mode.OnPress:
-            if (Input.GetButtonDown(_input.InputHotkey))
+            if (InputManager.GetButtonDown(_input.InputHotkey))
             {
               _input.InputAction?.Invoke();
             }
             break;
           case InputWrapper.Mode.Hold:
-            if (Input.GetButton(_input.InputHotkey))
+            if (InputManager.GetButton(_input.InputHotkey))
             {
               _input.InputAction?.Invoke();
               isHeld = true;
             }
             break;
           case InputWrapper.Mode.OnRelease:
-            if (Input.GetButtonUp(_input.InputHotkey))
+            if (InputManager.GetButtonUp(_input.InputHotkey))
             {
               _input.InputAction?.Invoke();
+            }
+            break;
+          case InputWrapper.Mode.StateSwitch:
+            // we initiate the state
+            if (InputManager.GetButtonDown(_input.InputHotkey))
+            {
+              // switch the state (true => false) / (false, null => true)
+              if (_input.IsActivated == true)
+              {
+                _input.IsActivated = false;
+              }
+              else
+              {
+                _input.IsActivated = true;
+              }
+            }
+            // init depending on the current state
+            if (_input.IsActivated == true)
+            {
+              _input.InputAction?.Invoke();
+            }
+            // we only ever want this to execute once, then we set the state => null
+            else if (_input.IsActivated == false)
+            {
+              _input.ReverseInputAction?.Invoke();
+              _input.IsActivated = null;
             }
             break;
           default:
@@ -82,15 +119,16 @@ namespace Workbench.ProjectDilemma
     }
     #endregion
 
+
     #region Input Actions
     [Space(20)]
-    [SerializeField]public ProjectileThrow projectileThrow;
+    [HideInInspector] public ProjectileThrow projectileThrow;
     [Space(20)]
-    [SerializeField] public PlayerEmote playerEmote;
+    [HideInInspector] public PlayerEmote playerEmote;
     [Space(20)]
-    [SerializeField] public OperatePerk operatePerk;
+    [HideInInspector] public OperatePerk operatePerk;
     [Space(20)]
-    [SerializeField] public MagnifyingGlass magnifyingGlass;
+    [HideInInspector] public MagnifyingGlass magnifyingGlass;
     public void ProjectileAim()
     {
       projectileThrow.Aim();
@@ -128,19 +166,26 @@ namespace Workbench.ProjectDilemma
 
     public void PerkSelect()
     {
-      operatePerk.Pick();
+      operatePerk.SwitchState();
     }
+    #endregion
 
-    public void PerkActivate()
+    #region Private Methods
+    private void OnDiscussionEnded()
     {
-      operatePerk.Activate();
+      if (!inputConditions.Contains(ICKeys.DISCUSSION_ENDED))
+      {
+        inputConditions.Add(ICKeys.DISCUSSION_ENDED);
+      }
     }
-
     #endregion
   }
 }
 
-public static class InputCondition
+/// <summary>
+/// ICKeys short for Input Condition Keys is a static class that contains bunch of predefined strings used as input conditions
+/// </summary>
+public static class ICKeys
 {
   public const string DISCUSSION_ENDED = "discussionEnded";
   public const string EMOTE_PLAYING = "emotePlaying";
