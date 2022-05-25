@@ -66,64 +66,64 @@ namespace GuruLaghima
   public class MyDebug
   {
 
-    public static void Log(string location, string message, Color textColor)
+    public static void Log(object location, object message, Color textColor)
     {
 #if ALEK_DEBUG_ON
-      Debug.Log("<color=#" + ColorUtility.ToHtmlStringRGB(textColor) + ">" + location + " >> </color>" + message);
+      Debug.Log("<color=#" + ColorUtility.ToHtmlStringRGB(textColor) + ">" + location + " >> </color>" + message.ToString());
 #endif
     }
-    public static void Log(string message, Color textColor)
+    public static void Log(object message, Color textColor)
     {
 #if ALEK_DEBUG_ON
-      Debug.Log("<color=#" + ColorUtility.ToHtmlStringRGB(textColor) + ">" + message + "</color>");
-#endif
-    }
-
-    public static void Log(string location, string message)
-    {
-#if ALEK_DEBUG_ON
-      Debug.Log("<color=orange>" + location + " >> </color>" + message);
+      Debug.Log("<color=#" + ColorUtility.ToHtmlStringRGB(textColor) + ">" + message.ToString() + "</color>");
 #endif
     }
 
-    public static void Log(string location, string color = "orange", string message = "")
+    public static void Log(object location, object message)
     {
 #if ALEK_DEBUG_ON
-      Debug.Log("<color=" + color + ">" + location + " >> </color>" + message);
+      Debug.Log("<color=orange>" + location + " >> </color>" + message.ToString());
 #endif
     }
 
-    public static void LogError(string message, UnityEngine.Object obj)
+    public static void Log(object location, object message = null, string color = "orange")
+    {
+#if ALEK_DEBUG_ON
+      Debug.Log("<color=" + color + ">" + location?.ToString() + " >> </color>" + message?.ToString());
+#endif
+    }
+
+    public static void LogError(object message, UnityEngine.Object obj)
     {
 #if ALEK_DEBUG_ON
       Debug.LogError(message, obj);
 #endif
     }
 
-    public static void LogError(string message)
+    public static void LogError(object message)
     {
 #if ALEK_DEBUG_ON
       Debug.LogError(message);
 #endif
     }
 
-    public static void LogFormat(string message, params object[] args)
+    public static void LogFormat(string format, params object[] args)
     {
 #if ALEK_DEBUG_ON
-      Debug.LogFormat(message, args);
+      Debug.LogFormat(format, args);
 #endif
     }
 
-    public static void LogErrorFormat(string location, short returnCode, string message = "", string color = "orange")
+    public static void LogErrorFormat(string format, short returnCode, object message = null, string color = "orange")
     {
 #if ALEK_DEBUG_ON
-      Debug.LogErrorFormat(location, returnCode, message);
+      Debug.LogErrorFormat(format, returnCode, message);
 #endif
     }
-    public static void LogWarning(string location, UnityEngine.Object obj)
+    public static void LogWarning(object message, UnityEngine.Object obj)
     {
 #if ALEK_DEBUG_ON
-      Debug.LogWarning(location, obj);
+      Debug.LogWarning(message, obj);
 #endif
     }
     public static void LogWarning(object message)

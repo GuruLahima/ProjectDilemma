@@ -33,6 +33,7 @@ namespace Workbench.ProjectDilemma
 #endif
     [SerializeField] string mainMenuScene;
     [SerializeField] public Scenario thisScenario;
+    [SerializeField] public GameObject GameFoundationObj;
 
     #endregion
 
@@ -95,8 +96,19 @@ namespace Workbench.ProjectDilemma
     // Start is called before the first frame update
     void Start()
     {
+#if UNITY_EDITOR
       if (debugMode)
+      {
+
         GetComponent<GameMechanic>().StartGameSequence();
+        GameFoundationObj.SetActive(true);
+
+      }
+#else
+        GameFoundationObj.SetActive(false);
+
+#endif
+
     }
 
     // Update is called once per frame

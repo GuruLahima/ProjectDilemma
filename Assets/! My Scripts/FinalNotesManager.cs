@@ -49,15 +49,15 @@ namespace Workbench.ProjectDilemma
 
     public void ShowNotes()
     {
-      Cursor.visible = true;
-      Cursor.lockState = CursorLockMode.Confined;
+      CursorManager.SetLockMode(CursorLockMode.Confined);
+      CursorManager.SetVisibility(true);
       canvas.SetActive(true);
     }
 
     public void HideNotes()
     {
-      Cursor.visible = false;
-      Cursor.lockState = CursorLockMode.Locked;
+      CursorManager.SetLockMode(CursorLockMode.Locked);
+      CursorManager.SetVisibility(false);
       canvas.SetActive(false);
     }
 

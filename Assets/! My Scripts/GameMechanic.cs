@@ -15,6 +15,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine.Animations.Rigging;
 using Photon.Voice.PUN;
+using UnityEngine.GameFoundation;
 
 namespace Workbench.ProjectDilemma
 {
@@ -145,21 +146,19 @@ namespace Workbench.ProjectDilemma
 
     [Header("Visual Feedback Events - Choices")]
 
-    [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnYourChoiceMade;
 
-    [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnTheirChoiceMade;
 
-    [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnBothPlayersChose;
 
-    [HideInInspector]
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnRanOutOfTime;
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent DiscussionEndedUnityEvent;
     #endregion
 
     #region exposed fields
@@ -172,8 +171,8 @@ namespace Workbench.ProjectDilemma
     [SerializeField] GameObject skipIntroText;
     [SerializeField] GameObject waitingOnOtherPlayerToSkipIntroText;
     [HorizontalLine(color: EColor.White)]
-    [SerializeField] PlayerSpot playerOneSpot;
-    [SerializeField] PlayerSpot playerTwoSpot;
+    [SerializeField] public PlayerSpot playerOneSpot;
+    [SerializeField] public PlayerSpot playerTwoSpot;
     [HorizontalLine(color: EColor.White)]
     public UnityEvent OnEndOfCinematic;
 
@@ -249,7 +248,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] GameObject localPlayerDecisionTextSave;
     [HorizontalLine(color: EColor.White)]
     [Foldout("End screen references")]
-    [SerializeField] NumberCounter victoryPointsCounter;
+    [SerializeField] NumberCounter totalPointsCounter;
     [Foldout("End screen references")]
     [SerializeField] NumberCounter localPlayerPointsCounter;
     [Foldout("End screen references")]
@@ -447,18 +446,24 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.killButton.enabled = true;
       localPlayerSpot.saveButton.enabled = true;
       localPlayerSpot.timer.enabled = true;
-      PlayerInputManager.Instance.projectileThrow = localPlayerSpot.projectileThrow;
-      PlayerInputManager.Instance.playerEmote = localPlayerSpot.playerEmote;
-      PlayerInputManager.Instance.operatePerk = localPlayerSpot.operatePerk;
-      PlayerInputManager.Instance.magnifyingGlass = localPlayerSpot.magnifyingGlass;
+      // localPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = true;
+      localPlayerSpot.projectileThrow.canon.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
+      PlayerInputManager.Instance.throwablesActivator = localPlayerSpot.projectileThrow;
+      PlayerInputManager.Instance.emoteActivator = localPlayerSpot.playerEmote;
+      PlayerInputManager.Instance.perkActivator = localPlayerSpot.operatePerk;
+      PlayerInputManager.Instance.abilityActivator = localPlayerSpot.magnifyingGlass;
+      localPlayerSpot.projectileThrow.Init();
+      localPlayerSpot.playerEmote.Init();
+      localPlayerSpot.operatePerk.Init();
+      localPlayerSpot.outfitLoader.Init();
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
       // load point data about eachother
-      if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(Keys.PLAYER_POINTS))
+      if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey(Keys.PLAYER_SOFT_CURRENCY_POINTS))
       {
         MyDebug.Log("Load points for local player");
-        localPlayerPoints = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_POINTS];
+        localPlayerPoints = (int)PhotonNetwork.LocalPlayer.CustomProperties[Keys.PLAYER_SOFT_CURRENCY_POINTS];
       }
       MyDebug.Log("localPlayerPoints", localPlayerPoints.ToString());
       localPlayerPointsCounter.Text.text = localPlayerPoints.ToString();
@@ -475,15 +480,27 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.saveButton.enabled = false;
       otherPlayerSpot.timer.enabled = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
+      otherPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = false;
+
       // assign current points to end screen counters
-      if (ScenarioManager.instance.otherPlayer != null && ScenarioManager.instance.otherPlayer.CustomProperties.ContainsKey(Keys.PLAYER_POINTS))
+      if (ScenarioManager.instance.otherPlayer != null && ScenarioManager.instance.otherPlayer.CustomProperties.ContainsKey(Keys.PLAYER_SOFT_CURRENCY_POINTS))
       {
         MyDebug.Log("Load points for other player");
-        otherPlayerPoints = (int)ScenarioManager.instance.otherPlayer.CustomProperties[Keys.PLAYER_POINTS];
+        otherPlayerPoints = (int)ScenarioManager.instance.otherPlayer.CustomProperties[Keys.PLAYER_SOFT_CURRENCY_POINTS];
       }
       MyDebug.Log("otherPlayerPoints", otherPlayerPoints.ToString());
       otherPlayerPointsCounter.Text.text = otherPlayerPoints.ToString();
 
+      if (PhotonNetwork.IsConnected)
+      {
+        RPCManager.Instance.photonView.RPC("RPC_SyncPlayerLoaded", RpcTarget.AllViaServer, localPlayerSpot.GetComponent<PhotonView>().ViewID);
+      }
+      else
+      {
+        localPlayerSpot.playerLoaded = true;
+        otherPlayerSpot.playerLoaded = true;
+        GameMechanic.Instance.CheckPlayersLoaded();
+      }
     }
 
     public void SpawnDeathPrefab()
@@ -500,6 +517,7 @@ namespace Workbench.ProjectDilemma
 
     public void SetupOtherPlayerCamForSplitScreen()
     {
+      MyDebug.Log("SetupOtherPlayerCamForSplitScreen");
       otherPlayerSpot.playerCam = otherPlayerSpot.suspenseCam;
       otherPlayerSpot.playerCam.SetActive(true);
       enemySplitScreenAnim.cam = otherPlayerSpot.playerCam.GetComponent<Camera>();
@@ -709,6 +727,7 @@ namespace Workbench.ProjectDilemma
         }
         else
         {
+          MyDebug.Log("Chosen Death sequence is", deathSequenceIndex);
           // to do: notify other user AND local player of the death scenario they chose)
           int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
           object[] content = new object[] { senderID, deathSequenceIndex };
@@ -738,6 +757,7 @@ namespace Workbench.ProjectDilemma
         else
         {
           // to do: notify other user AND local player of the death scenario they chose)
+          MyDebug.Log("Chosen Death sequence is", cooperateSequenceIndex);
           int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
           object[] content = new object[] { senderID, cooperateSequenceIndex };
           RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
@@ -765,6 +785,7 @@ namespace Workbench.ProjectDilemma
         else
         {
           // to do: notify other user AND local player of the death scenario they chose)
+          MyDebug.Log("Chosen Death sequence is", deathSequenceIndex);
           int senderID = PhotonNetwork.LocalPlayer.ActorNumber;
           object[] content = new object[] { senderID, deathSequenceIndex };
           RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All }; // You would have to set the Receivers to All in order to receive this event on the local client as well
@@ -847,77 +868,119 @@ namespace Workbench.ProjectDilemma
 
     public void CalculatePointsAfterOutcome()
     {
+      Currency softCurrency = null;
+      if (GameFoundationSdk.IsInitialized)
+        softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
+      int ourPoints = 0;
+      int theirPoints = 0;
+      PerkActivator operationalPerk = GameMechanic.Instance.localPlayerSpot.operatePerk;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
           //calculate points for each player
-          PlayerPrefs.SetInt(Keys.PLAYER_POINTS_PREF, localPlayerPoints + MiscelaneousSettings.Instance.pointsForWin);
-          localPlayerPointsCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.pointsForWin;
-          otherPlayerPointsCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.pointsForLoss;
-          victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.pointsForWin;
+          ourPoints = MiscelaneousSettings.Instance.pointsForWin +
+            (MiscelaneousSettings.Instance.pointsForWin * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
+
+          theirPoints = MiscelaneousSettings.Instance.pointsForLoss;
           break;
         case Outcome.Lost:
-          PlayerPrefs.SetInt(Keys.PLAYER_POINTS_PREF, localPlayerPoints + MiscelaneousSettings.Instance.pointsForLoss);
-          localPlayerPointsCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.pointsForLoss;
-          otherPlayerPointsCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.pointsForWin;
-          victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.pointsForLoss;
+          ourPoints = MiscelaneousSettings.Instance.pointsForLoss +
+            (MiscelaneousSettings.Instance.pointsForLoss * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
+
+          theirPoints = MiscelaneousSettings.Instance.pointsForWin;
           break;
         case Outcome.BothWon:
-          PlayerPrefs.SetInt(Keys.PLAYER_POINTS_PREF, localPlayerPoints + MiscelaneousSettings.Instance.pointsForBothWon);
-          localPlayerPointsCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.pointsForBothWon;
-          otherPlayerPointsCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.pointsForBothWon;
-          victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.pointsForBothWon;
+          ourPoints = MiscelaneousSettings.Instance.pointsForBothWon +
+            (MiscelaneousSettings.Instance.pointsForBothWon * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
+
+          theirPoints = MiscelaneousSettings.Instance.pointsForBothWon;
           break;
         case Outcome.BothLost:
-          PlayerPrefs.SetInt(Keys.PLAYER_POINTS_PREF, localPlayerPoints + MiscelaneousSettings.Instance.pointsForBothLost);
-          localPlayerPointsCounter.newAmount = localPlayerPoints += MiscelaneousSettings.Instance.pointsForBothLost;
-          otherPlayerPointsCounter.newAmount = otherPlayerPoints += MiscelaneousSettings.Instance.pointsForBothLost;
-          victoryPointsCounter.newAmount = MiscelaneousSettings.Instance.pointsForBothLost;
+          ourPoints = MiscelaneousSettings.Instance.pointsForBothLost +
+            (MiscelaneousSettings.Instance.pointsForBothLost * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
+          theirPoints = MiscelaneousSettings.Instance.pointsForBothLost;
           break;
         default:
           break;
       }
+      if (totalPointsCounter)
+      {
+
+        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourPoints >= 0) ? Color.green : Color.red;
+        totalPointsCounter.newAmount = ourPoints;
+      }
+      ourPoints = (localPlayerPoints + ourPoints < 0) ? localPlayerPoints : ourPoints;
+      MyDebug.Log("Our points are: " + ourPoints, Color.yellow);
+      if (GameFoundationSdk.IsInitialized)
+        GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourPoints);
+      localPlayerPointsCounter.newAmount = localPlayerPoints + ourPoints;
+      otherPlayerPointsCounter.newAmount = otherPlayerPoints + theirPoints;
+
     }
     public void CalculateXPAfterOutcome()
     {
+      Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
+      int ourXp = 0;
+      PerkActivator operationalPerk = GameMechanic.Instance.localPlayerSpot.operatePerk;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
-          //calculate points for each player
-          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForWin);
+          ourXp = MiscelaneousSettings.Instance.xpForWin +
+            (MiscelaneousSettings.Instance.xpForWin * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
           break;
         case Outcome.Lost:
-          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForLoss);
+          ourXp = MiscelaneousSettings.Instance.xpForLoss +
+            (MiscelaneousSettings.Instance.xpForLoss * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
           break;
         case Outcome.BothWon:
-          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothWon);
+          ourXp = MiscelaneousSettings.Instance.xpForBothWon +
+            (MiscelaneousSettings.Instance.xpForBothWon * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
           break;
         case Outcome.BothLost:
-          PlayerPrefs.SetInt(Keys.PLAYER_XP, PlayerPrefs.GetInt(Keys.PLAYER_XP, 0) + MiscelaneousSettings.Instance.xpForBothLost);
+          ourXp = MiscelaneousSettings.Instance.xpForBothLost +
+            (MiscelaneousSettings.Instance.xpForBothLost * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+
           break;
         default:
           break;
       }
+      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourXp);
     }
     public void CalculateRankAfterOutcome()
     {
+      Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
           //calculate points for each player
-          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForWin);
+          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForWin);
           break;
         case Outcome.Lost:
-          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForLoss);
+          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForLoss);
           break;
         case Outcome.BothWon:
-          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothWin);
+          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForBothWin);
           break;
         case Outcome.BothLost:
-          PlayerPrefs.SetInt(Keys.PLAYER_RANK, PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0) + MiscelaneousSettings.Instance.rankForBothLost);
+          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForBothLost);
           break;
         default:
           break;
@@ -949,6 +1012,8 @@ namespace Workbench.ProjectDilemma
     public void DecideOutcome()
     {
       votingOutcome = outcomeMatrix[myChoice][theirChoice];
+      // we call a static event (used by quests)
+      GameEvents.OnOutcome?.Invoke(votingOutcome);
       // setup outcome conditions
       MyDebug.Log("Voting outcome", votingOutcome.ToString());
 
@@ -1006,6 +1071,25 @@ namespace Workbench.ProjectDilemma
       // run postgame screen sequence
       postGameSequence.rootCoroutine = postGameSequence.RunSequence();
       StartCoroutine(postGameSequence.rootCoroutine);
+    }
+
+    // normaly we call this function via RPC twice, it fails the first time when only one of the player is loaded
+    // and succeeds the second time when both players load.
+    public void CheckPlayersLoaded()
+    {
+      if (localPlayerSpot && otherPlayerSpot)
+      {
+        if (localPlayerSpot.playerLoaded && otherPlayerSpot.playerLoaded)
+        {
+          MyDebug.Log("Both players have successfuly loaded", Color.green);
+          GameEvents.OnBothPlayerLoaded?.Invoke();
+        }
+        else
+        {
+          MyDebug.Log("Waiting for both players to load", Color.yellow);
+        }
+      }
+
     }
     #endregion
 
@@ -1081,13 +1165,6 @@ namespace Workbench.ProjectDilemma
       if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
       {
         votingOutcome = outcomeMatrix[myChoice][theirChoice];
-        bothBetrayedCondition.boolWrapper.Value = false;
-        bothSavedCondition.boolWrapper.Value = false;
-        bothVotedCondition.boolWrapper.Value = false;
-        noneVotedCondition.boolWrapper.Value = false;
-        oneVotedCondition.boolWrapper.Value = false;
-        oneBetrayedOneSaved.boolWrapper.Value = false;
-        localPlayerWonCondition.boolWrapper.Value = false;
       }
       else
       {
@@ -1097,6 +1174,13 @@ namespace Workbench.ProjectDilemma
         localPlayerPoints = 0;
         otherPlayerPoints = 0;
       }
+      bothBetrayedCondition.boolWrapper.Value = false;
+      bothSavedCondition.boolWrapper.Value = false;
+      bothVotedCondition.boolWrapper.Value = false;
+      noneVotedCondition.boolWrapper.Value = false;
+      oneVotedCondition.boolWrapper.Value = false;
+      oneBetrayedOneSaved.boolWrapper.Value = false;
+      localPlayerWonCondition.boolWrapper.Value = false;
     }
 
     private void Update()
@@ -1165,6 +1249,7 @@ namespace Workbench.ProjectDilemma
         OnRanOutOfTime?.Invoke();
 
       DiscussionEnded?.Invoke();
+      DiscussionEndedUnityEvent?.Invoke();
     }
     IEnumerator DeathChoiceCoroutine(float chooseDuration)
     {
@@ -1307,7 +1392,8 @@ namespace Workbench.ProjectDilemma
         {
           cam.enabled = false;
         }
-        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        var _deathSequence = Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        _deathSequence.ActivateOutcome(DeathSequence.OutcomeSequence.Both);
       }
 
     }
@@ -1340,7 +1426,8 @@ namespace Workbench.ProjectDilemma
         {
           cam.enabled = false;
         }
-        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        var _deathSequence = Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        _deathSequence.ActivateOutcome(DeathSequence.OutcomeSequence.Both);
       }
     }
 
@@ -1373,7 +1460,8 @@ namespace Workbench.ProjectDilemma
         {
           cam.enabled = false;
         }
-        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        var _deathSequence = Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        _deathSequence.ActivateOutcome((DeathSequence.OutcomeSequence)otherPlayerSpot.playerSpot);
       }
     }
 
@@ -1407,7 +1495,8 @@ namespace Workbench.ProjectDilemma
         {
           cam.enabled = false;
         }
-        Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        var _deathSequence = Instantiate(outcomeSequence, deathPrefabSpawnPos.position, deathPrefabSpawnPos.rotation);
+        _deathSequence.ActivateOutcome((DeathSequence.OutcomeSequence)localPlayerSpot.playerSpot);
       }
     }
     #endregion
@@ -1449,6 +1538,8 @@ namespace Workbench.ProjectDilemma
         && deathSequenceIndex >= 0)
           outcomeSequence = DeathSequencesManager.Instance.universalDeathSequences[deathSequenceIndex].deathSequence;
 
+        MyDebug.Log("outcomeSequence.name", outcomeSequence.name);
+
         // who's choice it was
         if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
         {
@@ -1481,6 +1572,7 @@ namespace Workbench.ProjectDilemma
       && currentScenario.defaultDeathSequences.Count > deathSequenceIndex
       && deathSequenceIndex >= 0)
         outcomeSequence = currentScenario.defaultDeathSequences[deathSequenceIndex].deathSequence;
+      MyDebug.Log("outcomeSequence.name", outcomeSequence.name);
 
       // who's choice it was
       if (senderID == PhotonNetwork.LocalPlayer.ActorNumber)
@@ -1513,6 +1605,7 @@ namespace Workbench.ProjectDilemma
       && currentScenario.defaultBothCooperateSequences.Count > cooperateSequenceIndex
       && cooperateSequenceIndex >= 0)
         outcomeSequence = currentScenario.defaultBothCooperateSequences[cooperateSequenceIndex].deathSequence;
+      MyDebug.Log("outcomeSequence.name", outcomeSequence.name);
 
     }
     void BothLoseSequenceChoiceEventFunc(EventData photonEvent)
@@ -1530,6 +1623,7 @@ namespace Workbench.ProjectDilemma
       && currentScenario.defaultBothLoseSequences.Count > deathSequenceIndex
       && deathSequenceIndex >= 0)
         outcomeSequence = currentScenario.defaultBothLoseSequences[deathSequenceIndex].deathSequence;
+      MyDebug.Log("outcomeSequence.name", outcomeSequence.name);
 
     }
 

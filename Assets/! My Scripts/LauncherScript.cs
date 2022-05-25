@@ -1,14 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Launcher.cs" company="Exit Games GmbH">
-//   Part of: Photon Unity Networking Demos
-// </copyright>
-// <summary>
-//  Used in "PUN Basic tutorial" to connect, and join/create room automatically
-// </summary>
-// <author>developer@exitgames.com</author>
-// --------------------------------------------------------------------------------------------------------------------
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -21,6 +11,12 @@ using ExitGames.Client.Photon;
 using NaughtyAttributes;
 using System.Collections.Generic;
 using GuruLaghima;
+using Michsky.UI.ModernUIPack;
+using UnityEngine.GameFoundation;
+using MoreMountains.Feedbacks;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Workbench.ProjectDilemma
 {
@@ -38,18 +34,19 @@ namespace Workbench.ProjectDilemma
 
     #endregion
 
-    #region Private Serializable Fields
+    #region Private exposed Fields
     [SerializeField] List<GameObject> introObjects = new List<GameObject>();
 
-    [Tooltip("The Ui Text to inform the user about the connection progress")]
+    [CustomTooltip("The Ui Text to inform the user about the connection progress")]
     [SerializeField]
     Text feedbackText;
 
-    [Tooltip("The maximum number of players per room")]
+    [CustomTooltip("The maximum number of players per room")]
     [SerializeField]
     byte maxPlayersPerRoom = 2;
 
-    [Tooltip("The input field for the nickname")]
+    [HorizontalLine]
+    [CustomTooltip("The input field for the nickname")]
     [SerializeField]
     TMP_InputField _inputField;
     [SerializeField]
@@ -57,19 +54,30 @@ namespace Workbench.ProjectDilemma
     [SerializeField]
     TMP_Text idCardXPLabel;
     [SerializeField]
-    Slider idCardXPSlider;
+    ProgressBar idCardXPSlider;
     [SerializeField]
     TMP_Text idCardRank;
     [SerializeField]
-    TMP_Text idCardPoints;
+    TMP_Text idHardCurrencyText;
     [SerializeField]
+    TMP_Text idSoftCurrencyText;
+    [SerializeField]
+    [HorizontalLine]
     GameObject chooseFateCanvas;
+    [HorizontalLine]
+    [SerializeField] GameObject fpsController;
+
+    [CustomTooltip("All virtual cameras should be parented to this object so this script can manage them properly")]
+    [SerializeField] Transform virtualCamerasParent;
+    [SerializeField] CanvasGroup menuv2UI;
+    [SerializeField] MMFeedbacks hideMenuFeedbacks;
+    [SerializeField] MMFeedbacks showMenuFeedbacks;
+
+    [HorizontalLine]
 
 
-    [Tooltip("The input field for the nickname")]
     [SerializeField]
     Button quickMatchButton;
-    [Tooltip("The input field for the nickname")]
     [SerializeField]
     [Dropdown("Regions")]
     string region;
@@ -122,6 +130,8 @@ namespace Workbench.ProjectDilemma
 
     RoomOptions roomOptions;
     AppSettings appSettings;
+
+    List<GameObject> virtualCameras = new List<GameObject>();
 
     #endregion
 
@@ -192,8 +202,6 @@ namespace Workbench.ProjectDilemma
 
     private void Start()
     {
-
-      // string defaultName = (Input.mousePosition.x * Input.mousePosition.y).ToString();
       string defaultName = "";
 
       if (_inputField != null)
@@ -204,34 +212,8 @@ namespace Workbench.ProjectDilemma
           _inputField.text = defaultName;
         }
       }
-      // initialize idcard details
-      if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
-      {
-        idCardNickname.text = PlayerPrefs.GetString(Keys.PLAYER_NAME);
-      }
-      int xp = PlayerPrefs.GetInt(Keys.PLAYER_XP, 0);
-      int accumulatedLevelThreshold = 0;
-      int currentLevel = 0;
-      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
-      {
-        int levelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
-        accumulatedLevelThreshold += levelThreshold;
-        if (xp >= accumulatedLevelThreshold)
-        {
-          currentLevel = i;
-        }
-        else
-        {
-          break;
-        }
-      }
-      idCardXPSlider.minValue = 0;
-      idCardXPSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[currentLevel];
-      idCardXPSlider.value = MiscelaneousSettings.Instance.levelsDistribution[currentLevel + 1] - (accumulatedLevelThreshold - xp);
-      idCardXPLabel.text = "Level " + currentLevel;
-      idCardRank.text = "Rank. " + PlayerPrefs.GetInt(Keys.PLAYER_RANK, 0).ToString();
-      idCardPoints.text = "Points: " + PlayerPrefs.GetInt(Keys.PLAYER_POINTS_PREF, 0).ToString();
 
+      InitializeCardDetals();
 
       // we are appending a deliminator and a random color to prevent duplicate of nicknames (because my colored chat system depends on unique nicknames)
       PhotonNetwork.NickName = defaultName + "#" + Random.ColorHSV();
@@ -239,17 +221,27 @@ namespace Workbench.ProjectDilemma
       // if player hasn't yet chosen a card deck show him the card deck canvas
       if (PlayerPrefs.GetString(Keys.CARD_DECK_CHOSEN, "false") == "false")
       {
-        chooseFateCanvas.SetActive(true);
+        if (chooseFateCanvas)
+          chooseFateCanvas.SetActive(true);
       }
       else
       {
-        chooseFateCanvas.SetActive(false);
+        if (chooseFateCanvas)
+          chooseFateCanvas.SetActive(false);
       }
-    }
 
-    public void FateChosen()
-    {
-      PlayerPrefs.SetString(Keys.CARD_DECK_CHOSEN, "true");
+      // fetch all cameras
+      virtualCameras.Clear();
+      foreach (Transform cam in virtualCamerasParent)
+      {
+        virtualCameras.Add(cam.gameObject);
+      }
+      // in the previous foreach we added the parent as well. we remove it now because it's not a camera
+      if (virtualCameras.Contains(virtualCamerasParent.gameObject))
+      {
+        int parentObjIndex = virtualCameras.IndexOf(virtualCamerasParent.gameObject);
+        virtualCameras.RemoveAt(parentObjIndex);
+      }
     }
 
     bool muted;
@@ -283,6 +275,35 @@ namespace Workbench.ProjectDilemma
 
 
     #region Public Methods
+
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+      EditorApplication.isPlaying = false;
+#else
+      Application.Quit();
+#endif
+    }
+
+    public void DisableMenuScreenCameras()
+    {
+      foreach (GameObject cam in virtualCameras)
+      {
+        cam.SetActive(false);
+      }
+    }
+
+    public void ExitMatchmaking()
+    {
+      Disconnect();
+      SwitchToMenuView();
+
+    }
+
+    public void FateChosen()
+    {
+      PlayerPrefs.SetString(Keys.CARD_DECK_CHOSEN, "true");
+    }
 
     /// <summary>
     /// Sets the name of the player, and save it in the PlayerPrefs for future sessions.
@@ -338,6 +359,34 @@ namespace Workbench.ProjectDilemma
     {
       PhotonNetwork.Disconnect();
     }
+    public void SwitchToFirstPersonControllerView()
+    {
+      DisableMenuScreenCameras();
+
+      // turn on first person controller
+      fpsController.SetActive(true);
+
+      ToggleMenu(false);
+    }
+    public void SwitchToMenuView()
+    {
+      DisableMenuScreenCameras();
+
+      // turn off first person controller
+      fpsController.SetActive(false);
+      ToggleMenu(true);
+
+    }
+
+    public void ToggleMenu(bool on)
+    {
+      menuv2UI.interactable = on;
+      if (on)
+        showMenuFeedbacks.PlayFeedbacks();
+      else
+        hideMenuFeedbacks.PlayFeedbacks();
+    }
+
 
 
     #endregion
@@ -390,7 +439,7 @@ namespace Workbench.ProjectDilemma
 
       // send points info about player
       Hashtable temphashtable = new Hashtable();
-      temphashtable.Add(Keys.PLAYER_POINTS, PlayerPrefs.GetInt(Keys.PLAYER_POINTS_PREF, 0));
+      temphashtable.Add(Keys.PLAYER_SOFT_CURRENCY_POINTS, (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT)));
       PhotonNetwork.LocalPlayer.SetCustomProperties(temphashtable);
 
       if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
@@ -583,6 +632,62 @@ namespace Workbench.ProjectDilemma
       }
       return temphashtable;
     }
+
+
+    private void InitializeCardDetals()
+    {
+      // initialize idcard details
+      if (PlayerPrefs.HasKey(Keys.PLAYER_NAME))
+      {
+        idCardNickname.text = PlayerPrefs.GetString(Keys.PLAYER_NAME);
+      }
+      // xp
+      int xp = (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP));
+      int accumulatedLevelThreshold = 0;
+      int currentLevel = 0;
+      int currentLevelThreshold = 0;
+      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
+      {
+        currentLevelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
+        accumulatedLevelThreshold += currentLevelThreshold;
+        if (xp >= accumulatedLevelThreshold)
+        {
+          currentLevel = i;
+        }
+        else
+        {
+          break;
+        }
+      }
+      if (idCardXPSlider)
+      {
+        float currentXPPerc = ((float)(Mathf.Abs((accumulatedLevelThreshold - xp) - currentLevelThreshold)) / (float)currentLevelThreshold) * 100;
+        idCardXPSlider.maxValue = 100;
+        StartCoroutine(AnimateProgressBar(idCardXPSlider, 0f, currentXPPerc));
+      }
+      if (idCardXPLabel)
+        idCardXPLabel.text = "Level " + currentLevel;
+      // rank
+      if (idCardRank)
+        idCardRank.text = "Rank. " + (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP));
+      // premium currency
+      if (idHardCurrencyText)
+        idHardCurrencyText.text = "Points: " + (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_HARD));
+      // virtual currency
+      if (idSoftCurrencyText)
+        idSoftCurrencyText.text = "Points: " + (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT));
+    }
+
+    private System.Collections.IEnumerator AnimateProgressBar(ProgressBar idCardXPSlider, float startPerc, float maxPercent)
+    {
+      idCardXPSlider.isOn = true;
+      idCardXPSlider.currentPercent = startPerc;
+      yield return new WaitUntil(() => idCardXPSlider.currentPercent >= maxPercent);
+      idCardXPSlider.isOn = false;
+
+    }
+
+
 
     #endregion
 

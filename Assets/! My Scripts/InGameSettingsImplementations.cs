@@ -8,13 +8,15 @@ using UnityEngine.Audio;
 using GuruLaghima;
 using Workbench.ProjectDilemma;
 using UnityEngine.SceneManagement;
+using Michsky.UI.ModernUIPack;
 
 public class InGameSettingsImplementations : MonoBehaviour
 {
 
   [SerializeField] InGameSettingsManager settingsManager;
   [SerializeField] AudioMixer mainMixer;
-  [SerializeField] TMP_Dropdown resolutionDropdown;
+  // [SerializeField] TMP_Dropdown resolutionDropdown;
+  [SerializeField] HorizontalSelector resolutionSelector;
 
 
   public static List<Camera> allCamsInScene = new List<Camera>();
@@ -83,6 +85,21 @@ public class InGameSettingsImplementations : MonoBehaviour
   public void ApplyInvertAxisSetting(string commonKey)
   {
     // 
+    InGameSetting setting = settingsManager.settings.Find((obj) =>
+        {
+          return obj.settingKey == commonKey;
+        });
+
+    // finds all mouse-driven controllers and inverts their y axis
+    // unless this is the main menu. we don't want that behaviour there
+    if (SceneManager.GetActiveScene().name != "MenuV2")
+    {
+      SimpleCameraController[] allcontrollerInScene = GameObject.FindObjectsOfType<SimpleCameraController>();
+      foreach (SimpleCameraController item in allcontrollerInScene)
+      {
+        item.reverseY = !item.reverseY;
+      }
+    }
 
 
   }
@@ -104,6 +121,7 @@ public class InGameSettingsImplementations : MonoBehaviour
 
     if (resSetting != null && resSetting.settingValue != null)
     {
+      MyDebug.Log("resSetting selector value:", resSetting.settingValue);
 
       // save setting
       if (uniqResolutionsList.Count > (int)resSetting.settingValue)
@@ -159,7 +177,7 @@ public class InGameSettingsImplementations : MonoBehaviour
   }
 
   /// <summary>
-  /// Applies brightness leve
+  /// Applies brightness level
   /// </summary>
   /// <param name="commonKey"></param>
   public void ApplyBrightnessSetting(string commonKey)
@@ -220,7 +238,7 @@ public class InGameSettingsImplementations : MonoBehaviour
       uniqResolutionsList.Add(newResolution);
     }
 
-    resolutionDropdown.ClearOptions();
+    // resolutionDropdown.ClearOptions(); // if using a Unity dropdown
 
     List<string> resolutionOptions = new List<string>();
 
@@ -231,13 +249,46 @@ public class InGameSettingsImplementations : MonoBehaviour
     {
       resolutionOption = uniqResolutionsList[i].width + " x " + uniqResolutionsList[i].height;
       resolutionOptions.Add(resolutionOption);
+      resolutionSelector.CreateNewItem(resolutionOption);
 
       if (uniqResolutionsList[i].width == Screen.currentResolution.width && uniqResolutionsList[i].height == Screen.currentResolution.height)
       {
         currentResolutionIndex = i;
       }
     }
-    resolutionDropdown.AddOptions(resolutionOptions);
+    // resolutionDropdown.AddOptions(resolutionOptions); // if using a Unity dropdown
+    resolutionSelector.SetupSelector(); // if using a ModernUI HorizontalSelector
+
+    // set default resolution
+    // 
+    InGameSetting resSetting = settingsManager.settings.Find((obj) =>
+    {
+      return obj.settingKey == "resolution_setting";
+    });
+
+    if (!PlayerPrefs.HasKey("resolution_setting"))
+    {
+      PlayerPrefs.SetInt("resolution_setting", currentResolutionIndex);
+      if (resSetting != null && resSetting.settingValue == null)
+      {
+        resSetting.settingValue = (int)currentResolutionIndex;
+
+        MyDebug.Log("resSetting selector value:", resSetting.settingValue);
+
+        // save setting
+        if (uniqResolutionsList.Count > (int)resSetting.settingValue)
+        {
+          currentResolution = uniqResolutionsList[(int)resSetting.settingValue];
+          Screen.SetResolution(currentResolution.width, currentResolution.height, Screen.fullScreen);
+        }
+        else
+        {
+          currentResolution = uniqResolutionsList[uniqResolutionsList.Count - 1];
+          Screen.SetResolution(currentResolution.width, currentResolution.height, Screen.fullScreen);
+        }
+      }
+    }
+
   }
   #endregion
 }

@@ -1,4 +1,5 @@
 using System;
+using GuruLaghima;
 using NaughtyAttributes;
 using UnityEngine;
 
@@ -66,16 +67,19 @@ public class CursorManager : MonoBehaviour
     }
   }
 
-  public void ToggleLockMode()
+  public static void ToggleLockMode()
   {
-    Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
+    CursorLockMode mode = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
+    Cursor.lockState = mode;
+    MyDebug.Log("LockState", mode.ToString());
   }
-  public void ToggleVisibility()
+  public static void ToggleVisibility()
   {
     Cursor.visible = !Cursor.visible;
   }
-  public void SetLockMode(CursorLockMode mode)
+  public static void SetLockMode(CursorLockMode mode)
   {
+    MyDebug.Log("LockState", mode.ToString());
     Cursor.lockState = mode;
   }
   /// <summary>
@@ -87,23 +91,26 @@ public class CursorManager : MonoBehaviour
   /// <param name="lockMode"></param>
   public void SetLockMode(int lockMode)
   {
+    CursorLockMode mode;
     switch (lockMode)
     {
       case 0:
-        Cursor.lockState = CursorLockMode.None;
+        mode = CursorLockMode.None;
         break;
       case 1:
-        Cursor.lockState = CursorLockMode.Confined;
+        mode = CursorLockMode.Confined;
         break;
       case 2:
-        Cursor.lockState = CursorLockMode.Locked;
+        mode = CursorLockMode.Locked;
         break;
       default:
-        Cursor.lockState = CursorLockMode.None;
+        mode = CursorLockMode.None;
         break;
     }
+    Cursor.lockState = mode;
+    MyDebug.Log("LockState", mode.ToString());
   }
-  public void SetVisibility(bool visible)
+  public static void SetVisibility(bool visible)
   {
     Cursor.visible = visible;
   }

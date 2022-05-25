@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using Workbench.ProjectDilemma;
 using UnityEngine.SceneManagement;
 using GuruLaghima;
+using Michsky.UI.ModernUIPack;
 
 public class InGameSettingsManager : MonoBehaviour
 {
@@ -73,12 +74,13 @@ public class InGameSettingsManager : MonoBehaviour
     // * (which means we not only load the settings from disk and show it in the ui but also apply the implementations of those settings )
     // * BUT ONLY IF THE VALUE IS CHANGED!
     ApplyDataToUIElement(setting);
-    // * which is why we must apply the settings here as well. so first the settings are loaded they are applied twice
+    // * which is why we must apply the settings here as well. so first the settings are loaded then they are applied twice (potentially)
     ApplySetting(setting);
   }
 
   private void ApplySetting(InGameSetting setting)
   {
+    MyDebug.Log("Applying setting", setting.settingKey);
     setting.OnValueChanged?.Invoke(setting.settingKey);
   }
 
@@ -119,6 +121,15 @@ public class InGameSettingsManager : MonoBehaviour
             setting.uiElementReference.GetComponent<TMP_Dropdown>().onValueChanged.AddListener((val) => { setting.OnValueChanged?.Invoke(val); });
           }
           break;
+        case UIElementType.HorizontalSelector:
+          if (setting.uiElementReference && setting.uiElementReference.GetComponent<HorizontalSelector>())
+          {
+            // setting.uiElementReference.GetComponent<HorizontalSelector>().selectorEvent.AddListener((val) => { MyDebug.Log("whatever", val); });
+            setting.uiElementReference.GetComponent<HorizontalSelector>().selectorEvent.AddListener((val) => { SaveSingleSetting(setting); });
+            setting.uiElementReference.GetComponent<HorizontalSelector>().selectorEvent.AddListener((val) => { setting.OnValueChanged?.Invoke(val); });
+
+          }
+          break;
         default:
           break;
       }
@@ -127,9 +138,13 @@ public class InGameSettingsManager : MonoBehaviour
   }
 
 
+  public void SomeFunction() { }
+
   void FetchDataFromStorage(InGameSetting setting)
   {
     // 
+    MyDebug.Log("fetch data for setting", setting.settingKey);
+
     if (PlayerPrefs.HasKey(setting.settingKey))
     {
       switch (setting.valueType)
@@ -137,14 +152,17 @@ public class InGameSettingsManager : MonoBehaviour
         case ValueType.Float:
           float valf = PlayerPrefs.GetFloat(setting.settingKey, 0);
           setting.settingValue = valf;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.Int:
           int vali = PlayerPrefs.GetInt(setting.settingKey, 0);
           setting.settingValue = vali;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.String:
           string vals = PlayerPrefs.GetString(setting.settingKey, "");
           setting.settingValue = vals;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         default:
           setting.settingValue = null;
@@ -157,12 +175,15 @@ public class InGameSettingsManager : MonoBehaviour
       {
         case ValueType.Float:
           setting.settingValue = setting.defaultValueFloat;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.Int:
           setting.settingValue = setting.defaultValueInt;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.String:
           setting.settingValue = setting.defaultValueString;
+          MyDebug.Log("setting val", setting.settingValue);
           break;
         default:
           setting.settingValue = null;
@@ -195,10 +216,6 @@ public class InGameSettingsManager : MonoBehaviour
         case UIElementType.Toggle:
           if (setting.uiElementReference && setting.uiElementReference.GetComponent<Toggle>())
           {
-            // MyDebug.Log(setting.settingKey, setting.settingValue.ToString());
-            // MyDebug.Log(setting.settingKey, ((int)setting.settingValue).ToString());
-            // MyDebug.Log(setting.settingKey, setting.uiElementReference.GetComponent<Toggle>().isOn.ToString());
-
             setting.uiElementReference.GetComponent<Toggle>().isOn = (int)setting.settingValue == 0 ? false : true;
           }
           break;
@@ -212,6 +229,14 @@ public class InGameSettingsManager : MonoBehaviour
           if (setting.uiElementReference && setting.uiElementReference.GetComponent<TMP_Dropdown>())
           {
             setting.uiElementReference.GetComponent<TMP_Dropdown>().value = (int)setting.settingValue;
+          }
+          break;
+        case UIElementType.HorizontalSelector:
+          if (setting.uiElementReference && setting.uiElementReference.GetComponent<HorizontalSelector>())
+          {
+            setting.uiElementReference.GetComponent<HorizontalSelector>().defaultIndex = (int)setting.settingValue;
+            setting.uiElementReference.GetComponent<HorizontalSelector>().index = (int)setting.settingValue;
+            setting.uiElementReference.GetComponent<HorizontalSelector>().UpdateUI();
           }
           break;
         default:
@@ -233,6 +258,7 @@ public class InGameSettingsManager : MonoBehaviour
   /// <param name="setting"></param>
   public void SaveSingleSetting(InGameSetting setting)
   {
+    MyDebug.Log("saving setting", setting.settingKey);
     switch (setting.elementType)
     {
       case UIElementType.Slider:
@@ -266,7 +292,7 @@ public class InGameSettingsManager : MonoBehaviour
         if (setting.uiElementReference && setting.uiElementReference.GetComponent<TMP_InputField>())
         {
           string newValue = setting.uiElementReference.GetComponent<TMP_InputField>().text;
-          PlayerPrefs.SetString(setting.settingKey, setting.uiElementReference.GetComponent<TMP_InputField>().text);
+          PlayerPrefs.SetString(setting.settingKey, newValue);
           setting.settingValue = newValue;
         }
         break;
@@ -274,7 +300,16 @@ public class InGameSettingsManager : MonoBehaviour
         if (setting.uiElementReference && setting.uiElementReference.GetComponent<TMP_Dropdown>())
         {
           int newValue = setting.uiElementReference.GetComponent<TMP_Dropdown>().value;
-          PlayerPrefs.SetInt(setting.settingKey, setting.uiElementReference.GetComponent<TMP_Dropdown>().value);
+          PlayerPrefs.SetInt(setting.settingKey, newValue);
+          setting.settingValue = newValue;
+        }
+        break;
+      case UIElementType.HorizontalSelector:
+        if (setting.uiElementReference && setting.uiElementReference.GetComponent<HorizontalSelector>())
+        {
+          int newValue = setting.uiElementReference.GetComponent<HorizontalSelector>().index;
+          MyDebug.Log("saving horizontalselector value", newValue);
+          PlayerPrefs.SetInt(setting.settingKey, newValue);
           setting.settingValue = newValue;
         }
         break;
@@ -313,7 +348,7 @@ public enum ValueType
 {
   Float,
   Int,
-  String
+  String,
 }
 public enum UIElementType
 {
@@ -321,5 +356,6 @@ public enum UIElementType
   Toggle,
   InputField,
   Dropdown,
+  HorizontalSelector,
 
 }

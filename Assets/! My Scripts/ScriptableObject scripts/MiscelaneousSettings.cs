@@ -5,6 +5,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections.Generic;
+using GuruLaghima;
 
 [CreateAssetMenu(fileName = "VersionSettingsAsset", menuName = "Workbench/ScriptableObjects/MiscelaneousSettings", order = 1)]
 public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettings>
@@ -19,7 +20,7 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   public string mainMenuScene = "Main Menu";
 
   [Header("Chat settings")]
-  [Tooltip("The time the chat is blocked after a massage is sent in lobby and in-game chat")]
+  [CustomTooltip("The time the chat is blocked after a massage is sent in lobby and in-game chat")]
   public float spamProtectInterval = 3f;
   [Header("Points distribution")]
   public int pointsForWin = 50;
@@ -31,7 +32,7 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   public int xpForLoss;
   public int xpForBothWon;
   public int xpForBothLost;
-  [Tooltip("Enter values for how much each level needs XP to be reached")]
+  [CustomTooltip("Enter values for how much each level needs XP to be reached")]
   public List<int> levelsDistribution = new List<int>();
   [Header("Rank distribution")]
   public int rankForWin;

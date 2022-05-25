@@ -5,34 +5,41 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.GameFoundation;
 using UnityEngine.GameFoundation.Components;
+using UnityEngine.GameFoundation.DefaultLayers;
+using UnityEngine.GameFoundation.DefaultLayers.Persistence;
+using UnityEngine.SceneManagement;
 
 namespace GuruLaghima.ProjectDilemma
 {
   /// <summary>
-  /// This class manages the scene and serves as an example for inventory basics.
+  /// This class manages the inventory (update, save, informing other classes of changes)
   /// </summary>
   public class InventoryManager : MonoBehaviour
   {
+    /// <summary>
+    /// singleton
+    /// </summary>
+    public static InventoryManager instance;
 
-    #region property keys
-
-    [SerializeField] string inventoryItem_HUDIconPropertyKey;
-
+    #region events
+    public static Action InventoryUpdated;
     #endregion
 
-    #region UI references
+    #region public fields
     /// <summary>
-    /// the parent to which we will attach inventory items
+    /// Reference to a list of InventoryItems in the GameFoundationSdk.inventory.
     /// </summary>
-    public Transform contentFrame;
+    public ItemList m_InventoryItems;
     /// <summary>
-    /// the inventory item template
+    /// Reference to a list of InventoryItems of a certain definition.
     /// </summary>
-    public Transform inventoryItemPrefab;
-
-    public GameObject canvas;
-
+    public List<InventoryItem> m_ItemsByDefinition = new List<InventoryItem>();
+    /// <summary>
+    /// Reference in the scene to the Game Foundation Init component.
+    /// </summary>
+    public GameFoundationInit gameFoundationInit;
     #endregion
+
 
 
     #region private vars
@@ -41,18 +48,18 @@ namespace GuruLaghima.ProjectDilemma
     /// Game Foundation finishes initialization or when script is enabled.
     /// </summary>
     private bool m_SubscribedFlag = false;
-    /// <summary>
-    /// Reference to a list of InventoryItems in the GameFoundationSdk.inventory.
-    /// </summary>
-    private readonly List<InventoryItem> m_InventoryItems = new List<InventoryItem>();
-
-    /// <summary>
-    /// Reference to a list of InventoryItems of a certain definition.
-    /// </summary>
-    private readonly List<InventoryItem> m_ItemsByDefinition = new List<InventoryItem>();
     #endregion
 
     #region Monobehaviour methods
+
+    private void Awake()
+    {
+      if (!instance)
+        instance = this;
+      else
+        Destroy(this);
+
+    }
 
     /// <summary>
     /// Standard starting point for Unity scripts.
@@ -60,13 +67,6 @@ namespace GuruLaghima.ProjectDilemma
     private void Start()
     {
 
-
-      // Game Foundation Initialization is being managed by GameFoundationInit Game Object
-      if (!GameFoundationSdk.IsInitialized)
-      {
-        // Disable all buttons while initializing
-        // EnableAllButtons(false);
-      }
     }
 
     /// <summary>
@@ -76,6 +76,12 @@ namespace GuruLaghima.ProjectDilemma
     private void OnEnable()
     {
       SubscribeToGameFoundationEvents();
+      SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+      UpdateInventory();
     }
 
     /// <summary>
@@ -93,8 +99,9 @@ namespace GuruLaghima.ProjectDilemma
     /// </summary>
     public void OnGameFoundationInitialized()
     {
-      // Show list of inventory items and update the button interactability.
-      RefreshUI();
+      m_InventoryItems = GameFoundationSdk.inventory.CreateList();
+
+      UpdateInventory();
 
       // Ensure that the inventory item changed callback is connected
       SubscribeToGameFoundationEvents();
@@ -109,9 +116,17 @@ namespace GuruLaghima.ProjectDilemma
     /// <param name="itemChanged">This parameter will not be used, but must exist so the signature is compatible with the inventory callbacks so we can bind it.</param>
     private void OnInventoryItemChanged(InventoryItem itemChanged)
     {
-      MyDebug.Log("Updating inventory UI");
-      RefreshUI();
+      UpdateInventory();
     }
+
+    void UpdateInventory()
+    {
+      MyDebug.Log("Updating inventory");
+      FetchInventory(m_InventoryItems);
+      ParseInventoryToScriptableObject(m_InventoryItems);
+      InventoryUpdated?.Invoke();
+    }
+
 
     /// <summary>
     /// If GameFoundation throws exception, log the error to console.
@@ -127,13 +142,97 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public methods
 
-    public void ToggleInventoryVisibility()
+    /// <summary>
+    /// Adds a single item to the main inventory.
+    /// </summary>
+    public void AddItem(string itemDefinitionKey)
     {
-      canvas.SetActive(!canvas.activeSelf);
+      try
+      {
+        // This will create a new item inside the InventoryManager.
+        var itemDefinition = GameFoundationSdk.catalog.Find<InventoryItemDefinition>(itemDefinitionKey);
+        GameFoundationSdk.inventory.CreateItem(itemDefinition);
+      }
+      catch (Exception exception)
+      {
+        OnGameFoundationException(exception);
+      }
     }
-    public void SetInventoryVisibility(bool visible)
+
+    /// <summary>
+    /// Removes a single item from the main inventory.
+    /// </summary>
+    public void RemoveItem(string itemDefinitionKey)
     {
-      canvas.SetActive(visible);
+      try
+      {
+        // To remove a single item from the InventoryManager, you need a specific instance of that item. Since we only know the 
+        // InventoryItemDefinition of the item we want to remove, we'll first look for all items with that definition.
+        // We'll use the version of FindItems that lets us pass in a collection to be filled to reduce allocations.
+        var itemDefinition = GameFoundationSdk.catalog.Find<InventoryItemDefinition>(itemDefinitionKey);
+        var itemCount = GameFoundationSdk.inventory.FindItems(itemDefinition, m_InventoryItems);
+
+        // Make sure there actually is an item available to return
+        if (itemCount > 0)
+        {
+          // We'll remove the first instance in the list of items
+          GameFoundationSdk.inventory.Delete(m_InventoryItems[0]);
+        }
+      }
+      catch (Exception exception)
+      {
+        OnGameFoundationException(exception);
+      }
+    }
+
+    /// <summary>
+    /// Removes all items from the inventory WITHOUT reinitializing.
+    /// </summary>
+    public void RemoveAllInventoryItems()
+    {
+      try
+      {
+        GameFoundationSdk.inventory.DeleteAllItems();
+      }
+      catch (Exception exception)
+      {
+        OnGameFoundationException(exception);
+      }
+    }
+
+    /// <summary>
+    /// Uninitializes Game Foundation, deletes persistence data, then re-initializes Game Foundation.
+    /// Note: Because Game Foundation is initialized again, all Initial Allocation items will be added again.
+    /// </summary>
+    public void DeleteAndReinitializeGameFoundation()
+    {
+      try
+      {
+
+        // Stop watching item events (events reconnected after initialization completes).
+        UnsubscribeFromGameFoundationEvents();
+
+        // Get the reference to the Data Layer used to initialize Game Foundation before GameFoundationSdk gets uninitialized.
+        if (!(GameFoundationSdk.dataLayer is PersistenceDataLayer dataLayer))
+          return;
+
+        // Using the Data Layer get the local persistence layer.
+        if (!(dataLayer.persistence is LocalPersistence localPersistence))
+          return;
+
+        // Uninitialize GameFoundation so we can delete the local persistence data file.
+        gameFoundationInit.Uninitialize();
+
+        // Delete local persistence data file.  Once finished, we will ReInitializeGameFoundation.
+        // Note: if we fail to delete for any reason, exception will be sent to 
+        //       OnGameFoundationInitializeException method for logging and buttons will remain disabled.
+        localPersistence.Delete(() => gameFoundationInit.Initialize(),
+            OnGameFoundationException);
+      }
+      catch (Exception exception)
+      {
+        OnGameFoundationException(exception);
+      }
     }
 
     #endregion
@@ -194,52 +293,16 @@ namespace GuruLaghima.ProjectDilemma
       }
     }
 
-    /// <summary>
-    /// This will fill out the main text box with information about the main inventory.
-    /// </summary>
-    private void RefreshUI()
-    {
-      ClearUI();
-
-      FetchInventory();
-
-      PopulateUI();
-
-    }
-
-    List<InventoryItemDefinition> addedItemTypes = new List<InventoryItemDefinition>();
-    private void PopulateUI()
-    {
-
-      addedItemTypes.Clear();
-      // Loop through every type of item within the inventory and display its name and quantity.
-      foreach (InventoryItem inventoryItem in m_InventoryItems)
-      {
-        // visually we want only one instance of the HUD representaion per item type because we specify the quantity of that type there too
-        if (addedItemTypes.Contains(inventoryItem.definition))
-        {
-          continue;
-        }
-        InventoryItemHudView newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHudView>();
-        addedItemTypes.Add(inventoryItem.definition);
-        newItem.SetItemDefinition(inventoryItem.definition);
-        newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-      }
-    }
-
-    private void ClearUI()
-    {
-      InventoryItemHudView[] children = contentFrame.GetComponentsInChildren<InventoryItemHudView>();
-      foreach (InventoryItemHudView child in children)
-      {
-        Destroy(child.gameObject);
-      }
-    }
-
-    private void FetchInventory()
+    private void FetchInventory(ItemList inv)
     {
       // We'll use the version of GetItems that lets us pass in a collection to be filled to reduce allocations
-      GameFoundationSdk.inventory.GetItems(m_InventoryItems);
+      GameFoundationSdk.inventory.GetItems(inv);
+      MyDebug.Log("Inventory items count:", inv.Count.ToString());
+    }
+
+    private void ParseInventoryToScriptableObject(ItemList items)
+    {
+      ItemSettings.Instance.ParseInventoryData(items);
     }
     #endregion
   }

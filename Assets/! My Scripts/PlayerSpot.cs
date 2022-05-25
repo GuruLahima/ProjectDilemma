@@ -20,13 +20,14 @@ namespace Workbench.ProjectDilemma
     public GameObject suspenseCam;
     public GameObject gameplayCamerasParent;
     public GameObject playerCam;
+    public SimpleCameraController mainCam;
     public GameObject nameplateCanvas;
     public TextMeshProUGUI nameplateText;
 
     [HorizontalLine(color: EColor.White)]
     public GameObject playerModelSpawnPos;
     public GameObject playerModel;
-    public Rig playerRig;
+    public UnityEngine.Animations.Rigging.Rig playerRig;
     public GameObject endScenePlayerModelLeft;
     public GameObject endScenePlayerModelRight;
     [HorizontalLine(color: EColor.White)]
@@ -44,11 +45,18 @@ namespace Workbench.ProjectDilemma
     public Image deathBookLeftPage;
     public Image deathBookRightPage;
     public DeathSequence_UI_Item deathItemPrefab;
-    [Space(10)]
-    public ProjectileThrow projectileThrow;
-    public PlayerEmote playerEmote;
-    public OperatePerk operatePerk;
-    public MagnifyingGlass magnifyingGlass;
+    [HorizontalLine(color: EColor.White)]
+    public ThrowablesActivator projectileThrow;
+    public EmoteActivator playerEmote;
+    public PerkActivator operatePerk;
+    public AbilityActivator magnifyingGlass;
+    public OutfitLoader outfitLoader;
+    [HorizontalLine(color: EColor.White)]
+    public Transform character;
+    public Transform rigRoot;
+    public int[] clothesId;
+
+    [HideInInspector] public bool playerLoaded;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]
