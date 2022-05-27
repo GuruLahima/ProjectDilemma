@@ -307,10 +307,10 @@ namespace Workbench.ProjectDilemma
     private int[] intValues = new int[] { 1, 2 };
     [Foldout("Debug")]
     [OnValueChanged("OnValueChangedCallback")]
-    [SerializeField] Choice myChoice = Choice.None;
+    [SerializeField] public Choice myChoice = Choice.None;
     [Foldout("Debug")]
     [OnValueChanged("OnValueChangedCallback")]
-    [SerializeField] Choice theirChoice = Choice.None;
+    [SerializeField] public Choice theirChoice = Choice.None;
     [Foldout("Debug")]
     [SerializeField] bool madeChoice = false;
     [Foldout("Debug")]
@@ -871,120 +871,115 @@ namespace Workbench.ProjectDilemma
       Currency softCurrency = null;
       if (GameFoundationSdk.IsInitialized)
         softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
-      int ourPoints = 0;
+      int ourTotalPoints;
       int theirPoints = 0;
-      PerkActivator operationalPerk = GameMechanic.Instance.localPlayerSpot.operatePerk;
+      int ourBasePoints = 0;
+      PerkActivator perkActivator = GameMechanic.Instance.localPlayerSpot.operatePerk;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
           //calculate points for each player
-          ourPoints = MiscelaneousSettings.Instance.pointsForWin +
-            (MiscelaneousSettings.Instance.pointsForWin * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
-
+          ourBasePoints = MiscelaneousSettings.Instance.pointsForWin;
           theirPoints = MiscelaneousSettings.Instance.pointsForLoss;
           break;
         case Outcome.Lost:
-          ourPoints = MiscelaneousSettings.Instance.pointsForLoss +
-            (MiscelaneousSettings.Instance.pointsForLoss * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
-
+          ourBasePoints = MiscelaneousSettings.Instance.pointsForLoss;
           theirPoints = MiscelaneousSettings.Instance.pointsForWin;
           break;
         case Outcome.BothWon:
-          ourPoints = MiscelaneousSettings.Instance.pointsForBothWon +
-            (MiscelaneousSettings.Instance.pointsForBothWon * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
-
+          ourBasePoints = MiscelaneousSettings.Instance.pointsForBothWon;
           theirPoints = MiscelaneousSettings.Instance.pointsForBothWon;
           break;
         case Outcome.BothLost:
-          ourPoints = MiscelaneousSettings.Instance.pointsForBothLost +
-            (MiscelaneousSettings.Instance.pointsForBothLost * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
+          ourBasePoints = MiscelaneousSettings.Instance.pointsForBothLost;
           theirPoints = MiscelaneousSettings.Instance.pointsForBothLost;
           break;
         default:
           break;
       }
+      ourTotalPoints = ourBasePoints + (ourBasePoints * (int)perkActivator.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
+        (int)perkActivator.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+      if (perkActivator.CheckModifierBonuses(PerkKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
+      {
+        ourTotalPoints = 0;
+      }
       if (totalPointsCounter)
       {
-
-        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourPoints >= 0) ? Color.green : Color.red;
-        totalPointsCounter.newAmount = ourPoints;
+        // we show the total difference of points here (raw)
+        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourTotalPoints >= 0) ? Color.green : Color.red;
+        totalPointsCounter.newAmount = ourTotalPoints;
       }
-      ourPoints = (localPlayerPoints + ourPoints < 0) ? localPlayerPoints : ourPoints;
-      MyDebug.Log("Our points are: " + ourPoints, Color.yellow);
+      ourTotalPoints = (localPlayerPoints + ourTotalPoints < 0) ? localPlayerPoints : ourTotalPoints;
+      MyDebug.Log("Their points are: " + theirPoints, Color.magenta);
+      MyDebug.Log("Our points are: " + ourTotalPoints, Color.yellow);
       if (GameFoundationSdk.IsInitialized)
-        GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourPoints);
-      localPlayerPointsCounter.newAmount = localPlayerPoints + ourPoints;
+        GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourTotalPoints);
+      // we show current players' points here (post zero check)
+      localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
       otherPlayerPointsCounter.newAmount = otherPlayerPoints + theirPoints;
 
     }
     public void CalculateXPAfterOutcome()
     {
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
-      int ourXp = 0;
-      PerkActivator operationalPerk = GameMechanic.Instance.localPlayerSpot.operatePerk;
+      int ourTotalXp;
+      int ourBaseXp = 0;
+      PerkActivator perkActivator = GameMechanic.Instance.localPlayerSpot.operatePerk;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
-          ourXp = MiscelaneousSettings.Instance.xpForWin +
-            (MiscelaneousSettings.Instance.xpForWin * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
+          ourBaseXp = MiscelaneousSettings.Instance.xpForWin;
           break;
         case Outcome.Lost:
-          ourXp = MiscelaneousSettings.Instance.xpForLoss +
-            (MiscelaneousSettings.Instance.xpForLoss * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
+          ourBaseXp = MiscelaneousSettings.Instance.xpForLoss;
           break;
         case Outcome.BothWon:
-          ourXp = MiscelaneousSettings.Instance.xpForBothWon +
-            (MiscelaneousSettings.Instance.xpForBothWon * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
+          ourBaseXp = MiscelaneousSettings.Instance.xpForBothWon;
           break;
         case Outcome.BothLost:
-          ourXp = MiscelaneousSettings.Instance.xpForBothLost +
-            (MiscelaneousSettings.Instance.xpForBothLost * (int)operationalPerk.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-            (int)operationalPerk.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-
+          ourBaseXp = MiscelaneousSettings.Instance.xpForBothLost;
           break;
         default:
           break;
       }
-      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourXp);
+      ourTotalXp = ourBaseXp + (ourBaseXp * (int)perkActivator.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+        (int)perkActivator.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
     }
     public void CalculateRankAfterOutcome()
     {
       Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
+      int ourTotalRank;
+      int ourBaseRank = 0;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
         case Outcome.Won:
           //calculate points for each player
-          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForWin);
+          ourBaseRank = MiscelaneousSettings.Instance.rankForWin;
           break;
         case Outcome.Lost:
-          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForLoss);
+          ourBaseRank = MiscelaneousSettings.Instance.rankForLoss;
           break;
         case Outcome.BothWon:
-          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForBothWin);
+          ourBaseRank = MiscelaneousSettings.Instance.rankForBothWin;
           break;
         case Outcome.BothLost:
-          GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + MiscelaneousSettings.Instance.rankForBothLost);
+          ourBaseRank = MiscelaneousSettings.Instance.rankForBothLost;
           break;
         default:
           break;
       }
+      //for now -- missing formula
+      ourTotalRank = ourBaseRank;
+      GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
+    }
+
+    public void ActivateEndScreenCounters()
+    {
+
     }
 
     public void DisableFog()
@@ -1064,6 +1059,26 @@ namespace Workbench.ProjectDilemma
       CalculatePointsAfterOutcome();
       CalculateRankAfterOutcome();
       CalculateXPAfterOutcome();
+      if (PhotonNetwork.IsConnected)
+      {
+        if (GameFoundationSdk.IsInitialized)
+        {
+          Currency softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
+          Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
+          Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
+          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
+            GameFoundationSdk.wallet.Get(softCurrency), GameFoundationSdk.wallet.Get(rankAsCurrency), GameFoundationSdk.wallet.Get(xpAsCurrency));
+        }
+        else
+        {
+          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
+            0, 0, 0);
+        }
+      }
+      else
+      {
+        ActivateEndScreenCounters();
+      }
 
       // stop game sequence
       StopCoroutine(gameSequence.rootCoroutine);

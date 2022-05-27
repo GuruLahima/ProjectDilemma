@@ -98,6 +98,7 @@ crashlytics-build.properties
 /[Aa]ssets/AddressableAssetsData/
 /[Aa]ssets/CustomInputManager/
 /[Aa]ssets/My Packages/Fonts
+/[Aa]ssets/! My Data/
 
 
 Assets/FX_Classic_Confetti/

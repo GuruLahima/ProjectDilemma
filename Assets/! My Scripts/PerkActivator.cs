@@ -208,7 +208,7 @@ namespace Workbench.ProjectDilemma
     // standard formula for calculating points would look like
     // x where x is the base amount of points
     // x + bonus% + bonus(flat)
-
+     
     /// <summary>
     /// Used by the PerkKey property to display a dropdown menu of the existing keys
     /// </summary>
@@ -239,7 +239,7 @@ namespace Workbench.ProjectDilemma
     public static System.Action OnBothPlayerLoaded;
     public static System.Action<Choice> OnLocalPlayerVoted;
     public static System.Action<Choice> OnOtherPlayerVoted;
-    public static System.Action<Choice,Choice> OnBothPlayersVoted;
+    public static System.Action<Choice, Choice> OnBothPlayersVoted;
     public static System.Action<Outcome> OnOutcome;
   }
 }

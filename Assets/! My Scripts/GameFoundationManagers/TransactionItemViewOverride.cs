@@ -21,7 +21,6 @@ public class TransactionItemViewOverride : TransactionItemView
 
   void UpdateVisualStatus()
   {
-    MyDebug.Log(this.transaction.key);
     // * I need to check if the transaction for this TransactionView is repeatable 
     // * and if not then check if it has already been made
     // * so I can turn it off in the store or hide it or grey it out or whatever

@@ -6,12 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/! My Scenes/Main Menu.unity
-    guid: 4bf055c1df8cea0449b77d48a7f2d131
+    path: Assets/! My Scenes/MenuV2.unity
+    guid: f7757f0805981974dacc34f63a862a68
   - enabled: 1
     path: Assets/! My Scenes/ApprovedScenarios/Motel-Scene.unity
     guid: 567b948946e22e1459f54a46545687cd
-  - enabled: 1
+  - enabled: 0
+    path: Assets/! My Scenes/Main Menu.unity
+    guid: 4bf055c1df8cea0449b77d48a7f2d131
+  - enabled: 0
     path: Assets/! My Scenes/Player Apartment.unity
     guid: 6f726191152d16c419d49d6b8d81ec20
   - enabled: 0
@@ -27,9 +30,11 @@ EditorBuildSettings:
     path: Assets/Photon/PhotonVoice/Demos/DemoVoicePun/DemoVoicePun-Scene.unity
     guid: a3f3c3b3816924199acba595045624d2
   - enabled: 0
-    path: Assets/! My Scenes/VoiceTest.unity
-    guid: 0ec836e40481c0d40b9a08213ee193a4
-  - enabled: 1
-    path: Assets/Stefan Folder/TeST TEST TEST scene.unity
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
+    path: Assets/Stefan Folder/TestScenes/TeST TEST TEST scene.unity
     guid: e49312fd74995854ebf362f21e8c3498
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 9c0c94e6fed67ed49a083a089a42b7e4,
+      type: 2}
