@@ -75,6 +75,25 @@ namespace Workbench.ProjectDilemma
       }
       GameMechanic.Instance.CheckPlayersLoaded();
     }
+
+    [PunRPC]
+    void RPC_EvaluatePlayerIncomes(object points, object rank, object xp)
+    {
+      long _points = 0, _rank = 0, _xp = 0;
+      if (points is long lPoints)
+      {
+        _points = lPoints;
+      }
+      if (rank is long lRank)
+      {
+        _rank = lRank;
+      }
+      if (xp is long lXp)
+      {
+        _xp = lXp;
+      }
+      GameMechanic.Instance.ActivateEndScreenCountersOtherPlayer(_points, _rank, _xp);
+    }
     #endregion
 
   }

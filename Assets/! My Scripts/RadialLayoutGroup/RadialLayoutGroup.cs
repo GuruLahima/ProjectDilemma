@@ -1,3 +1,4 @@
+using GuruLaghima;
 using UnityEngine;
 using UnityEngine.UI;
 /*
@@ -22,13 +23,23 @@ THE SOFTWARE.
 public class RadialLayoutGroup : LayoutGroup
 {
   public float Radius;
+  public float radius
+  {
+    get { return Radius; }
+    set
+    {
+      Radius = value;
+      CalculateRadial();
+    }
+  }
   [Range(0f, 360f)]
   public float MinAngle, MaxAngle, StartAngle;
   public bool ForceChildScale;
-  public Vector2 ScaleLimit = new Vector2 (0f, 9999f);
+  public Vector2 ScaleLimit = new Vector2(0f, 9999f);
   [Range(0.1f, 1.0f)]
   public float ScaleMultiplier;
   public System.Action OnChildrenModified;
+
 
   /// <summary>
   /// Short for writing Mathf.Sqrt(2)
@@ -39,6 +50,9 @@ public class RadialLayoutGroup : LayoutGroup
   /// </summary>
   readonly Vector2 CenteredPivot = new Vector2(0.5f, 0.5f);
   protected override void OnEnable() { base.OnEnable(); CalculateRadial(); }
+
+
+
   public override void SetLayoutHorizontal()
   {
   }
@@ -60,7 +74,7 @@ public class RadialLayoutGroup : LayoutGroup
     CalculateRadial();
   }
 #endif
-  void CalculateRadial()
+  public void CalculateRadial()
   {
     m_Tracker.Clear();
     if (transform.childCount == 0)
@@ -79,9 +93,9 @@ public class RadialLayoutGroup : LayoutGroup
       {
         //Adding the elements to the tracker stops the user from modifiying their positions via the editor.
         m_Tracker.Add(this, child,
-        DrivenTransformProperties.Anchors |
-        DrivenTransformProperties.AnchoredPosition |
-        DrivenTransformProperties.Pivot);
+          DrivenTransformProperties.Anchors |
+          DrivenTransformProperties.AnchoredPosition |
+          DrivenTransformProperties.Pivot);
         Vector2 vPos = new Vector2(Mathf.Cos(fAngle * Mathf.Deg2Rad), Mathf.Sin(fAngle * Mathf.Deg2Rad));
         child.localPosition = vPos * Radius;
         //Force objects to be center aligned, this can be changed however I'd suggest you keep all of the objects with the same anchor points.
@@ -90,7 +104,7 @@ public class RadialLayoutGroup : LayoutGroup
 
         if (ForceChildScale)
         {
-          m_Tracker.Add(this, child, DrivenTransformProperties.SizeDelta);          
+          m_Tracker.Add(this, child, DrivenTransformProperties.SizeDelta);
           child.sizeDelta = new Vector2(fScale, fScale);
         }
       }

@@ -86,6 +86,10 @@ namespace Workbench.ProjectDilemma
           {
             totalValue += @float;
           }
+          else if (val is int @int)
+          {
+            totalValue += @int;
+          }
         }
       }
       return totalValue;
@@ -107,6 +111,23 @@ namespace Workbench.ProjectDilemma
         }
       }
       return false;
+    }
+
+    public List<string> ReadModifierBonuses(string key)
+    {
+      List<string> bonusKeys = new List<string>();
+      object[] values = (object[])GetModifier(key);
+      if (values != null)
+      {
+        foreach (object val in values)
+        {
+          if (val is string @string)
+          {
+            bonusKeys.Add(@string);
+          }
+        }
+      }
+      return bonusKeys;
     }
     #endregion
 
@@ -153,7 +174,7 @@ namespace Workbench.ProjectDilemma
 
       #region LOCAL STUFF
       perkActivated = true;
-      activeQuest = Instantiate(ownedPerk.quest);
+      activeQuest = Instantiate(ownedPerk.objective);
       #endregion
 
       #region INTERNET STUFF
@@ -186,8 +207,8 @@ namespace Workbench.ProjectDilemma
       }
       bonusAdded = true;
 
-      PerkData.PerkBonusModifiers[] mod = ownedPerk.GetPerkModifiers(condition);
-      foreach (PerkData.PerkBonusModifiers pm in mod)
+      ObjectiveData.PerkBonusModifiers[] mod = ownedPerk.GetPerkModifiers(condition);
+      foreach (ObjectiveData.PerkBonusModifiers pm in mod)
       {
         AddModifier(pm.ModifierKey, pm.GetValue());
       }
@@ -203,12 +224,12 @@ namespace Workbench.ProjectDilemma
   /// <para>To define a new custom key, simply create a new public const string and add it to the array CompleteListOfKeys</para>
   /// <para>Note: keys with matching string values will not show up in the PerkKey property</para>
   /// </summary>
-  public static class PerkKeys
+  public static class BonusModifiersKeys
   {
     // standard formula for calculating points would look like
     // x where x is the base amount of points
     // x + bonus% + bonus(flat)
-     
+
     /// <summary>
     /// Used by the PerkKey property to display a dropdown menu of the existing keys
     /// </summary>
@@ -222,7 +243,8 @@ namespace Workbench.ProjectDilemma
       FLAT_BONUS_COINS,
       IMMUNITY_TO_LOSS,
       MULTIPLIER_BONUS_CARDS,
-      RARITY_IMPROVEMENT_CARDS
+      RARITY_IMPROVEMENT_CARDS,
+      EARN_ITEM_REWARD
     };
     public const string PERCENT_BONUS_EXPERIENCE = "percentBonusExperience";
     public const string PERCENT_BONUS_POINTS = "percentBonusPoints";
@@ -233,6 +255,7 @@ namespace Workbench.ProjectDilemma
     public const string IMMUNITY_TO_LOSS = "immunityToLoss";
     public const string MULTIPLIER_BONUS_CARDS = "mutliplierBonusCards";
     public const string RARITY_IMPROVEMENT_CARDS = "rarityImprovementCards";
+    public const string EARN_ITEM_REWARD = "earnItemReward";
   }
   public static class GameEvents
   {
@@ -241,5 +264,7 @@ namespace Workbench.ProjectDilemma
     public static System.Action<Choice> OnOtherPlayerVoted;
     public static System.Action<Choice, Choice> OnBothPlayersVoted;
     public static System.Action<Outcome> OnOutcome;
+    public static System.Action<float> OnPlayersChoseTimeLeft;
+    public static System.Action OnGameEnded;
   }
 }

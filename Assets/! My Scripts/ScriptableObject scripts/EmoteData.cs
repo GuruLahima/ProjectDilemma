@@ -12,6 +12,4 @@ public class EmoteData : ItemData
   public List<FXWrapper> FXOnCast = new List<FXWrapper>();
   public List<FXWrapper> FXOnEnd = new List<FXWrapper>();
   public SelectionMenuContainer Icon;
-  [ShowAssetPreview]
-  public Sprite ico;
 }

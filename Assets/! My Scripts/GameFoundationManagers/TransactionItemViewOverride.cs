@@ -43,4 +43,15 @@ public class TransactionItemViewOverride : TransactionItemView
   {
     OnTransactionDisabled?.Invoke();
   }
+  public void UpdateNewlyAddedInfoForAllBoughtItems()
+  {
+    // for (int i = 0; i < this.transaction.payout.GetExchanges(); i++){
+    //   // inventoryItemType.NewlyAdded
+    //   this.transaction.payout.GetExchange(i).tradableDefinition.;
+    // }
+    //   foreach (var item in this.transaction.payout.GetExchange)
+    //   {
+
+    //   }
+  }
 }

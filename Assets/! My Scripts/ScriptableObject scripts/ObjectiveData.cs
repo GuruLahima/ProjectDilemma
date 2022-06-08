@@ -3,15 +3,13 @@ using NaughtyAttributes;
 using UnityEngine;
 using Workbench.ProjectDilemma;
 
-[CreateAssetMenu(fileName = "New PerkData", menuName = "Workbench/ScriptableObjects/PerkData", order = 3)]
-public class PerkData : ItemData
+[CreateAssetMenu(fileName = "New ObjectiveData", menuName = "Workbench/ScriptableObjects/ObjectiveData", order = 3)]
+public class ObjectiveData : ItemData
 {
   #region Public Fields
   public SelectionMenuContainer Icon;
-  [ShowAssetPreview]
-  public Sprite ico;
   public List<PerkModifiersWrapper> AllPerkModifiers = new List<PerkModifiersWrapper>();
-  public ObjectiveBase quest;
+  public ObjectiveBase objective;
   #endregion
 
   #region Public Methods
@@ -44,8 +42,8 @@ public class PerkData : ItemData
   [System.Serializable]
   public class PerkBonusModifiers
   {
-    public enum ModifierType : byte { Float, Bool }
-    [PerkKey]
+    public enum ModifierType : byte { Float, Bool, String }
+    [ModifierKey]
     public string ModifierKey;
     public ModifierType ModifierValueType;
 
@@ -57,6 +55,10 @@ public class PerkData : ItemData
     [ShowIf("ModifierValueType", ModifierType.Bool)]
     public bool ModifierValueBool;
 
+    [AllowNesting]
+    [ShowIf("ModifierValueType", ModifierType.String)]
+    public string ModifierValueString;
+
     /// <returns>Value for the modifier corresponding to the modifier type</returns>
     public object GetValue()
     {
@@ -64,6 +66,7 @@ public class PerkData : ItemData
       {
         ModifierType.Float => ModifierValueFloat,
         ModifierType.Bool => ModifierValueBool,
+        ModifierType.String => ModifierValueString,
         _ => ModifierValueFloat,
       };
     }

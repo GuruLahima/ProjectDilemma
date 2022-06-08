@@ -33,8 +33,8 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 0
-    path: Assets/Stefan Folder/TestScenes/TeST TEST TEST scene.unity
-    guid: e49312fd74995854ebf362f21e8c3498
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9c0c94e6fed67ed49a083a089a42b7e4,
       type: 2}

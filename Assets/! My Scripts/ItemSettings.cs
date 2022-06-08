@@ -183,6 +183,7 @@ public class ItemSettings : SingletonScriptableObject<ItemSettings>
     ProjectileData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ProjectileData>();
     tmpData.inventoryitemDefinition = item.definition;
     tmpData.AmountOwned = 1;
+    // tmpData.NewlyAdded = item.GetMutableProperty();
     throwables.Add(tmpData);
 
   }

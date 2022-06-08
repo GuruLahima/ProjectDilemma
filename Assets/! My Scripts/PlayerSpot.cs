@@ -50,6 +50,7 @@ namespace Workbench.ProjectDilemma
     public EmoteActivator playerEmote;
     public PerkActivator operatePerk;
     public AbilityActivator magnifyingGlass;
+    public QuestActivator questActivator;
     public OutfitLoader outfitLoader;
     [HorizontalLine(color: EColor.White)]
     public Transform character;

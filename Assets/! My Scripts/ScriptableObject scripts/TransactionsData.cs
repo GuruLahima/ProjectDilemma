@@ -20,6 +20,17 @@ public class TransactionsData : SingletonScriptableObject<TransactionsData>
   #region private fields
   #endregion
 
+  #region Messages
+  private void OnEnable()
+  {
+#if UNITY_EDITOR
+    // we need to reset this list because scriptable objects in editor dont get reset like in a build
+    recordedNonrepeatableTransactions.Clear();
+#endif
+  }
+
+  #endregion
+
   #region public methods
 
   /// <summary>
@@ -30,7 +41,7 @@ public class TransactionsData : SingletonScriptableObject<TransactionsData>
   {
 
   }
-  
+
   public void AddTransaction(string transactionKey)
   {
     recordedNonrepeatableTransactions.Add(transactionKey);

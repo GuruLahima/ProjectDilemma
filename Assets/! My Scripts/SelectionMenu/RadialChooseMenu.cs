@@ -8,6 +8,7 @@ using UnityEngine;
 public class RadialChooseMenu : MonoBehaviour
 {
   #region Public Fields
+  public RadialMenuData radialMenuData;
   /// <summary>
   /// Triggered whenever the selection changes i.e new element has been selected from the list
   /// <para>First transform is the old selection</para>
@@ -57,15 +58,17 @@ public class RadialChooseMenu : MonoBehaviour
   #endregion
 
   #region Exposed Private Fields
-  [SerializeField] [InputAxis] string HorizontalAxis;
-  [SerializeField] [InputAxis] string VerticalAxis;
+  [SerializeField][InputAxis] string HorizontalAxis;
+  [SerializeField][InputAxis] string VerticalAxis;
   [SerializeField] bool useMouseMovement;
+  [SerializeField] GameObject raycastBlocker;
   #endregion
 
   #region Private Fields
   private List<Vector2> _objectSnapPoints = new List<Vector2>();
   private List<RectTransform> _objectPositions = new List<RectTransform>();
   private Transform _lastSelected;
+
   private Vector2 FakeCursorPosition
   {
     get
@@ -89,7 +92,9 @@ public class RadialChooseMenu : MonoBehaviour
   private void Start()
   {
     GenerateSnapPoints();
+    PopulateRadialMenuFromData();
   }
+
   private void OnTransformChildrenChanged()
   {
     GenerateSnapPoints();
@@ -118,11 +123,38 @@ public class RadialChooseMenu : MonoBehaviour
       }
     }
     LastSelectedObject = _closestObject;
+    raycastBlocker.SetActive(true);
   }
   public void Deactivate()
   {
+    raycastBlocker.SetActive(false);
     OnSelectionDeactivated?.Invoke();
+
   }
+
+
+  public void PopulateRadialMenuFromData()
+  {
+    if (radialMenuData)
+      for (int i = 0; i < transform.childCount; i++)
+      {
+        var tr = transform.GetChild(i).GetComponent<SelectionMenuContainer>();
+        if (tr != null)
+        {
+          if (radialMenuData.orderedItems.Count > i && radialMenuData.orderedItems[i])
+          {
+            tr.container = radialMenuData.orderedItems[i];
+            tr.image.sprite = radialMenuData.orderedItems[i].ico;
+          }
+          else
+          {
+            tr.container = null;
+            tr.image.sprite = tr.defaultIcon;
+          }
+        }
+      }
+  }
+
   #endregion
 
   #region Private Methods
@@ -148,5 +180,6 @@ public class RadialChooseMenu : MonoBehaviour
       }
     }
   }
+
   #endregion
 }

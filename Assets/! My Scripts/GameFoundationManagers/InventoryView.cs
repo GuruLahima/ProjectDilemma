@@ -7,12 +7,15 @@ using System.Linq;
 using Workbench.ProjectDilemma;
 using System;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using System.Collections;
+using MoreMountains.Feedbacks;
+using NaughtyAttributes;
 
 namespace GuruLaghima.ProjectDilemma
 {
 
 
-  public class InventoryView : MonoBehaviour
+  public class InventoryView : MonoBehaviour, ISequenceExecutor
   {
 
     #region UI references
@@ -29,7 +32,30 @@ namespace GuruLaghima.ProjectDilemma
     /// </summary>
     public ItemSettings.ItemType itemType;
     public string itemTag;
+    /// <summary>
+    /// the radial menu which pops up when we select an item
+    /// </summary>
+    public RadialChooseMenu radialMenu;
+    public RadialMenuData radialMenuData;
 
+    public ControllableSequence choosingSlotSequence;
+    public ControllableSequence hidingRadialMenuSequence;
+
+    public bool onlyOneItemPerInventory;
+    public bool mustHaveOneEquippedAtAllTimes;
+    [ShowIf("onlyOneItemPerInventory")]
+    [ReadOnly]
+    public InventoryItemHUDViewOverride equippedItem;
+
+    public bool InSelection
+    {
+      get;
+      set;
+    }
+
+    #endregion
+
+    #region exposed fields
 
     #endregion
 
@@ -39,22 +65,74 @@ namespace GuruLaghima.ProjectDilemma
 
     #endregion
 
-    #region MOnobehaviors
+    #region private fields
+
+    List<InventoryItemHUDViewOverride> inventoryItems = new List<InventoryItemHUDViewOverride>();
+
+    #endregion
+
+    #region Monobehaviors
+
+    private void Awake()
+    {
+      if (radialMenuData)
+        radialMenu.radialMenuData = this.radialMenuData;
+    }
+
+    // public void ItemWasEquipped(ItemData item)
+    // {
+    //   // if only one item is allowed to be equppied (from this list) then unequip other items
+    //   if(onlyOneItemAllowed){
+    //     if(!item.Equipped){
+
+    //     }
+    //   }
+    // }
 
     private void OnEnable()
     {
       InventoryManager.InventoryUpdated += RefreshUI;
+      if (radialMenu)
+        radialMenu.OnSelectionChanged += UpdateSelectedSlotIcon;
+    }
 
+    private void UpdateSelectedSlotIcon(Transform lastSelected, Transform newlySelected)
+    {
+      lastSelectedSlot = newlySelected;
+      newlySelected.GetComponent<SelectionMenuContainer>().image.sprite = lastItemSelected.whoDis.ico;
+      if (lastSelected)
+      {
+        if (lastSelected.GetComponent<SelectionMenuContainer>().container)
+          lastSelected.GetComponent<SelectionMenuContainer>().image.sprite = ((ItemData)lastSelected.GetComponent<SelectionMenuContainer>().container).ico;
+        else
+          lastSelected.GetComponent<SelectionMenuContainer>().image.sprite = lastSelected.GetComponent<SelectionMenuContainer>().defaultIcon;
+      }
     }
 
     private void OnDisable()
     {
       InventoryManager.InventoryUpdated -= RefreshUI;
+      if (radialMenu)
+        radialMenu.OnSelectionChanged -= UpdateSelectedSlotIcon;
+
     }
 
     #endregion
 
     #region public methods
+    public void StartSelectionPhase()
+    {
+      // start selection phase
+      StartCoroutine(RadialMenuSelection());
+    }
+
+    public void ClearRadialMenuData()
+    {
+      for (int i = 0; i < radialMenuData.orderedItems.Count; i++)
+      {
+        radialMenuData.orderedItems[i] = null;
+      }
+    }
 
     public void ToggleInventoryVisibility()
     {
@@ -63,6 +141,119 @@ namespace GuruLaghima.ProjectDilemma
     public void SetInventoryVisibility(bool visible)
     {
       contentFrame.gameObject.SetActive(visible);
+    }
+
+    public void ShowRadialMenuSequence(InventoryItemHUDViewOverride itemSelected)
+    {
+      StopAllCoroutines();
+      this.lastItemSelected = itemSelected;
+      choosingSlotSequence.rootCoroutine = choosingSlotSequence.RunSequence(this);
+      StartCoroutine(choosingSlotSequence.rootCoroutine);
+    }
+
+
+    IEnumerator currentCoroutine;
+
+    public IEnumerator SequenceCoroutine(List<ControllableSequence.EventWithDuration> eventSequence, string name)
+    {
+      MyDebug.Log($"[{name}]", "started");
+
+      foreach (ControllableSequence.EventWithDuration ev in eventSequence)
+      {
+        if (ev.shouldExecute)
+        {
+          ev.theEvent?.Invoke();
+          if (ev.isCoroutine)
+          {
+            if (currentCoroutine != null)
+            {
+              StopCoroutine(currentCoroutine);
+              yield return StartCoroutine(currentCoroutine);
+            }
+            else
+            {
+              MyDebug.Log("There is no current coroutine. Assign it in the UnityEvent handler by calling a void function");
+              yield return new WaitForSeconds(ev.duration);
+            }
+          }
+          else
+          {
+            yield return new WaitForSeconds(ev.duration);
+          }
+        }
+      }
+
+      MyDebug.Log($"[{name}]", "ended");
+    }
+
+    public void HideItems()
+    {
+      MyDebug.Log("inventoryItems.Count", inventoryItems.Count);
+      foreach (InventoryItemHUDViewOverride item in inventoryItems)
+      {
+        if (item)
+        {
+
+          MyDebug.Log("Hiding item", item.name);
+          MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Hide").key);
+          item.feedbacks.Find((obj) => obj.key == "Hide")?.element?.PlayFeedbacks();
+        }
+      }
+    }
+    public void ShowItems()
+    {
+      MyDebug.Log("inventoryItems.Count", inventoryItems.Count);
+      foreach (InventoryItemHUDViewOverride item in inventoryItems)
+      {
+        if (item)
+        {
+
+          MyDebug.Log("Showing item", item.name);
+          MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Show").key);
+          item.feedbacks.Find((obj) => obj.key == "Show")?.element?.PlayFeedbacks();
+        }
+      }
+    }
+    private bool inSelection = true;
+    private InventoryItemHUDViewOverride lastItemSelected;
+    private Transform lastSelectedSlot;
+    private bool onlyOneItemAllowed;
+
+    public IEnumerator RadialMenuSelection()
+    {
+      inSelection = true;
+      while (inSelection)
+      {
+        radialMenu.Activate();
+        if (Input.GetMouseButtonDown(0))
+          inSelection = false;
+        yield return null;
+      }
+      // when selection ends
+      // close the radial menu 
+      HideRadialMenuSequence();
+      // save the selected position in the RadialMenuData
+      if (radialMenuData.orderedItems.Count > lastSelectedSlot.GetSiblingIndex())
+        radialMenuData.orderedItems[lastSelectedSlot.GetSiblingIndex()] = lastItemSelected.whoDis;
+      // update 
+      radialMenu.PopulateRadialMenuFromData();
+    }
+    public void HideRadialMenuSequence()
+    {
+      StopAllCoroutines();
+      hidingRadialMenuSequence.rootCoroutine = hidingRadialMenuSequence.RunSequence(this);
+      StartCoroutine(hidingRadialMenuSequence.rootCoroutine);
+    }
+
+
+    public void UnequipPreviousitem()
+    {
+      if (equippedItem)
+      {
+
+        equippedItem.Equip(false);
+        equippedItem = null;
+      }
     }
 
     #endregion
@@ -87,6 +278,8 @@ namespace GuruLaghima.ProjectDilemma
       List<ItemData> tempList = new List<ItemData>();
       // addedItemTypes.Clear();
       // Loop through every type of item within the inventory and display its name and quantity.
+      List<InventoryItemDefinition> allClothesDefinitions = new List<InventoryItemDefinition>();
+      GameFoundationSdk.catalog.FindItems<InventoryItemDefinition>(GameFoundationSdk.tags.Find(Keys.CLOTHES_TAG), allClothesDefinitions);
       switch (itemType)
       {
         case ItemSettings.ItemType.Emotes:
@@ -99,12 +292,15 @@ namespace GuruLaghima.ProjectDilemma
             //   continue;
             // }
             InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+            newItem.parentView = this;
             // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
             newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
             newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
             newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
             newItem.SetItemData(inventoryItemType);
-
+            newItem.usesRadialMenu = true;
+            // newItem.notificationIcon.SetActive(inventoryItemType.inventoryitemDefinition.);
+            inventoryItems.Add(newItem);
             // newItem.GetComponent<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty("ingame_ScriptableObject"), SetIconSprite, OnSpriteLoadFailed) as RigData;
           }
           break;
@@ -118,11 +314,15 @@ namespace GuruLaghima.ProjectDilemma
             //   continue;
             // }
             InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+            newItem.parentView = this;
             // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
             newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
             newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
             newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
             newItem.SetItemData(inventoryItemType);
+            newItem.usesRadialMenu = true;
+            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
+            inventoryItems.Add(newItem);
 
             // newItem.GetComponent<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty("ingame_ScriptableObject"), SetIconSprite, OnSpriteLoadFailed) as RigData;
           }
@@ -137,13 +337,17 @@ namespace GuruLaghima.ProjectDilemma
             //   continue;
             // }
             InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+            newItem.parentView = this;
             // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
             newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
             newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
             newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
             newItem.SetItemData(inventoryItemType);
+            newItem.usesRadialMenu = false;
+            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
             if (newItem.GetComponentInChildren<ClothingPlaceholder>())
               newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
+            inventoryItems.Add(newItem);
           }
           break;
         case ItemSettings.ItemType.ActivePerks:
@@ -156,11 +360,15 @@ namespace GuruLaghima.ProjectDilemma
             //   continue;
             // }
             InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+            newItem.parentView = this;
             // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
             newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
             newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
             newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
             newItem.SetItemData(inventoryItemType);
+            newItem.usesRadialMenu = false;
+            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
+            inventoryItems.Add(newItem);
           }
           break;
         case ItemSettings.ItemType.Abilities:
@@ -173,11 +381,15 @@ namespace GuruLaghima.ProjectDilemma
             //   continue;
             // }
             InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+            newItem.parentView = this;
             // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
             newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
             newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
             newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
             newItem.SetItemData(inventoryItemType);
+            newItem.usesRadialMenu = false;
+            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
+            inventoryItems.Add(newItem);
           }
           break;
         default:
@@ -188,14 +400,14 @@ namespace GuruLaghima.ProjectDilemma
 
     private void ClearUI()
     {
-      InventoryItemHUDViewOverride[] children = contentFrame.GetComponentsInChildren<InventoryItemHUDViewOverride>();
-      foreach (InventoryItemHUDViewOverride child in children)
+      MyDebug.Log("Clearing UI for", this.name);
+      foreach (InventoryItemHUDViewOverride child in inventoryItems)
       {
         Destroy(child.gameObject);
       }
+      inventoryItems.Clear();
     }
 
-    #endregion
 
     /// <summary>
     ///     Triggers one of the two callbacks specified in the parameters, either onLoadSucceeded or on LoadFailed,
@@ -210,7 +422,7 @@ namespace GuruLaghima.ProjectDilemma
     /// <param name="onLoadFailed">
     ///     Callback for if a itemdata could not be found in the given Property.
     /// </param>
-    public static ItemData LoadItemData(Property scriptableObjectProperty, Action<ItemData> onLoadSucceeded, Action<string> onLoadFailed)
+    static ItemData LoadItemData(Property scriptableObjectProperty, Action<ItemData> onLoadSucceeded, Action<string> onLoadFailed)
     {
       if (Application.isPlaying)
       {
@@ -301,5 +513,7 @@ namespace GuruLaghima.ProjectDilemma
     {
       MyDebug.LogWarning(errorMessage);
     }
+    #endregion
+
   }
 }

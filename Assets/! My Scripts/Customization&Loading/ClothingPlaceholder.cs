@@ -14,11 +14,11 @@ namespace Workbench.ProjectDilemma
 
     public void Select()
     {
-      OnSelected?.Invoke();
+      // OnSelected?.Invoke(); // InventoryItemHUDViewOverride
     }
     public void Deselect()
     {
-      OnDeselected?.Invoke();
+      // OnDeselected?.Invoke(); // this is raken care of by the InventoryItemHUDViewOverride class
     }
 
     private void OnEnable()

@@ -26,6 +26,7 @@ namespace Workbench.ProjectDilemma
     #region exposed fields
     [HorizontalLine]
     [CustomTooltip("Source from where the projectile is thrown")]
+    [SerializeField] GameObject raycastBlocker;
     [SerializeField] public SimpleCameraController canon;
     [SerializeField] Transform startingAngle;
     [SerializeField] LineRenderer aimHelper;
@@ -104,21 +105,16 @@ namespace Workbench.ProjectDilemma
     public override void Init()
     {
       ownedProjectiles = ItemSettings.Instance.throwables.Where((obj) => { return obj.Owned && obj.Equipped; }).ToList();
-      // first clear existing items in the menu
-      foreach (Transform item in radialMenu.transform)
-      {
-        Destroy(item.gameObject);
-      }
       // generate the new items
-      foreach (ProjectileData projData in ownedProjectiles)
-      {
-        if (projData.Icon)
-        {
-          var ico = Instantiate(projData.Icon, radialMenu.transform);
-          ico.container = projData;
-          if (projData.ico) ico.image.sprite = projData.ico;
-        }
-      }
+      // foreach (ProjectileData projData in ownedProjectiles)
+      // {
+      //   if (projData.Icon)
+      //   {
+      //     var ico = Instantiate(projData.Icon, radialMenu.transform);
+      //     ico.container = projData;
+      //     if (projData.ico) ico.image.sprite = projData.ico;
+      //   }
+      // }
     }
     public void Pick()
     {
@@ -213,10 +209,12 @@ namespace Workbench.ProjectDilemma
           OutOfThrowablesFeedback();
           return;
         }
+        MyDebug.Log("Start aiming");
+
         aiming = true;
         Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<Camera>();
         originalFieldOfView = currentPlayerCam.fieldOfView;
-
+        raycastBlocker.SetActive(true);
 
         DisableCameraControl();
         canon.playerHasControlOverCamera = true;
@@ -227,7 +225,7 @@ namespace Workbench.ProjectDilemma
         {
           iconOutline.effectColor = Color.red;
         }
-        ActiveState = true;
+        // ActiveState = true;
       }
       CalculateStrengthAndAngle();
       TrajectoryMotion.AIM(aimHelper, startingPoint, aimingAngle, baseThrowStrength, resolutionRay, (int)resolutionLine, layerMask.value, null, null, decal);
@@ -250,11 +248,14 @@ namespace Workbench.ProjectDilemma
     {
       MyDebug.Log("Throw projectile");
       aiming = false;
+      raycastBlocker.SetActive(false);
+
       if (OnCooldown) return;
       if (!selectedProjectile) return;
+      if (!(selectedProjectile.AmountOwned > 0)) return;
 
-      ActiveState = false;
-      if (selectedProjectile && GameFoundationSdk.inventory.GetTotalQuantity(selectedProjectile.inventoryitemDefinition) > 0)
+      // ActiveState = false;
+      if (selectedProjectile && selectedProjectile.AmountOwned > 0)
       {
         // expend an item
         InventoryManager.instance.RemoveItem(selectedProjectile.inventoryitemDefinition.key);
@@ -287,6 +288,7 @@ namespace Workbench.ProjectDilemma
         ShootThrowableFeedback();
 
       }
+
       aimHelper.gameObject.SetActive(false);
       canon.playerHasControlOverCamera = false;
       RestoreCameraControl();

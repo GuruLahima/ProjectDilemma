@@ -5,12 +5,12 @@ using UnityEngine;
 using Workbench.ProjectDilemma;
 
 #if UNITY_EDITOR
-[CustomPropertyDrawer(typeof(PerkKeyAttribute))]
-public class PerkKeyInspector : PropertyDrawer
+[CustomPropertyDrawer(typeof(ModifierKeyAttribute))]
+public class ModifierKeyInspector : PropertyDrawer
 {
   public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
   {
-    if (PerkKeys.CompleteListOfKeys.Length < 1)
+    if (BonusModifiersKeys.CompleteListOfKeys.Length < 1)
     {
       Debug.LogError("No keys are defined");
       return;
@@ -18,7 +18,7 @@ public class PerkKeyInspector : PropertyDrawer
 
     if (property.propertyType == SerializedPropertyType.String)
     {
-      string[] displayedOptions = PerkKeys.CompleteListOfKeys; 
+      string[] displayedOptions = BonusModifiersKeys.CompleteListOfKeys; 
       int _selectedIndex = 0;
       if (System.Array.Exists(displayedOptions, s => s == property.stringValue))
       {

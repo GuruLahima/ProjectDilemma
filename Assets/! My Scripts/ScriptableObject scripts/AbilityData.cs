@@ -8,8 +8,6 @@ public class AbilityData : ItemData
 {
   #region Public Fields
   public SelectionMenuContainer Icon;
-  [ShowAssetPreview]
-  public Sprite ico;
   public ObjectiveBase quest;
   #endregion
 

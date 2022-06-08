@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,7 +16,7 @@ public class RadialChooseMenuTools : MonoBehaviour
   #endregion
 
   #region Public Fields
-  public UnityEvent OnSelectionChangedEvent;
+  public UnityEvent<Transform, Transform> OnSelectionChangedEvent;
   public UnityEvent<Transform> OnNewTransform;
   #endregion
 
@@ -25,6 +26,7 @@ public class RadialChooseMenuTools : MonoBehaviour
   [SerializeField] private bool IncludeOutlineSelection;
   [SerializeField] private bool IncludeRadialBackground;
   [SerializeField] private bool IncludeZoomOnSelection;
+  [SerializeField] private bool IncludeChangeTextOnSelection = true;
   [SerializeField] private Vector3 ZoomSelectedSize;
   [SerializeField] private Vector3 ZoomNormalSize;
   [SerializeField] private float ZoomPositionOffset;
@@ -91,13 +93,20 @@ public class RadialChooseMenuTools : MonoBehaviour
 
   #endregion
 
+  #region public methods
+  public void CallFeedbacksOnTransform(Transform lastSelectedObject, Transform previousSelectedObj)
+  {
+    lastSelectedObject.GetComponent<MMFeedbacks>().PlayFeedbacks();
+  }
+  #endregion
+
   #region Subscribed Methods
   void OnSelectionChanged(Transform oldSelection, Transform newSelection)
   {
     //Call events on the options themselves
-    OnSelectionChangedEvent?.Invoke();
+    OnSelectionChangedEvent?.Invoke(newSelection, oldSelection);
     OnNewTransform?.Invoke(newSelection);
-    
+
     if (allOutlines.Count > 0)
     {
       if (oldSelection)
@@ -115,7 +124,7 @@ public class RadialChooseMenuTools : MonoBehaviour
 
       }
     }
-    if (textIndicator)
+    if (textIndicator && IncludeChangeTextOnSelection)
     {
       SetTextIndicator(newSelection);
     }
@@ -157,10 +166,10 @@ public class RadialChooseMenuTools : MonoBehaviour
     {
       pointerIndicator.gameObject.SetActive(false);
     }
-    if (textIndicator)
-    {
-      textIndicator.gameObject.SetActive(false);
-    }
+    // if (textIndicator)
+    // {
+    //   textIndicator.gameObject.SetActive(false);
+    // }
   }
   void OnChildrenModified()
   {
@@ -242,7 +251,7 @@ public class RadialChooseMenuTools : MonoBehaviour
     if (backgroundOutline)
     {
       allBackgroundOutlines.Clear();
-      foreach (KeyValuePair<Transform,Transform> bg in allBackgrounds)
+      foreach (KeyValuePair<Transform, Transform> bg in allBackgrounds)
       {
         var outline = bg.Value.GetComponent<Outline>();
         if (outline)
@@ -269,7 +278,7 @@ public class RadialChooseMenuTools : MonoBehaviour
         GenerateArcFill(bg.Value.GetComponent<Image>(), index);
         index++;
       }
-    }    
+    }
 
   }
 
@@ -282,7 +291,7 @@ public class RadialChooseMenuTools : MonoBehaviour
     var rt = img.GetComponent<RectTransform>();
     var rtParent = img.transform.parent.GetComponent<RectTransform>();
     //rt.anchoredPosition = (rtParent.anchoredPosition + (Vector2)dir * backgroundOffset) * (1 / rt.sizeDelta.x);
-    rt.anchoredPosition =  dir * backgroundOffset;
+    rt.anchoredPosition = dir * backgroundOffset;
     //img.GetComponent<RectTransform>().anchoredPosition=/* RectTransformUtility.PixelAdjustPoint(img.transform.parent.position, img.transform, img.GetComponent<Canvas>()) +*/ (backgroundOffset * dir) + dir * (backgroundOffset / allBackgrounds.Count);
     //img.transform.position = RectTransformUtility.PixelAdjustPoint(img.transform.parent.position, img.transform, img.GetComponent<Canvas>());
     img.type = Image.Type.Filled;

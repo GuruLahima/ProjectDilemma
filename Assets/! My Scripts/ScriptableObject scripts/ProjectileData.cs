@@ -6,6 +6,4 @@ public class ProjectileData : ItemData
 {
   public Projectile Prefab;
   public SelectionMenuContainer Icon;
-  [ShowAssetPreview]
-  public Sprite ico;
 }

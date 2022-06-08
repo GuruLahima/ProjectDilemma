@@ -323,10 +323,10 @@ namespace GuruLaghima
   }
 
   [Serializable]
-  public class DictWrapper
+  public class DictWrapper<T>
   {
     public string key;
-    public GameObject element;
+    public T element;
   }
 
   [Serializable]
@@ -553,4 +553,49 @@ namespace GuruLaghima
 
 
   }
+
+
+  [Serializable]
+  public class ControllableSequence
+  {
+    public string name;
+    public BoolReference condition;
+    // public bool inParallel; // the code does not allow parallel sequences because I only maintain one coroutine at a time right now
+#if UNITY_EDITOR
+    [ReorderableList]
+#endif
+    public List<EventWithDuration> eventSequence;
+    public List<ControllableSequence> nextSequences;
+
+    public IEnumerator rootCoroutine;
+
+    public IEnumerator RunSequence(ISequenceExecutor exec)
+    {
+      // run the sequence if the condition is true or if there is no condition
+      if (!condition || condition.boolWrapper.Value)
+      {
+        // execute the events that comprise this sequence one by one
+        // * the actual coroutine is iimplemented in a Monobehaviour because it needs a Monobehaviour instance to run
+        yield return exec.SequenceCoroutine(eventSequence, this.name);
+
+        // run next sequences (in sequence)
+        foreach (ControllableSequence seq in nextSequences)
+        {
+          yield return seq.RunSequence(exec);
+        }
+      }
+    }
+
+    [Serializable]
+    public class EventWithDuration
+    {
+      public string name;
+      public bool shouldExecute = true;
+      public bool isCoroutine;
+      public UnityEvent theEvent;
+      public float duration;
+    }
+
+  }
+
 }

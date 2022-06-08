@@ -32,51 +32,12 @@ namespace Workbench.ProjectDilemma
     BothWon,
     BothLost,
   }
-  public class GameMechanic : MonoBehaviourPunCallbacks
+  //
+  public class GameMechanic : MonoBehaviourPunCallbacks, ISequenceExecutor
   {
     IEnumerator currentCoroutine;
 
-    [Serializable]
-    public class ControllableSequence
-    {
-      public string name;
-      public BoolReference condition;
-      // public bool inParallel; // the code does not allow parallel sequences because I only maintain one coroutine at a time right now
-#if UNITY_EDITOR
-      [ReorderableList]
-#endif
-      public List<EventWithDuration> eventSequence;
-      public List<ControllableSequence> nextSequences;
-
-      public IEnumerator rootCoroutine;
-
-      public IEnumerator RunSequence()
-      {
-        if (condition && condition.boolWrapper.Value)
-        {
-          // execute the events that comprise this sequence one by one
-          yield return GameMechanic.Instance.SequenceCoroutine(eventSequence, this.name); // !massive coupling here
-
-          // run next sequences (in sequence)
-          foreach (ControllableSequence seq in nextSequences)
-          {
-            yield return seq.RunSequence();
-          }
-        }
-      }
-
-      [Serializable]
-      public class EventWithDuration
-      {
-        public bool shouldExecute = true;
-        public bool isCoroutine;
-        public UnityEvent theEvent;
-        public float duration;
-      }
-
-    }
-
-    IEnumerator SequenceCoroutine(List<ControllableSequence.EventWithDuration> eventSequence, string name)
+    public IEnumerator SequenceCoroutine(List<ControllableSequence.EventWithDuration> eventSequence, string name)
     {
       MyDebug.Log($"[{name}]", "started");
 
@@ -355,7 +316,7 @@ namespace Workbench.ProjectDilemma
     #region public methods
     public void StartGameSequence()
     {
-      gameSequence.rootCoroutine = gameSequence.RunSequence();
+      gameSequence.rootCoroutine = gameSequence.RunSequence(this);
       StartCoroutine(gameSequence.rootCoroutine);
     }
 
@@ -398,7 +359,7 @@ namespace Workbench.ProjectDilemma
           madeChoice = true;
           myChoice = kill ? Choice.Kill : Choice.Save;
           // decisionsMade++;
-
+          GameEvents.OnLocalPlayerVoted?.Invoke(myChoice);
           // if both players made the choice execute the outcome
           // if (decisionsMade >= 2)
           {
@@ -452,10 +413,12 @@ namespace Workbench.ProjectDilemma
       PlayerInputManager.Instance.emoteActivator = localPlayerSpot.playerEmote;
       PlayerInputManager.Instance.perkActivator = localPlayerSpot.operatePerk;
       PlayerInputManager.Instance.abilityActivator = localPlayerSpot.magnifyingGlass;
+      // we can maybe use SendMessage to call all of these together, but I will leave it be for now
       localPlayerSpot.projectileThrow.Init();
       localPlayerSpot.playerEmote.Init();
       localPlayerSpot.operatePerk.Init();
       localPlayerSpot.outfitLoader.Init();
+      localPlayerSpot.questActivator.Init();
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -856,6 +819,20 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.RaiseEvent(AnimationEvent, content, raiseEventOptions, SendOptions.SendReliable);
     }
 
+    // referenced in inspector
+    public void PrepareForEndScreen()
+    {
+      ActivateProperModelForEndScreen();
+      CalculatePointsAfterOutcome();
+      CalculateRankAfterOutcome();
+      CalculateXPAfterOutcome();
+      CalculateRewardsAfterOutcome();
+      SyncDataToOtherPlayer();
+
+      //im triggering the OnGameEnded event here after all the calculations are done
+      GameEvents.OnGameEnded?.Invoke();
+    }
+
     public void ActivateProperModelForEndScreen()
     {
       // activate proper model on endscreen
@@ -898,9 +875,9 @@ namespace Workbench.ProjectDilemma
         default:
           break;
       }
-      ourTotalPoints = ourBasePoints + (ourBasePoints * (int)perkActivator.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_POINTS) / 100) +
-        (int)perkActivator.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
-      if (perkActivator.CheckModifierBonuses(PerkKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
+      ourTotalPoints = ourBasePoints + (ourBasePoints * (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_POINTS) / 100) +
+        (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_POINTS);
+      if (perkActivator.CheckModifierBonuses(BonusModifiersKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
       {
         ourTotalPoints = 0;
       }
@@ -917,8 +894,6 @@ namespace Workbench.ProjectDilemma
         GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourTotalPoints);
       // we show current players' points here (post zero check)
       localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
-      otherPlayerPointsCounter.newAmount = otherPlayerPoints + theirPoints;
-
     }
     public void CalculateXPAfterOutcome()
     {
@@ -944,8 +919,8 @@ namespace Workbench.ProjectDilemma
         default:
           break;
       }
-      ourTotalXp = ourBaseXp + (ourBaseXp * (int)perkActivator.CalculateModifierBonuses(PerkKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-        (int)perkActivator.CalculateModifierBonuses(PerkKeys.FLAT_BONUS_EXPERIENCE);
+      ourTotalXp = ourBaseXp + (ourBaseXp * (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+        (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_EXPERIENCE);
       GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
     }
     public void CalculateRankAfterOutcome()
@@ -977,9 +952,44 @@ namespace Workbench.ProjectDilemma
       GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
     }
 
-    public void ActivateEndScreenCounters()
+    public void CalculateRewardsAfterOutcome()
     {
+      // this should work?
+      foreach (string rewardKey in GameMechanic.Instance.localPlayerSpot.operatePerk.ReadModifierBonuses(BonusModifiersKeys.EARN_ITEM_REWARD))
+      {
+        StartCoroutine(ClaimReward(rewardKey));
+      }
+    }
 
+    // we send an RPC to other player containing our total points, rank, xp..
+    public void SyncDataToOtherPlayer()
+    {
+      if (PhotonNetwork.IsConnected)
+      {
+        if (GameFoundationSdk.IsInitialized)
+        {
+          Currency softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
+          Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
+          Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
+          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
+            GameFoundationSdk.wallet.Get(softCurrency), GameFoundationSdk.wallet.Get(rankAsCurrency), GameFoundationSdk.wallet.Get(xpAsCurrency));
+        }
+        else
+        {
+          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
+            0, 0, 0);
+        }
+      }
+      else
+      {
+        ActivateEndScreenCountersOtherPlayer(0, 0, 0);
+      }
+    }
+
+    // we recieve the rpc from the other player containing their total points, rank, xp..
+    public void ActivateEndScreenCountersOtherPlayer(long theirPoints, long theirRank, long theirXp)
+    {
+      otherPlayerPointsCounter.newAmount = (int)theirPoints;
     }
 
     public void DisableFog()
@@ -1055,36 +1065,14 @@ namespace Workbench.ProjectDilemma
     public void OnPlayerDisconnect()
     {
       votingOutcome = Outcome.Won;
-      ActivateProperModelForEndScreen();
-      CalculatePointsAfterOutcome();
-      CalculateRankAfterOutcome();
-      CalculateXPAfterOutcome();
-      if (PhotonNetwork.IsConnected)
-      {
-        if (GameFoundationSdk.IsInitialized)
-        {
-          Currency softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
-          Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
-          Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
-          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
-            GameFoundationSdk.wallet.Get(softCurrency), GameFoundationSdk.wallet.Get(rankAsCurrency), GameFoundationSdk.wallet.Get(xpAsCurrency));
-        }
-        else
-        {
-          RPCManager.Instance.photonView.RPC("RPC_EvaluatePlayerIncomes", GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner,
-            0, 0, 0);
-        }
-      }
-      else
-      {
-        ActivateEndScreenCounters();
-      }
+      PrepareForEndScreen();
+     
 
       // stop game sequence
       StopCoroutine(gameSequence.rootCoroutine);
 
       // run postgame screen sequence
-      postGameSequence.rootCoroutine = postGameSequence.RunSequence();
+      postGameSequence.rootCoroutine = postGameSequence.RunSequence(this);
       StartCoroutine(postGameSequence.rootCoroutine);
     }
 
@@ -1207,10 +1195,47 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region coroutines
+    IEnumerator ClaimReward(string rewardKey)
+    {
+      var reward = GameFoundationSdk.rewards.FindReward(rewardKey);
+
+      string claimableKey = reward.GetLastClaimableRewardItemKey();
+
+      // We use a using block to automatically release the deferred promise handler.
+      using (var deferredResult = GameFoundationSdk.rewards.Claim(reward.rewardDefinition, claimableKey))
+      {
+        // Wait for the process to finish
+        while (!deferredResult.isDone)
+        {
+          yield return null;
+        }
+
+        // The process failed
+        if (!deferredResult.isFulfilled)
+        {
+          Debug.LogException(deferredResult.error);
+        }
+
+        // The process succeeded
+        else
+        {
+          var result = deferredResult.result;
+
+          foreach (var tradable in result.products)
+          {
+            if (tradable is TradableDefinition tradableDefinition)
+            {
+              Debug.Log("You earned reward = " + tradableDefinition.displayName);
+            }
+          }
+        }
+      }
+    }
+
     IEnumerator GameSequence()
     {
       GameStarted?.Invoke();
-      yield return gameSequence.RunSequence();
+      yield return gameSequence.RunSequence(this);
     }
 
     IEnumerator SkipIntroCoroutine()
@@ -1254,7 +1279,10 @@ namespace Workbench.ProjectDilemma
       }
 
       canChoose = false;
-
+      if (timer > 0)
+      {
+        GameEvents.OnPlayersChoseTimeLeft?.Invoke(timer);
+      }
       MyDebug.Log("DiscussionPhase coroutine ended");
 
       localPlayerSpot.TimerFinished?.Invoke();
@@ -1738,6 +1766,7 @@ namespace Workbench.ProjectDilemma
         OnYourChoiceMade?.Invoke();
         localPlayerSpot.OnMyChoiceMade?.Invoke();
         otherPlayerSpot.OnTheirChoiceMade?.Invoke();
+        GameEvents.OnLocalPlayerVoted?.Invoke(choice);
       }
       else
       {
@@ -1746,6 +1775,7 @@ namespace Workbench.ProjectDilemma
         OnTheirChoiceMade?.Invoke();
         otherPlayerSpot.OnMyChoiceMade?.Invoke();
         localPlayerSpot.OnTheirChoiceMade?.Invoke();
+        GameEvents.OnOtherPlayerVoted?.Invoke(choice);
       }
 
       decisionsMade++;
@@ -1797,5 +1827,17 @@ namespace Workbench.ProjectDilemma
 
     #endregion
 
+    #region DEBUG
+    [Button("Other player make choice")]
+    void DebugOtherPlayerChoice()
+    {
+      //theirChoice = theirChoice;
+      theyMadeChoice = true;
+      //OnTheirChoiceMade?.Invoke();
+      //otherPlayerSpot.OnMyChoiceMade?.Invoke();
+      //localPlayerSpot.OnTheirChoiceMade?.Invoke();
+      GameEvents.OnOtherPlayerVoted?.Invoke(theirChoice);
+    }
+    #endregion
   }
 }

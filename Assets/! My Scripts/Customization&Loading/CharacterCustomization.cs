@@ -24,6 +24,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] private Transform rigRoot;
     [SerializeField] private ClothingData currentClothingData;
     [SerializeField] private bool setActiveOnEnable;
+    // [SerializeField] ClothingPlaceholder defaultClothing;
     #endregion
 
     #region Private Fields
@@ -192,6 +193,11 @@ namespace Workbench.ProjectDilemma
               placeholdersAllocation[rigToAdd.type].Deselect();
               placeholdersAllocation[rigToAdd.type] = cp;
               cp.Select();
+            }
+            else
+            {
+              // cp.Deselect();
+              // placeholdersAllocation[rigToAdd.type] = defaultClothing;
             }
           }
           else

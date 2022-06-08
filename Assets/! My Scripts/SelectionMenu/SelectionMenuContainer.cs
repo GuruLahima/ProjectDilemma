@@ -8,6 +8,7 @@ public class SelectionMenuContainer : MonoBehaviour
 {
   public ScriptableObject container;
   public UnityEngine.UI.Image image;
+  public Sprite defaultIcon;
   public UnityEvent OnSelected;
   public UnityEvent OnDeselected;
 }
