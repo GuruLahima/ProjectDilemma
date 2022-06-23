@@ -10,7 +10,8 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using System.Collections;
 using MoreMountains.Feedbacks;
 using NaughtyAttributes;
-
+using UnityEngine.UI;
+using TMPro;
 namespace GuruLaghima.ProjectDilemma
 {
 
@@ -18,40 +19,50 @@ namespace GuruLaghima.ProjectDilemma
   public class InventoryView : MonoBehaviour, ISequenceExecutor
   {
 
-    #region UI references
-    /// <summary>
-    /// the parent to which we will attach inventory items
-    /// </summary>
-    public Transform contentFrame;
-    /// <summary>
-    /// the inventory item template
-    /// </summary>
-    public Transform inventoryItemPrefab;
-    /// <summary>
-    /// the item type this inventory should render
-    /// </summary>
-    public ItemSettings.ItemType itemType;
-    public string itemTag;
-    /// <summary>
-    /// the radial menu which pops up when we select an item
-    /// </summary>
-    public RadialChooseMenu radialMenu;
-    public RadialMenuData radialMenuData;
-
-    public ControllableSequence choosingSlotSequence;
-    public ControllableSequence hidingRadialMenuSequence;
+    #region public fields
 
     public bool onlyOneItemPerInventory;
     public bool mustHaveOneEquippedAtAllTimes;
     [ShowIf("onlyOneItemPerInventory")]
     [ReadOnly]
     public InventoryItemHUDViewOverride equippedItem;
+    public InventoryViewsCollection parentCollection;
+
+    public ControllableSequence choosingSlotSequence;
+    public ControllableSequence hidingRadialMenuSequence;
+    #endregion
+
+    #region UI references
+    /// the parent to which we will attach inventory items
+    public Transform contentFrame;
+    /// the inventory item template
+    public Transform inventoryItemPrefab;
+    /// the item type this inventory should render
+    public InventoryData.ItemType itemType;
+    public string itemTag;
+    /// the radial menu which pops up when we select an item
+    [HorizontalLine]
+    public RadialChooseMenu radialMenu;
+    public RadialMenuData radialMenuData;
+    // the "New Item" notification for this inventory
+    public GameObject inventoryNotification;
+
 
     public bool InSelection
     {
       get;
       set;
     }
+
+    [HorizontalLine]
+    public Image hoveredItemIcon;
+    public TextMeshProUGUI hoveredItemTitle;
+    public TextMeshProUGUI hoveredItemDesc;
+    public string defaultItemTitle;
+    public string defaultItemDesc;
+    public Sprite defaultItemIcon;
+
+    [HorizontalLine]
 
     #endregion
 
@@ -68,6 +79,36 @@ namespace GuruLaghima.ProjectDilemma
     #region private fields
 
     List<InventoryItemHUDViewOverride> inventoryItems = new List<InventoryItemHUDViewOverride>();
+    int newItems;
+
+    public int NewItems
+    {
+      get
+      {
+        return newItems;
+      }
+      set
+      {
+        MyDebug.Log("new items in " + this.name, value);
+        if (value <= 0)
+        {
+          if (inventoryNotification)
+            inventoryNotification.SetActive(false);
+        }
+        else if (value > 0 && newItems <= 0)
+        {
+          if (inventoryNotification)
+            inventoryNotification.SetActive(true);
+        }
+
+        newItems = value;
+
+        if (parentCollection)
+        {
+          parentCollection.UpdateNewItemsCount();
+        }
+      }
+    }
 
     #endregion
 
@@ -77,6 +118,8 @@ namespace GuruLaghima.ProjectDilemma
     {
       if (radialMenuData)
         radialMenu.radialMenuData = this.radialMenuData;
+
+      // NewItems = 0;
     }
 
     // public void ItemWasEquipped(ItemData item)
@@ -128,10 +171,18 @@ namespace GuruLaghima.ProjectDilemma
 
     public void ClearRadialMenuData()
     {
+      // clear data
       for (int i = 0; i < radialMenuData.orderedItems.Count; i++)
       {
         radialMenuData.orderedItems[i] = null;
       }
+      // unequip items
+      foreach (var item in inventoryItems)
+      {
+        item.Equip(false);
+      }
+
+
     }
 
     public void ToggleInventoryVisibility()
@@ -146,6 +197,7 @@ namespace GuruLaghima.ProjectDilemma
     public void ShowRadialMenuSequence(InventoryItemHUDViewOverride itemSelected)
     {
       StopAllCoroutines();
+      radialMenu.RegenerateSnapPoints();
       this.lastItemSelected = itemSelected;
       choosingSlotSequence.rootCoroutine = choosingSlotSequence.RunSequence(this);
       StartCoroutine(choosingSlotSequence.rootCoroutine);
@@ -237,6 +289,17 @@ namespace GuruLaghima.ProjectDilemma
         radialMenuData.orderedItems[lastSelectedSlot.GetSiblingIndex()] = lastItemSelected.whoDis;
       // update 
       radialMenu.PopulateRadialMenuFromData();
+      // select the inventory item in the Prep board view
+      // lastItemSelected.Equip(true);
+      // make sure selected item is marked equipped now and vice versa 
+      // *(we have to go through all the items in the data because we might have overriden one of them so we have to unequipp them)
+      foreach (InventoryItemHUDViewOverride item in inventoryItems)
+      {
+        ItemData data = item.itemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.ingame_ScriptableObject).AsAsset<ItemData>();
+        bool contains = radialMenuData.orderedItems.Contains(data);
+        item.Equip(contains);
+      }
+
     }
     public void HideRadialMenuSequence()
     {
@@ -250,9 +313,9 @@ namespace GuruLaghima.ProjectDilemma
     {
       if (equippedItem)
       {
-
-        equippedItem.Equip(false);
+        var item = equippedItem;
         equippedItem = null;
+        item.Equip(false);
       }
     }
 
@@ -276,126 +339,66 @@ namespace GuruLaghima.ProjectDilemma
     {
       MyDebug.Log("Updating Inventory UI");
       List<ItemData> tempList = new List<ItemData>();
-      // addedItemTypes.Clear();
       // Loop through every type of item within the inventory and display its name and quantity.
       List<InventoryItemDefinition> allClothesDefinitions = new List<InventoryItemDefinition>();
       GameFoundationSdk.catalog.FindItems<InventoryItemDefinition>(GameFoundationSdk.tags.Find(Keys.CLOTHES_TAG), allClothesDefinitions);
       switch (itemType)
       {
-        case ItemSettings.ItemType.Emotes:
+        case InventoryData.ItemType.Emotes:
           MyDebug.Log("Updating Emotes");
-          foreach (ItemData inventoryItemType in ItemSettings.Instance.emotes.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemTag)); }))
-          {
-            // visually we want only one instance of the HUD representation per item type because we specify the quantity of that type there too
-            // if (addedItemTypes.Contains(inventoryItemType.inventoryitemDefinition))
-            // {
-            //   continue;
-            // }
-            InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-            newItem.parentView = this;
-            // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
-            newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-            newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-            newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-            newItem.SetItemData(inventoryItemType);
-            newItem.usesRadialMenu = true;
-            // newItem.notificationIcon.SetActive(inventoryItemType.inventoryitemDefinition.);
-            inventoryItems.Add(newItem);
-            // newItem.GetComponent<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty("ingame_ScriptableObject"), SetIconSprite, OnSpriteLoadFailed) as RigData;
-          }
+          PopulateUIForItemType(itemTag, InventoryData.Instance.emotes);
           break;
-        case ItemSettings.ItemType.Throwables:
+        case InventoryData.ItemType.Throwables:
           MyDebug.Log("Updating Throwables");
-          foreach (ItemData inventoryItemType in ItemSettings.Instance.throwables.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemTag)); }))
-          {
-            // visually we want only one instance of the HUD representation per item type because we specify the quantity of that type there too
-            // if (addedItemTypes.Contains(inventoryItemType.inventoryitemDefinition))
-            // {
-            //   continue;
-            // }
-            InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-            newItem.parentView = this;
-            // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
-            newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-            newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-            newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-            newItem.SetItemData(inventoryItemType);
-            newItem.usesRadialMenu = true;
-            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-            inventoryItems.Add(newItem);
-
-            // newItem.GetComponent<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty("ingame_ScriptableObject"), SetIconSprite, OnSpriteLoadFailed) as RigData;
-          }
+          PopulateUIForItemType(itemTag, InventoryData.Instance.throwables);
           break;
-        case ItemSettings.ItemType.Clothes:
+        case InventoryData.ItemType.Clothes:
           MyDebug.Log("Updating Clothes");
-          foreach (ItemData inventoryItemType in ItemSettings.Instance.clothes.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemTag)); }))
-          {
-            // visually we want only one instance of the HUD representation per item type because we specify the quantity of that type there too
-            // if (addedItemTypes.Contains(inventoryItemType.inventoryitemDefinition))
-            // {
-            //   continue;
-            // }
-            InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-            newItem.parentView = this;
-            // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
-            newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-            newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-            newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-            newItem.SetItemData(inventoryItemType);
-            newItem.usesRadialMenu = false;
-            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-            if (newItem.GetComponentInChildren<ClothingPlaceholder>())
-              newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
-            inventoryItems.Add(newItem);
-          }
+          PopulateUIForItemType(itemTag, InventoryData.Instance.clothes);
           break;
-        case ItemSettings.ItemType.ActivePerks:
+        case InventoryData.ItemType.ActivePerks:
           MyDebug.Log("Updating perks");
-          foreach (ItemData inventoryItemType in ItemSettings.Instance.activePerks.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemTag)); }))
-          {
-            // visually we want only one instance of the HUD representation per item type because we specify the quantity of that type there too
-            // if (addedItemTypes.Contains(inventoryItemType.inventoryitemDefinition))
-            // {
-            //   continue;
-            // }
-            InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-            newItem.parentView = this;
-            // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
-            newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-            newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-            newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-            newItem.SetItemData(inventoryItemType);
-            newItem.usesRadialMenu = false;
-            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-            inventoryItems.Add(newItem);
-          }
+          PopulateUIForItemType(itemTag, InventoryData.Instance.activePerks);
           break;
-        case ItemSettings.ItemType.Abilities:
+        case InventoryData.ItemType.Abilities:
           MyDebug.Log("Updating abilities");
-          foreach (ItemData inventoryItemType in ItemSettings.Instance.abilities.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemTag)); }))
-          {
-            // visually we want only one instance of the HUD representation per item type because we specify the quantity of that type there too
-            // if (addedItemTypes.Contains(inventoryItemType.inventoryitemDefinition))
-            // {
-            //   continue;
-            // }
-            InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-            newItem.parentView = this;
-            // addedItemTypes.Add(inventoryItemType.inventoryitemDefinition);
-            newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-            newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-            newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-            newItem.SetItemData(inventoryItemType);
-            newItem.usesRadialMenu = false;
-            // newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-            inventoryItems.Add(newItem);
-          }
+          PopulateUIForItemType(itemTag, InventoryData.Instance.abilities);
           break;
         default:
           break;
       }
 
+    }
+
+    void PopulateUIForItemType(string itemType, IEnumerable<ItemData> itemList)
+    {
+      foreach (ItemData inventoryItemType in itemList.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
+      {
+        InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+        newItem.parentView = this;
+        newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
+        newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
+        newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
+        newItem.SetItemData(inventoryItemType);
+        newItem.Equip(inventoryItemType.Equipped);
+        newItem.usesRadialMenu = false;
+        if (itemType == "emotes" || itemType == "throwables") newItem.usesRadialMenu = true; else newItem.usesRadialMenu = false;
+        newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
+        MyDebug.Log("PopulateUIForItemType " + inventoryItemType.Key, "newly added " + inventoryItemType.NewlyAdded);
+        if (inventoryItemType.NewlyAdded)
+        {
+          this.NewItems++;
+        }
+        else
+        {
+          newItem.notificationPopFeedback.enabled = false;
+          Destroy(newItem.notificationPopFeedback);
+        }
+        if (newItem.GetComponentInChildren<ClothingPlaceholder>())
+          newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
+        inventoryItems.Add(newItem);
+
+      }
     }
 
     private void ClearUI()
@@ -406,6 +409,8 @@ namespace GuruLaghima.ProjectDilemma
         Destroy(child.gameObject);
       }
       inventoryItems.Clear();
+
+      NewItems = 0;
     }
 
 

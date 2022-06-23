@@ -1,3 +1,4 @@
+using GuruLaghima;
 using GuruLaghima.ProjectDilemma;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace Workbench.ProjectDilemma
     private void Awake()
     {
       Instance = this;
+      SetActiveCharacterCustomization(_defaultCharacterCustomization);
     }
     #endregion
 
@@ -20,7 +22,8 @@ namespace Workbench.ProjectDilemma
     /// <summary>
     /// To change the value call SetActiveCharacterCustomization() function
     /// </summary>
-    [HideInInspector] public CharacterCustomization ActiveCharacterCustomization
+    [HideInInspector]
+    public CharacterCustomization ActiveCharacterCustomization
     {
       get
       {
@@ -29,39 +32,21 @@ namespace Workbench.ProjectDilemma
       private set
       {
         _characterCustomization = value;
+        MyDebug.Log("Current active CharacterCustomization is: " + (_characterCustomization ? _characterCustomization.gameObject.name : "none"), Color.yellow);
       }
     }
-    //this is only used for deep searches
-     public List<ClothingPlaceholder> FullListOfClothingPlaceholders = new List<ClothingPlaceholder>();
     #endregion
 
     #region Exposed Private Fields
-    [SerializeField] private List<CharacterCustomization> CharacterCustomizationsToUpdate = new List<CharacterCustomization>();
+    [CustomTooltip("The CharacterCustomization that becomes active upon start")]
+    [SerializeField] CharacterCustomization _defaultCharacterCustomization;
     #endregion
 
     #region Private Fields
     private CharacterCustomization _characterCustomization;
     #endregion
 
-    private void Start()
-    {
-      RefreshUI();
-    }
-
     #region Public Methods
-
-    public void RefreshUI()
-    {
-      FullListOfClothingPlaceholders = new List<ClothingPlaceholder>();
-      foreach (CharacterCustomization cc in CharacterCustomizationsToUpdate)
-      {
-        cc.RefreshPlaceholders();
-        //cc.ReInitialize();
-        //someArray = FullListOfClothingPlaceholders.ToArray();
-        FullListOfClothingPlaceholders.AddRange(cc.clothingPlaceholders);
-      }
-    }
-
     public void SetActiveCharacterCustomization(CharacterCustomization cc)
     {
       if (ActiveCharacterCustomization)
@@ -75,6 +60,5 @@ namespace Workbench.ProjectDilemma
       }
     }
     #endregion
-
   }
 }

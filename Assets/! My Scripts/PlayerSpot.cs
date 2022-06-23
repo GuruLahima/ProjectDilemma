@@ -8,6 +8,7 @@ using GuruLaghima;
 using UnityEngine.UI;
 using Photon.Realtime;
 using UnityEngine.Animations.Rigging;
+using cakeslice;
 
 namespace Workbench.ProjectDilemma
 {
@@ -20,6 +21,7 @@ namespace Workbench.ProjectDilemma
     public GameObject suspenseCam;
     public GameObject gameplayCamerasParent;
     public GameObject playerCam;
+    public OutlineEffect outlineComponent;
     public SimpleCameraController mainCam;
     public GameObject nameplateCanvas;
     public TextMeshProUGUI nameplateText;
@@ -34,7 +36,7 @@ namespace Workbench.ProjectDilemma
     public GameObject votingMechanism;
     public Collider killButton;
     public Collider saveButton;
-    public TextMeshProUGUI timer;
+    // public TextMeshProUGUI timer; // deprecated, using UI overlay now
     public GameObject decisionTextSave;
     public GameObject decisionTextBetray;
     public GameTimer gameTimer;
@@ -51,6 +53,7 @@ namespace Workbench.ProjectDilemma
     public PerkActivator operatePerk;
     public AbilityActivator magnifyingGlass;
     public QuestActivator questActivator;
+    public BankActivator bankActivator;
     public OutfitLoader outfitLoader;
     [HorizontalLine(color: EColor.White)]
     public Transform character;

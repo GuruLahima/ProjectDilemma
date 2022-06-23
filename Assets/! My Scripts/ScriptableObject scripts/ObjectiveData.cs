@@ -8,21 +8,21 @@ public class ObjectiveData : ItemData
 {
   #region Public Fields
   public SelectionMenuContainer Icon;
-  public List<PerkModifiersWrapper> AllPerkModifiers = new List<PerkModifiersWrapper>();
+  public List<BonusModifiersConditionWrapper> AllBonusModifiers = new List<BonusModifiersConditionWrapper>();
   public ObjectiveBase objective;
   #endregion
 
   #region Public Methods
-  public PerkBonusModifiers[] GetPerkModifiers(ObjectiveCondition condition)
+  public BonusModifiersWrapper[] GetBonusModifiers(ObjectiveCondition condition)
   {
-    foreach (PerkModifiersWrapper pmw in AllPerkModifiers)
+    foreach (BonusModifiersConditionWrapper pmw in AllBonusModifiers)
     {
       if (pmw.Condition == condition)
       {
         return pmw.Modifiers;
       }
     }
-    return new PerkBonusModifiers[0];
+    return new BonusModifiersWrapper[0];
   }
   #endregion
 
@@ -31,16 +31,16 @@ public class ObjectiveData : ItemData
   /// Class exclusive to PerkData for storing modifiers with their conditional objective
   /// </summary>
   [System.Serializable]
-  public class PerkModifiersWrapper
+  public class BonusModifiersConditionWrapper
   {
     public ObjectiveCondition Condition;
-    public PerkBonusModifiers[] Modifiers;
+    public BonusModifiersWrapper[] Modifiers;
   }
   /// <summary>
   /// Class used for assigning values to keys (PerkKeys)
   /// </summary>
   [System.Serializable]
-  public class PerkBonusModifiers
+  public class BonusModifiersWrapper
   {
     public enum ModifierType : byte { Float, Bool, String }
     [ModifierKey]

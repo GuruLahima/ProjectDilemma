@@ -402,11 +402,12 @@ namespace Workbench.ProjectDilemma
       Invoke("InitVoice", 2f);
       localPlayerSpot.playerUsingThisSpot = PhotonNetwork.LocalPlayer;
       localPlayerSpot.playerModel.SetActive(true);
+      localPlayerSpot.outlineComponent.enabled = true;
+      DestroyImmediate(otherPlayerSpot.outlineComponent);
       localPlayerSpot.gameplayCamerasParent.SetActive(true);
       localPlayerSpot.playerCam.SetActive(true);
       localPlayerSpot.killButton.enabled = true;
       localPlayerSpot.saveButton.enabled = true;
-      localPlayerSpot.timer.enabled = true;
       // localPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = true;
       localPlayerSpot.projectileThrow.canon.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
       PlayerInputManager.Instance.throwablesActivator = localPlayerSpot.projectileThrow;
@@ -419,6 +420,7 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.operatePerk.Init();
       localPlayerSpot.outfitLoader.Init();
       localPlayerSpot.questActivator.Init();
+      localPlayerSpot.bankActivator.Init();
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -439,9 +441,9 @@ namespace Workbench.ProjectDilemma
         Destroy(otherPlayerSpot.gameplayCamerasParent);
       }
       otherPlayerSpot.playerCam.SetActive(false);
+      otherPlayerSpot.playerCam.GetComponent<Camera>().cullingMask = otherPlayerSpot.playerCam.GetComponent<Camera>().cullingMask | (1 << LayerMask.NameToLayer("Masks"));
       otherPlayerSpot.killButton.enabled = false;
       otherPlayerSpot.saveButton.enabled = false;
-      otherPlayerSpot.timer.enabled = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
       otherPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = false;
 
@@ -845,39 +847,33 @@ namespace Workbench.ProjectDilemma
 
     public void CalculatePointsAfterOutcome()
     {
-      Currency softCurrency = null;
-      if (GameFoundationSdk.IsInitialized)
-        softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
-      int ourTotalPoints;
-      int theirPoints = 0;
-      int ourBasePoints = 0;
-      PerkActivator perkActivator = GameMechanic.Instance.localPlayerSpot.operatePerk;
+      //Currency softCurrency = null;
+      //if (GameFoundationSdk.IsInitialized)
+      //  softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
       // set up some stuff depending on outcome
-      switch (votingOutcome)
-      {
-        case Outcome.Won:
-          //calculate points for each player
-          ourBasePoints = MiscelaneousSettings.Instance.pointsForWin;
-          theirPoints = MiscelaneousSettings.Instance.pointsForLoss;
-          break;
-        case Outcome.Lost:
-          ourBasePoints = MiscelaneousSettings.Instance.pointsForLoss;
-          theirPoints = MiscelaneousSettings.Instance.pointsForWin;
-          break;
-        case Outcome.BothWon:
-          ourBasePoints = MiscelaneousSettings.Instance.pointsForBothWon;
-          theirPoints = MiscelaneousSettings.Instance.pointsForBothWon;
-          break;
-        case Outcome.BothLost:
-          ourBasePoints = MiscelaneousSettings.Instance.pointsForBothLost;
-          theirPoints = MiscelaneousSettings.Instance.pointsForBothLost;
-          break;
-        default:
-          break;
-      }
-      ourTotalPoints = ourBasePoints + (ourBasePoints * (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_POINTS) / 100) +
-        (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_POINTS);
-      if (perkActivator.CheckModifierBonuses(BonusModifiersKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
+      //switch (votingOutcome)
+      //{
+      //  case Outcome.Won:
+      //    //calculate points for each player
+      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForWin;
+      //    break;
+      //  case Outcome.Lost:
+      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForLoss;
+      //    break;
+      //  case Outcome.BothWon:
+      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForBothWon;
+      //    break;
+      //  case Outcome.BothLost:
+      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForBothLost;
+      //    break;
+      //  default:
+      //    break;
+      //}
+      int ourTotalPoints = (int)(BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BASE_POINTS) +
+        (BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BASE_POINTS) *
+        BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_POINTS) / 100) +
+        BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_POINTS));
+      if (BonusModifiersManager.Instance.CheckModifierBonuses(BonusModifiersKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
       {
         ourTotalPoints = 0;
       }
@@ -887,11 +883,11 @@ namespace Workbench.ProjectDilemma
         totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourTotalPoints >= 0) ? Color.green : Color.red;
         totalPointsCounter.newAmount = ourTotalPoints;
       }
-      ourTotalPoints = (localPlayerPoints + ourTotalPoints < 0) ? localPlayerPoints : ourTotalPoints;
-      MyDebug.Log("Their points are: " + theirPoints, Color.magenta);
-      MyDebug.Log("Our points are: " + ourTotalPoints, Color.yellow);
-      if (GameFoundationSdk.IsInitialized)
-        GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourTotalPoints);
+      //ourTotalPoints = (localPlayerPoints + ourTotalPoints < 0) ? localPlayerPoints : ourTotalPoints;
+      //if (GameFoundationSdk.IsInitialized)
+      //  GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourTotalPoints);
+      if (BankManager.Instance)
+        BankManager.Instance.WalletEvaluate(ourTotalPoints);
       // we show current players' points here (post zero check)
       localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
     }
@@ -900,7 +896,6 @@ namespace Workbench.ProjectDilemma
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
       int ourTotalXp;
       int ourBaseXp = 0;
-      PerkActivator perkActivator = GameMechanic.Instance.localPlayerSpot.operatePerk;
       // set up some stuff depending on outcome
       switch (votingOutcome)
       {
@@ -919,8 +914,8 @@ namespace Workbench.ProjectDilemma
         default:
           break;
       }
-      ourTotalXp = ourBaseXp + (ourBaseXp * (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-        (int)perkActivator.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_EXPERIENCE);
+      ourTotalXp = ourBaseXp + (ourBaseXp * (int)BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
+        (int)BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_EXPERIENCE);
       GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
     }
     public void CalculateRankAfterOutcome()
@@ -955,9 +950,18 @@ namespace Workbench.ProjectDilemma
     public void CalculateRewardsAfterOutcome()
     {
       // this should work?
-      foreach (string rewardKey in GameMechanic.Instance.localPlayerSpot.operatePerk.ReadModifierBonuses(BonusModifiersKeys.EARN_ITEM_REWARD))
+      foreach (string rewardKey in BonusModifiersManager.Instance.ReadModifierBonuses(BonusModifiersKeys.EARN_ITEM_REWARD))
       {
         StartCoroutine(ClaimReward(rewardKey));
+      }
+      if (MasterData.Instance)
+      {
+        foreach (string rewardKey in BonusModifiersManager.Instance.ReadModifierBonuses(BonusModifiersKeys.EARN_CARD_REWARD))
+        {
+          RewardData reward = MasterData.Instance.allRewards.Find((x) => x.Key == rewardKey);
+          if (reward)
+            reward.AmountOwned++;
+        }
       }
     }
 
@@ -1066,7 +1070,7 @@ namespace Workbench.ProjectDilemma
     {
       votingOutcome = Outcome.Won;
       PrepareForEndScreen();
-     
+
 
       // stop game sequence
       StopCoroutine(gameSequence.rootCoroutine);
@@ -1199,6 +1203,11 @@ namespace Workbench.ProjectDilemma
     {
       var reward = GameFoundationSdk.rewards.FindReward(rewardKey);
 
+      if (reward == null)
+      {
+        MyDebug.Log("ERROR: Reward value is null, are you missing a definition?", Color.red);
+        yield break;
+      }
       string claimableKey = reward.GetLastClaimableRewardItemKey();
 
       // We use a using block to automatically release the deferred promise handler.
@@ -1215,7 +1224,6 @@ namespace Workbench.ProjectDilemma
         {
           Debug.LogException(deferredResult.error);
         }
-
         // The process succeeded
         else
         {
@@ -1223,9 +1231,15 @@ namespace Workbench.ProjectDilemma
 
           foreach (var tradable in result.products)
           {
-            if (tradable is TradableDefinition tradableDefinition)
+            if (tradable is ItemData itemData)
             {
-              Debug.Log("You earned reward = " + tradableDefinition.displayName);
+              //we disable the current quest
+              itemData.ActivatedCardQuest = false;
+              MyDebug.Log("You earned reward = ", itemData.name, Color.green);
+            }
+            else if (tradable is TradableDefinition tradableDefinition)
+            {
+              MyDebug.Log("You earned reward = ", tradableDefinition.displayName, Color.green);
             }
           }
         }

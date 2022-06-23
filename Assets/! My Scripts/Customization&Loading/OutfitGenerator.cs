@@ -13,11 +13,11 @@ namespace Workbench.ProjectDilemma
   public class OutfitGenerator : MonoBehaviour
   {
     #region Enum Declaration
-    public enum PlayerNumeration : byte { Player1 = 1, Player2 = 2}
+    public enum PlayerNumeration : byte { Player1 = 1, Player2 = 2 }
     #endregion
 
     #region Public Fields
- 
+
     public PlayerNumeration player = PlayerNumeration.Player1;
     [CustomTooltip("Which protocol for loading should be used?")]
     public bool autoGenerateOnStart;
@@ -80,6 +80,20 @@ namespace Workbench.ProjectDilemma
       {
         RigData rig = MasterData.Instance.allRigs[rigIds[i]];
         var newSkin = Instantiate(rig.SkinPrefab, rigRoot.parent);
+        if (!newSkin.isVisibleToPlayerWearingIt)
+        {
+          MyDebug.Log("Changing layer of", newSkin.name);
+
+          if (GameMechanic.Instance.localPlayerSpot.outfitLoader.defaultGeneratedClothes == this)
+          {
+            MyDebug.Log("Changing layer of", newSkin.name);
+            foreach (Transform child in newSkin.transform.GetComponentsInChildren<Transform>())
+            {
+              child.gameObject.layer = LayerMask.NameToLayer("Masks");
+            }
+
+          }
+        }
         Rig.ReassignBones(rigRoot, rig, newSkin.skinMeshRenderer);
       }
     }
@@ -88,6 +102,18 @@ namespace Workbench.ProjectDilemma
       for (int i = 0; i < clothes.Count; i++)
       {
         var newSkin = Instantiate(clothes[i].Clothing.SkinPrefab, rigRoot.parent);
+        if (!newSkin.isVisibleToPlayerWearingIt)
+        {
+          MyDebug.Log("Changing layer of", newSkin.name);
+          if (GameMechanic.Instance.localPlayerSpot.outfitLoader.defaultGeneratedClothes == this)
+          {
+            MyDebug.Log("Changing layer of", newSkin.name);
+            foreach (Transform child in newSkin.transform.GetComponentsInChildren<Transform>())
+            {
+              child.gameObject.layer = LayerMask.NameToLayer("Masks");
+            }
+          }
+        }
         Rig.ReassignBones(rigRoot, clothes[i].Clothing, newSkin.skinMeshRenderer);
       }
     }

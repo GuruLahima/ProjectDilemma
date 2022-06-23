@@ -16,7 +16,8 @@ namespace Workbench.ProjectDilemma
   {
     #region Exposed Private Fields
     [SerializeField] ClothingData clothingData;
-    [SerializeField] OutfitGenerator defaultGeneratedClothes;
+    [SerializeField] public OutfitGenerator defaultGeneratedClothes;
+    [SerializeField] public OutfitGenerator endScreenClothesGenerator;
     #endregion
 
     #region Private Fields
@@ -50,7 +51,8 @@ namespace Workbench.ProjectDilemma
     public void GenerateDefault()
     {
       // this happens on each instance of OutfitLoader separately when called via the RPC method
-      defaultGeneratedClothes.enabled = true;
+      if (defaultGeneratedClothes) defaultGeneratedClothes.enabled = true;
+      if (endScreenClothesGenerator) endScreenClothesGenerator.enabled = true;
     }
     #endregion
   }

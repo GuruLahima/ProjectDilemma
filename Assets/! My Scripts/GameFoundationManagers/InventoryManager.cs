@@ -302,7 +302,7 @@ namespace GuruLaghima.ProjectDilemma
 
     private void ParseInventoryToScriptableObject(ItemList items)
     {
-      ItemSettings.Instance.ParseInventoryData(items);
+      InventoryData.Instance.ParseInventoryData(items);
     }
     #endregion
   }

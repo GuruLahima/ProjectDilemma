@@ -3,39 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
-  public class ClothingPlaceholder : MonoBehaviour, IPointerClickHandler
+  public class ClothingPlaceholder : MonoBehaviour
   {
     public RigData Clothing;
-    public UnityEvent OnSelected;
-    public UnityEvent OnDeselected;
-
-    public void Select()
+    public void AddToCharacter()
     {
-      // OnSelected?.Invoke(); // InventoryItemHUDViewOverride
-    }
-    public void Deselect()
-    {
-      // OnDeselected?.Invoke(); // this is raken care of by the InventoryItemHUDViewOverride class
-    }
-
-    private void OnEnable()
-    {
+      MyDebug.Log("AddCLothing::AddToCharacter called for", this.Clothing.SkinPrefab.name);
       if (CharacterCustomizationManager.Instance)
       {
-        CharacterCustomizationManager.Instance.RefreshUI();
-      }
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-      if (CharacterCustomizationManager.Instance)
-      {
+        MyDebug.Log("AddCLothing:: CharacterCustomizationManager.Instance present");
         if (CharacterCustomizationManager.Instance.ActiveCharacterCustomization)
         {
-          CharacterCustomizationManager.Instance.ActiveCharacterCustomization.AddClothing(this.Clothing, this);
+          MyDebug.Log("AddCLothing:: ActiveCharacterCustomization present");
+          CharacterCustomizationManager.Instance.ActiveCharacterCustomization.AddClothing(this.Clothing);
         }
       }
     }

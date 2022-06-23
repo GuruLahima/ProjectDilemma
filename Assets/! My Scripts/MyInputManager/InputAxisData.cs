@@ -206,13 +206,10 @@ public class InputAxisData : ScriptableObject
 #if UNITY_EDITOR
   private void OnValidate()
   {
-    if (autoGenerateHotkeys)
+    ListOfHotkeys = new List<string>();
+    foreach (InputGroup ig in inputs)
     {
-      ListOfHotkeys = new List<string>();
-      foreach (InputGroup ig in inputs)
-      {
-        ListOfHotkeys.Add(ig.AxisName);
-      }
+      ListOfHotkeys.Add(ig.AxisName);
     }
   }
 #endif

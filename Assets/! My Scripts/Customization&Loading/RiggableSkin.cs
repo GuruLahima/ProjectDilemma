@@ -9,6 +9,8 @@ public class RiggableSkin : MonoBehaviour
   public Transform root;
   public RigData rig;
 
+  public bool isVisibleToPlayerWearingIt = true;
+
   [Button("Reassign bones")]
   public void ReassignBones()
   {

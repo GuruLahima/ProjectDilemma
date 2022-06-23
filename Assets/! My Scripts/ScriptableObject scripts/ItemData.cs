@@ -6,23 +6,24 @@ using Workbench.ProjectDilemma;
 [CreateAssetMenu(fileName = "New Item Data", menuName = "Workbench/ScriptableObjects/ItemData", order = 1)]
 public class ItemData : ScriptableObject
 {
-#if UNITY_EDITOR
+
   [SerializeField] bool restoreValuesOnAwake = true;
-  private void Awake()
+  private void OnEnable()
   {
     if (restoreValuesOnAwake)
     {
       Equipped = false;
-      Owned = false;
+      AmountOwned = 0;
+      ActivatedCardQuest = false;
     }
   }
-#endif
 
   public InventoryItemDefinition inventoryitemDefinition;
   public string Key;
-  public int AmountOwned;
+  public int AmountOwned = 0;
   public bool Equipped = false;
-  public bool Owned = true; // fetch this data from server
+  public bool Owned => AmountOwned > 0;
+  //public bool Owned = true; // fetch this data from server
   // for handling notifications (!) when new item is added
   public bool NewlyAdded = false;
   // for handling shop population, if item should not show up
@@ -31,7 +32,7 @@ public class ItemData : ScriptableObject
   [ShowAssetPreview]
   public Sprite ico;
 
-  //
+  //----------------earning this item via quest-------------------------//
   public bool ActivatedCardQuest
   {
     get
@@ -44,7 +45,8 @@ public class ItemData : ScriptableObject
       Debug.Log((_activatedCardQuest ? "Added quest for: " : "Removed quest for: ") + (RewardData != null ? RewardData.name : "empty"));
     }
   }
-  [HorizontalLine]
+  [Foldout("Earning this item")]
   [SerializeField] private bool _activatedCardQuest;
+  [Foldout("Earning this item")]
   public RewardData RewardData;
 }

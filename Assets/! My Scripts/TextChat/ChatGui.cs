@@ -233,16 +233,16 @@ namespace Workbench.ProjectDilemma
         return;
       }
 
-      // !deprecated. we no longer trigger chat on enter, but by clicking console
-      // if (GameMechanic.Instance.canChoose)
-      // {
-      //   // toggle chat mode 
-      //   if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
-      //   {
-      //     // notify other scripts that keyboard input will be expected to go into chat box
-      //     ToggleChat(!this.InputFieldChat_outline1.activeSelf);
-      //   }
-      // }
+      // // * deprecated because we are now using PlayerInputManager to trigger stuff via keyboard
+      if (GameMechanic.Instance.canChoose)
+      {
+        // toggle chat mode 
+        if (Input.GetButtonDown(InputAxisMappings.Instance.EnterChatAxis))
+        {
+          // notify other scripts that keyboard input will be expected to go into chat box
+          ToggleChat(!isInChatMode);
+        }
+      }
 
       // ensures text input is always focused when player has chosen text chat as communication method
       // even when clicking around in the scene
@@ -250,6 +250,8 @@ namespace Workbench.ProjectDilemma
       {
         if (!this.InputFieldChat.isFocused)
         {
+          MyDebug.Log(this.GetType().ToString(), "Focusing chat ");
+
           this.InputFieldChat.ActivateInputField();
           this.InputFieldChat.Select();
         }
@@ -275,9 +277,12 @@ namespace Workbench.ProjectDilemma
       //   }
       // }
 
+
       if (inChat)
       {
         MyDebug.Log(this.GetType().ToString(), "Enter Chat ");
+
+        PlayerInputManager.Instance.InChatVoice();
 
         EnteredChatMode?.Invoke(inChat);
         isInChatMode = true;
@@ -290,6 +295,8 @@ namespace Workbench.ProjectDilemma
       {
         MyDebug.Log(this.GetType().ToString(), "Exit Chat ");
         isInChatMode = false;
+
+        PlayerInputManager.Instance.ExitChatVoice();
 
         /*         if (!PauseMenu.GameIsPaused)
                   EnteredChatMode?.Invoke(inChat); */
@@ -325,7 +332,7 @@ namespace Workbench.ProjectDilemma
         {
           this.SendChatMessage(this.InputFieldChat.text);
           this.InputFieldChat.text = "";
-          FocusChat();
+          // FocusChat(); // uncomment this if you want the chat to remain focused after sending a message
           // disable chat for a while so players cant spam
           if (spamCoroutine != null)
             StopCoroutine(spamCoroutine);

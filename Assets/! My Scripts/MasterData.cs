@@ -7,47 +7,37 @@ namespace Workbench.ProjectDilemma
   /// <summary>
   /// Singleton script for storing all requisites for RPC calls that require ScriptableObjects (data) to resolve
   /// </summary>
-  public class MasterData : MonoBehaviour
+  [CreateAssetMenu(fileName = "MasterData", menuName = "Workbench/ScriptableObjects/MasterData", order = 10)]
+  public class MasterData : SingletonScriptableObject<MasterData>
   {
-    #region Singleton
-    public static MasterData Instance;
-    private void Awake()
-    {
-      Instance = this;
-    }
-    #endregion
-
+    #region Public Fields
     // !: To return index simply call the corresponding function
     // !: To return the data simply use the index from the allData[index] of the corresponding type
-
     public List<ProjectileData> allProjectiles = new List<ProjectileData>();
+    public List<EmoteData> allEmotes = new List<EmoteData>();
+    public List<PerkData> allPerks = new List<PerkData>();
+    public List<RigData> allRigs = new List<RigData>();
+    public List<RewardData> allRewards = new List<RewardData>();
+
+    #endregion
+
+    #region Public Methods
     public int GetProjectileIndex(ProjectileData projData)
     {
-      int index = allProjectiles.IndexOf(projData);
-      return index;
+      return allProjectiles.IndexOf(projData);
     }
-
-    public List<EmoteData> allEmotes = new List<EmoteData>();
     public int GetAnimationIndex(EmoteData emote)
     {
-      int index = allEmotes.IndexOf(emote);
-      return index;
+      return allEmotes.IndexOf(emote);
     }
-
-    public List<PerkData> allPerks = new List<PerkData>();
     public int GetPerkIndex(PerkData perk)
     {
-      int index = allPerks.IndexOf(perk);
-      return index;
+      return allPerks.IndexOf(perk);
     }
-
-    public List<RigData> allRigs = new List<RigData>();
     public int GetRigIndex(RigData rig)
     {
-      int index = allRigs.IndexOf(rig);
-      return index;
+      return allRigs.IndexOf(rig);
     }
-
     public int[] GetTreeRigIds(List<ClothingTree> clothing)
     {
       List<int> rigIds = new List<int>();
@@ -60,5 +50,6 @@ namespace Workbench.ProjectDilemma
       }
       return rigIds.ToArray();
     }
+    #endregion
   }
 }

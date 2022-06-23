@@ -6,6 +6,14 @@ namespace Workbench.ProjectDilemma
 {
   public class GameTimer : MonoBehaviour
   {
+    public float CurrentTime
+    {
+      get
+      {
+        return incTimer;
+      } 
+    }
+
     [SerializeField] TextMeshProUGUI Timer;
 
     private float incTimer;

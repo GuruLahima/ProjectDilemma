@@ -66,6 +66,7 @@ namespace Workbench.ProjectDilemma
     GameObject chooseFateCanvas;
     [HorizontalLine]
     [SerializeField] GameObject fpsController;
+    [SerializeField] GameObject fpsControllerCam;
 
     [CustomTooltip("All virtual cameras should be parented to this object so this script can manage them properly")]
     [SerializeField] Transform virtualCamerasParent;
@@ -365,6 +366,7 @@ namespace Workbench.ProjectDilemma
 
       // turn on first person controller
       fpsController.SetActive(true);
+      fpsControllerCam.SetActive(true);
 
       ToggleMenu(false);
     }
@@ -374,6 +376,7 @@ namespace Workbench.ProjectDilemma
 
       // turn off first person controller
       fpsController.SetActive(false);
+      fpsControllerCam.SetActive(false);
       ToggleMenu(true);
 
     }

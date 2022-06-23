@@ -132,6 +132,11 @@ public class RadialChooseMenu : MonoBehaviour
 
   }
 
+  public void RegenerateSnapPoints()
+  {
+    Debug.Log("RegeneratingSnapPoints");
+    GenerateSnapPoints();
+  }
 
   public void PopulateRadialMenuFromData()
   {
