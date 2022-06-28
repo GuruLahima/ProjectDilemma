@@ -10,6 +10,7 @@ public class InventoryViewsCollection : MonoBehaviour
 
   // the "New Item" notification for this collection
   public GameObject inventoryCollectionNotification;
+  public GameObject inventoryCollectionNotificationAlternative;
   public InventoryViewsCollection parentCollection;
 
   public int newItems;
@@ -26,11 +27,15 @@ public class InventoryViewsCollection : MonoBehaviour
     {
       if (inventoryCollectionNotification)
         inventoryCollectionNotification.SetActive(false);
+      if (inventoryCollectionNotificationAlternative)
+        inventoryCollectionNotificationAlternative.SetActive(false);
     }
     else if (newItems > 0)
     {
       if (inventoryCollectionNotification)
         inventoryCollectionNotification.SetActive(true);
+      if (inventoryCollectionNotificationAlternative)
+        inventoryCollectionNotificationAlternative.SetActive(true);
     }
 
     if (parentCollection)

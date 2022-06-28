@@ -6,6 +6,13 @@ namespace Workbench.ProjectDilemma
 {
   public class GameTimer : MonoBehaviour
   {
+    [System.Serializable]
+    public class TimerEvent
+    {
+      public float TriggerTime;
+      public UnityEngine.Events.UnityEvent TriggerEvent;
+    }
+
     public float CurrentTime
     {
       get
@@ -13,6 +20,9 @@ namespace Workbench.ProjectDilemma
         return incTimer;
       } 
     }
+
+    [SerializeField] List<TimerEvent> OnTimerEvents = new List<TimerEvent>();
+    private TimerEvent _lastTimerEvent;
 
     [SerializeField] TextMeshProUGUI Timer;
 
@@ -42,6 +52,11 @@ namespace Workbench.ProjectDilemma
         // gameTimer -= Time.deltaTime;
         FormatTimeForUI(decTimer);
         yield return null;
+        var timerEvent = OnTimerEvents.Find((x) => Mathf.Abs(decTimer - x.TriggerTime) <= 1); //1 is threshold for checking
+        if (timerEvent != null && timerEvent != _lastTimerEvent)
+        {
+          timerEvent.TriggerEvent?.Invoke();
+        }
       }
       FormatTimeForUI(0f);
     }

@@ -1,4 +1,5 @@
 using NaughtyAttributes;
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,13 +10,14 @@ using Workbench.ProjectDilemma;
 [CreateAssetMenu(fileName = "New ClothingData", menuName = "Workbench/ScriptableObjects/ClothingData", order = 4)]
 public class ClothingData : ScriptableObject
 {
-  
+
 
   private void OnEnable()
   {
     if (defaultClothing && !IsDefault)
     {
-      SaveClothes(defaultClothing.Clothes);
+      if (PhotonNetwork.IsConnected) // this check enables us to test clothes by running scenario directly in editor
+        SaveClothes(defaultClothing.Clothes);
     }
   }
 

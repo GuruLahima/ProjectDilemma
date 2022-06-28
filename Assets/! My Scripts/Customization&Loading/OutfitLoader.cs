@@ -35,7 +35,8 @@ namespace Workbench.ProjectDilemma
     public void Init()
     {
       // check if this is the local player spot
-      if (GameMechanic.Instance.localPlayerSpot != playerSpot) return;
+      if (PhotonNetwork.IsConnected) // this check ensures we load both outfits locally even when we are not connected to photon
+        if (GameMechanic.Instance.localPlayerSpot != playerSpot) return;
 
       int[] rigIds = MasterData.Instance.GetTreeRigIds(clothingData.Clothes);
       if (PhotonNetwork.IsConnected)
@@ -45,6 +46,8 @@ namespace Workbench.ProjectDilemma
       else
       {
         Debug.LogWarning("Trying to load outfit but photon is not connected");
+        // circumventing photon because we are not connected
+        RPCManager.LoadOutfit(photonView.ViewID, rigIds);
       }
     }
 

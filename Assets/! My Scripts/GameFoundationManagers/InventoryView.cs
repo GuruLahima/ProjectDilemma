@@ -26,26 +26,33 @@ namespace GuruLaghima.ProjectDilemma
     [ShowIf("onlyOneItemPerInventory")]
     [ReadOnly]
     public InventoryItemHUDViewOverride equippedItem;
-    public InventoryViewsCollection parentCollection;
 
     public ControllableSequence choosingSlotSequence;
     public ControllableSequence hidingRadialMenuSequence;
     #endregion
 
     #region UI references
-    /// the parent to which we will attach inventory items
+    /// 
+    [CustomTooltip("the parent to which we will attach inventory items")]
     public Transform contentFrame;
-    /// the inventory item template
+    /// 
+    [CustomTooltip("the inventory item template")]
     public Transform inventoryItemPrefab;
-    /// the item type this inventory should render
+    /// 
+    [CustomTooltip("the item type this inventory should render")]
     public InventoryData.ItemType itemType;
     public string itemTag;
-    /// the radial menu which pops up when we select an item
+    /// 
     [HorizontalLine]
+    [CustomTooltip("the radial menu which pops up when we select an item")]
     public RadialChooseMenu radialMenu;
     public RadialMenuData radialMenuData;
-    // the "New Item" notification for this inventory
+    [HorizontalLine]
+    // 
+    [CustomTooltip("the New Item notification for this inventory")]
     public GameObject inventoryNotification;
+    [CustomTooltip("// the collection that tracks the new items in this inventory for notification purposes")]
+    public InventoryViewsCollection parentCollection;
 
 
     public bool InSelection

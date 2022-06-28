@@ -446,6 +446,10 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.saveButton.enabled = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
       otherPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = false;
+      if (!PhotonNetwork.IsConnected){
+        otherPlayerSpot.outfitLoader.Init();
+      }
+
 
       // assign current points to end screen counters
       if (ScenarioManager.instance.otherPlayer != null && ScenarioManager.instance.otherPlayer.CustomProperties.ContainsKey(Keys.PLAYER_SOFT_CURRENCY_POINTS))

@@ -23,10 +23,8 @@ public class TransactionsData : SingletonScriptableObject<TransactionsData>
   #region Messages
   private void OnEnable()
   {
-#if UNITY_EDITOR
-    // we need to reset this list because scriptable objects in editor dont get reset like in a build
+    // // we need to reset this list because scriptable objects in editor dont get reset like in a build
     recordedNonrepeatableTransactions.Clear();
-#endif
   }
 
   #endregion

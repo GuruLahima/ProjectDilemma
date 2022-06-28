@@ -58,10 +58,7 @@ namespace Workbench.ProjectDilemma
     [PunRPC]
     void RPC_LoadOutfit(int viewID, int[] clothesId)
     {
-      PhotonView player = PhotonView.Find(viewID);
-      PlayerSpot playerSpot = player.GetComponent<PlayerSpot>();
-      playerSpot.clothesId = clothesId;
-      playerSpot.outfitLoader.GenerateDefault();
+      LoadOutfit(viewID, clothesId);
     }
 
     [PunRPC]
@@ -94,6 +91,18 @@ namespace Workbench.ProjectDilemma
       }
       GameMechanic.Instance.ActivateEndScreenCountersOtherPlayer(_points, _rank, _xp);
     }
+    #endregion
+
+    #region public static methods
+
+    public static void LoadOutfit(int viewID, int[] clothesId)
+    {
+      PhotonView player = PhotonView.Find(viewID);
+      PlayerSpot playerSpot = player.GetComponent<PlayerSpot>();
+      playerSpot.clothesId = clothesId;
+      playerSpot.outfitLoader.GenerateDefault();
+    }
+
     #endregion
 
   }
