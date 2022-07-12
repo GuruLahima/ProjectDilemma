@@ -286,16 +286,16 @@ namespace Workbench.ProjectDilemma
         if (PhotonNetwork.IsConnected)
         {
 
-          RPCManager.Instance.photonView.RPC("RPC_ThrowProjectile", Photon.Pun.RpcTarget.AllViaServer, MasterData.Instance.GetProjectileIndex(selectedProjectile), startingPoint.position,
+          RPCManager.Instance.photonView.RPC("RPC_ThrowProjectile", Photon.Pun.RpcTarget.AllViaServer, photonView.ViewID, MasterData.Instance.GetProjectileIndex(selectedProjectile), startingPoint.position,
             startingPoint.TransformDirection(new Vector3(0, Mathf.Sin(radianAngle), Mathf.Cos(radianAngle))), baseThrowStrength, Physics.gravity.y);
         }
         else
         {
           var proj = Instantiate(selectedProjectile.Prefab);
-          proj.SetProjectile(startingPoint.position,
+          proj.SetProjectile(photonView.ViewID, startingPoint.position,
            startingPoint.TransformDirection(new Vector3(0, Mathf.Sin(radianAngle), Mathf.Cos(radianAngle))), baseThrowStrength, Physics.gravity.y);
         }
-
+        GameEvents.OnThrowableUsed?.Invoke(selectedProjectile);
         ShootThrowableFeedback();
 
       }

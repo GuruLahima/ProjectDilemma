@@ -100,7 +100,7 @@ namespace Workbench.ProjectDilemma
 
     #region private fields
 
-    #endregion
+    #endregion  
 
 
     #region public methods

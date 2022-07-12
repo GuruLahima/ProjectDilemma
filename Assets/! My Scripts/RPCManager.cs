@@ -24,13 +24,13 @@ namespace Workbench.ProjectDilemma
 
     #region Pun RPCs
     [PunRPC]
-    void RPC_ThrowProjectile(int projectileIndex, Vector3 startPosition, Vector3 direction, float strength, float customGravity)
+    void RPC_ThrowProjectile(int viewId, int projectileIndex, Vector3 startPosition, Vector3 direction, float strength, float customGravity)
     {
       Projectile projectile = MasterData.Instance.allProjectiles[projectileIndex].Prefab;
       if (projectile)
       {
         var proj = Instantiate(projectile);
-        proj.SetProjectile(startPosition, direction, strength, customGravity);
+        proj.SetProjectile(viewId, startPosition, direction, strength, customGravity);
       }
     }
 

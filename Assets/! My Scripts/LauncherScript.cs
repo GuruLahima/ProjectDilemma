@@ -192,7 +192,10 @@ namespace Workbench.ProjectDilemma
       if (!introPlayed)
         introPlayed = true;
       else
-        introObjects.ForEach((obj) => { obj.SetActive(false); });
+      {
+        if (introObjects.Count > 0)
+          introObjects.ForEach((obj) => { if (obj) obj.SetActive(false); });
+      }
 
     }
     public override void OnDisable()
@@ -243,6 +246,9 @@ namespace Workbench.ProjectDilemma
         int parentObjIndex = virtualCameras.IndexOf(virtualCamerasParent.gameObject);
         virtualCameras.RemoveAt(parentObjIndex);
       }
+
+      // disable outlines of garage objects
+      cakeslice.Outline.eraseRendererGlobal = true;
     }
 
     bool muted;
@@ -296,7 +302,11 @@ namespace Workbench.ProjectDilemma
 
     public void ExitMatchmaking()
     {
-      Disconnect();
+      // if in matchmaking cancel it
+      if (isConnecting)
+      {
+        Disconnect();
+      }
       SwitchToMenuView();
 
     }

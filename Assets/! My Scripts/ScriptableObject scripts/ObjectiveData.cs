@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NaughtyAttributes;
 using UnityEngine;
 using Workbench.ProjectDilemma;
 
@@ -27,46 +26,29 @@ public class ObjectiveData : ItemData
   #endregion
 
   #region Class Definition
-  /// <summary>
-  /// Class exclusive to PerkData for storing modifiers with their conditional objective
-  /// </summary>
   [System.Serializable]
   public class BonusModifiersConditionWrapper
   {
     public ObjectiveCondition Condition;
     public BonusModifiersWrapper[] Modifiers;
   }
-  /// <summary>
-  /// Class used for assigning values to keys (PerkKeys)
-  /// </summary>
   [System.Serializable]
   public class BonusModifiersWrapper
   {
-    public enum ModifierType : byte { Float, Bool, String }
-    [ModifierKey]
-    public string ModifierKey;
-    public ModifierType ModifierValueType;
+    public BonusModifierData ModifierKey;
 
-    [AllowNesting]
-    [ShowIf("ModifierValueType", ModifierType.Float)]
     public float ModifierValueFloat;
-
-    [AllowNesting]
-    [ShowIf("ModifierValueType", ModifierType.Bool)]
     public bool ModifierValueBool;
-
-    [AllowNesting]
-    [ShowIf("ModifierValueType", ModifierType.String)]
     public string ModifierValueString;
 
     /// <returns>Value for the modifier corresponding to the modifier type</returns>
     public object GetValue()
     {
-      return ModifierValueType switch
+      return ModifierKey.Type switch
       {
-        ModifierType.Float => ModifierValueFloat,
-        ModifierType.Bool => ModifierValueBool,
-        ModifierType.String => ModifierValueString,
+        BonusModifierData.BonusModifierType.Float => ModifierValueFloat,
+        BonusModifierData.BonusModifierType.Bool => ModifierValueBool,
+        BonusModifierData.BonusModifierType.String => ModifierValueString,
         _ => ModifierValueFloat,
       };
     }

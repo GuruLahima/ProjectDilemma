@@ -20,12 +20,16 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public ItemData whoDis;
 
   public InventoryView parentView;
+  public NewItemsTracker notificationHandler;
+  public RecyclerView recyclerView;
   #endregion
 
   #region public fields 
   public bool usesRadialMenu = false;
   public List<DictWrapper<MMFeedbacks>> feedbacks = new List<DictWrapper<MMFeedbacks>>();
+  public bool usedInRecycler;
   #endregion
+
   #region exposed fields
 
   [SerializeField] TextMeshProUGUI title;
@@ -56,6 +60,11 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
 
   public void HandleClick()
   {
+    if (usedInRecycler)
+    {
+      recyclerView.ItemSelected(this);
+      return;
+    }
     if (usesRadialMenu)
     {
       ShowRadialMenu();
@@ -145,7 +154,8 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
       Destroy(notificationPopFeedback);
 
       // notify parentView that this item was checked out so it can decide if the other icons in the hierarchy should be disabled too
-      parentView.NewItems--;
+      // parentView.NewItems--;
+      notificationHandler.NewItems--;
     }
   }
   #endregion

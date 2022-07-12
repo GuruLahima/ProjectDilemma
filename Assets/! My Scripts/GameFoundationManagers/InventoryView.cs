@@ -21,6 +21,7 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public fields
 
+
     public bool onlyOneItemPerInventory;
     public bool mustHaveOneEquippedAtAllTimes;
     [ShowIf("onlyOneItemPerInventory")]
@@ -51,8 +52,6 @@ namespace GuruLaghima.ProjectDilemma
     // 
     [CustomTooltip("the New Item notification for this inventory")]
     public GameObject inventoryNotification;
-    [CustomTooltip("// the collection that tracks the new items in this inventory for notification purposes")]
-    public InventoryViewsCollection parentCollection;
 
 
     public bool InSelection
@@ -74,11 +73,15 @@ namespace GuruLaghima.ProjectDilemma
     #endregion
 
     #region exposed fields
+    [SerializeField] bool usedForRecycler;
+    [ShowIf("usedForRecycler")]
+    [SerializeField] RecyclerView recyclerView;
 
     #endregion
 
     #region property keys
 
+    [HorizontalLine]
     [SerializeField] string inventoryItem_HUDIconPropertyKey;
 
     #endregion
@@ -86,36 +89,6 @@ namespace GuruLaghima.ProjectDilemma
     #region private fields
 
     List<InventoryItemHUDViewOverride> inventoryItems = new List<InventoryItemHUDViewOverride>();
-    int newItems;
-
-    public int NewItems
-    {
-      get
-      {
-        return newItems;
-      }
-      set
-      {
-        MyDebug.Log("new items in " + this.name, value);
-        if (value <= 0)
-        {
-          if (inventoryNotification)
-            inventoryNotification.SetActive(false);
-        }
-        else if (value > 0 && newItems <= 0)
-        {
-          if (inventoryNotification)
-            inventoryNotification.SetActive(true);
-        }
-
-        newItems = value;
-
-        if (parentCollection)
-        {
-          parentCollection.UpdateNewItemsCount();
-        }
-      }
-    }
 
     #endregion
 
@@ -126,7 +99,6 @@ namespace GuruLaghima.ProjectDilemma
       if (radialMenuData)
         radialMenu.radialMenuData = this.radialMenuData;
 
-      // NewItems = 0;
     }
 
     // public void ItemWasEquipped(ItemData item)
@@ -273,7 +245,8 @@ namespace GuruLaghima.ProjectDilemma
         }
       }
     }
-    private bool inSelection = true;
+    // are we in the Radial Menu selecting a slot?
+    private bool inSelection = false;
     private InventoryItemHUDViewOverride lastItemSelected;
     private Transform lastSelectedSlot;
     private bool onlyOneItemAllowed;
@@ -285,12 +258,16 @@ namespace GuruLaghima.ProjectDilemma
       {
         radialMenu.Activate();
         if (Input.GetMouseButtonDown(0))
+        {
+          // when selection ends
+          // close the radial menu 
+          HideRadialMenuSequence();
           inSelection = false;
+
+        }
         yield return null;
       }
-      // when selection ends
-      // close the radial menu 
-      HideRadialMenuSequence();
+
       // save the selected position in the RadialMenuData
       if (radialMenuData.orderedItems.Count > lastSelectedSlot.GetSiblingIndex())
         radialMenuData.orderedItems[lastSelectedSlot.GetSiblingIndex()] = lastItemSelected.whoDis;
@@ -310,9 +287,14 @@ namespace GuruLaghima.ProjectDilemma
     }
     public void HideRadialMenuSequence()
     {
-      StopAllCoroutines();
-      hidingRadialMenuSequence.rootCoroutine = hidingRadialMenuSequence.RunSequence(this);
-      StartCoroutine(hidingRadialMenuSequence.rootCoroutine);
+      // hide the radial menu only if it is shown
+      if (inSelection)
+      {
+        StopAllCoroutines();
+        hidingRadialMenuSequence.rootCoroutine = hidingRadialMenuSequence.RunSequence(this);
+        StartCoroutine(hidingRadialMenuSequence.rootCoroutine);
+        inSelection = false;
+      }
     }
 
 
@@ -371,6 +353,10 @@ namespace GuruLaghima.ProjectDilemma
           MyDebug.Log("Updating abilities");
           PopulateUIForItemType(itemTag, InventoryData.Instance.abilities);
           break;
+        case InventoryData.ItemType.Relics:
+          MyDebug.Log("Updating relics");
+          PopulateUIForItemType(itemTag, InventoryData.Instance.relics);
+          break;
         default:
           break;
       }
@@ -379,10 +365,14 @@ namespace GuruLaghima.ProjectDilemma
 
     void PopulateUIForItemType(string itemType, IEnumerable<ItemData> itemList)
     {
-      foreach (ItemData inventoryItemType in itemList.Where((obj) => { return obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
+      foreach (ItemData inventoryItemType in itemList.Where((obj) => { return itemType == "" ? true : obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
       {
+        if (usedForRecycler)
+          if (inventoryItemType.AmountOwned < 2)
+            continue;
         InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
         newItem.parentView = this;
+        newItem.notificationHandler = this.GetComponent<NewItemsTracker>();
         newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
         newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
         newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
@@ -391,15 +381,27 @@ namespace GuruLaghima.ProjectDilemma
         newItem.usesRadialMenu = false;
         if (itemType == "emotes" || itemType == "throwables") newItem.usesRadialMenu = true; else newItem.usesRadialMenu = false;
         newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-        MyDebug.Log("PopulateUIForItemType " + inventoryItemType.Key, "newly added " + inventoryItemType.NewlyAdded);
         if (inventoryItemType.NewlyAdded)
         {
-          this.NewItems++;
+          // this.NewItems++;
+          if (newItem.notificationHandler)
+            newItem.notificationHandler.NewItems++;
         }
         else
         {
           newItem.notificationPopFeedback.enabled = false;
           Destroy(newItem.notificationPopFeedback);
+        }
+        // show visually that this item has duplicates
+        if (inventoryItemType.AmountOwned > 1)
+        {
+          newItem.feedbacks.Find((obj) => obj.key == "Duplicates")?.element?.PlayFeedbacks();
+        }
+        // if this view is used for the recycler feature then this item should have the information to which object to send data about itself
+        if (usedForRecycler)
+        {
+          newItem.usedInRecycler = true;
+          newItem.recyclerView = this.recyclerView;
         }
         if (newItem.GetComponentInChildren<ClothingPlaceholder>())
           newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
@@ -417,7 +419,9 @@ namespace GuruLaghima.ProjectDilemma
       }
       inventoryItems.Clear();
 
-      NewItems = 0;
+      // NewItems = 0;
+      if (GetComponent<NewItemsTracker>())
+        GetComponent<NewItemsTracker>().NewItems = 0;
     }
 
 

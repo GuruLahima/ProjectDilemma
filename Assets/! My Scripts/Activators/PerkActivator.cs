@@ -5,6 +5,7 @@ using Photon.Pun;
 using MoreMountains.Feedbacks;
 using GuruLaghima;
 using System;
+using UnityEngine.Events;
 
 namespace Workbench.ProjectDilemma
 {
@@ -14,6 +15,15 @@ namespace Workbench.ProjectDilemma
   public class PerkActivator : BaseActivatorComponent
   {
 
+    #region events
+
+    public UnityEvent PerkChosen;
+
+    #endregion
+
+    #region Public Fields
+    public PerkData ownedPerk;
+    #endregion
 
     #region Exposed Private Fields
     [SerializeField] Transform perkCanvasSlot;
@@ -23,7 +33,8 @@ namespace Workbench.ProjectDilemma
     [SerializeField] MMFeedbacks hideChooseScreenFeedbacks;
     [SerializeField] MMFeedbacks disableChooseScreenFeedbacks;
     [SerializeField] ActivePerksChooser perkChooser;
-    public PerkData ownedPerk;
+    [NaughtyAttributes.HorizontalLine]
+    [SerializeField] UpgradeData upgradePerkBonus;
     #endregion
 
     #region Private Fields
@@ -102,9 +113,10 @@ namespace Workbench.ProjectDilemma
 
     public void ActivatePerk()
     {
-      MyDebug.Log("Perks window perk SHOULD be activated");
       if (perkActivated)
         return;
+
+      PerkChosen?.Invoke();
 
       #region LOCAL STUFF
       perkActivated = true;
@@ -159,7 +171,7 @@ namespace Workbench.ProjectDilemma
       ObjectiveData.BonusModifiersWrapper[] mod = ownedPerk.GetBonusModifiers(condition);
       foreach (ObjectiveData.BonusModifiersWrapper pm in mod)
       {
-        BonusModifiersManager.Instance.AddModifier(pm.ModifierKey, pm.GetValue());
+        BonusModifierManager.Instance.AddModifier(pm.ModifierKey, pm.GetValue());
       }
     }
     #endregion

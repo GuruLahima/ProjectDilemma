@@ -38,6 +38,7 @@ namespace Workbench.ProjectDilemma
     public const string CLOTHES_TAG = "cosmetics";
     public const string PERKS_TAG = "perks";
     public const string ABILITIES_TAG = "abilities";
+    public const string RELICS_TAG = "relics";
     public const string ITEMPROPERTY_INGAMESCRIPTABLEOBJECT = "ingame_ScriptableObject";
     public const string ITEMPROPERTY_EQUIPPED = "equipped";
     public const string CURRENCY_XP = "player_xp";

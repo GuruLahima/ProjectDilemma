@@ -82,6 +82,7 @@ namespace Workbench.ProjectDilemma
             {
               SYNC_Animation(emoteSelected);
             }
+            GameEvents.OnEmoteUsed?.Invoke(emoteSelected);
           }
         }
       }

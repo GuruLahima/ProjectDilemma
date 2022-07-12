@@ -99,6 +99,8 @@ crashlytics-build.properties
 /[Aa]ssets/CustomInputManager/
 /[Aa]ssets/My Packages/Fonts
 /[Aa]ssets/! My Data/
+/[Aa]ssets/Cute Background FX/
+/[Aa]ssets/Cute Background FX.meta
 
 
 Assets/FX_Classic_Confetti/

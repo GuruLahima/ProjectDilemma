@@ -5,8 +5,7 @@ using UnityEditor;
 using NaughtyAttributes;
 using UnityEngine;
 using GuruLaghima;
-
-
+using System.Linq;
 
 namespace Workbench.ProjectDilemma
 {
@@ -20,6 +19,10 @@ namespace Workbench.ProjectDilemma
     public List<OwnableDeathSequence> defaultBothLoseSequences = new List<OwnableDeathSequence>();
     // alwyays randomly chosen
     public List<OwnableDeathSequence> defaultBothCooperateSequences = new List<OwnableDeathSequence>();
+
+    public ValidationSystem<RelicData> HighestRelicTierQualification(float value) => this.scenarioSpecificRelicTiers.Where((x) => x.MinimumBetMultiplier <= value).Max();
+
+    public List<ValidationSystem<RelicData>> scenarioSpecificRelicTiers = new List<ValidationSystem<RelicData>>();
 
   }
 }

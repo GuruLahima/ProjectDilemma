@@ -12,11 +12,11 @@ EditorBuildSettings:
     path: Assets/! My Scenes/ApprovedScenarios/Motel-Scene.unity
     guid: 567b948946e22e1459f54a46545687cd
   - enabled: 0
-    path: Assets/! My Scenes/Main Menu.unity
-    guid: 4bf055c1df8cea0449b77d48a7f2d131
+    path: Assets/! My Scenes/Scenarios/Sewer.unity
+    guid: 225332d294ea7fe4886c10ffeb44a632
   - enabled: 0
-    path: Assets/! My Scenes/Player Apartment.unity
-    guid: 6f726191152d16c419d49d6b8d81ec20
+    path: Assets/! My Scenes/Scenarios/Pier.unity
+    guid: 288be1726e27f0d4ca0d67bd8214023a
   - enabled: 0
     path: Assets/! My Scenes/ApprovedScenarios/China Town.unity
     guid: cd97a7d1c8880d34dbafadfc75e0d9ac
@@ -29,12 +29,6 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Photon/PhotonVoice/Demos/DemoVoicePun/DemoVoicePun-Scene.unity
     guid: a3f3c3b3816924199acba595045624d2
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 9c0c94e6fed67ed49a083a089a42b7e4,
       type: 2}

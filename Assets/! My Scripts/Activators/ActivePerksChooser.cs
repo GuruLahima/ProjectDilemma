@@ -41,7 +41,6 @@ public class ActivePerksChooser : MonoBehaviour
       if (!card_1_Data)
         if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
         {
-
           card_1_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
           MyDebug.Log("Equipped", item.key);
           continue;
@@ -62,57 +61,24 @@ public class ActivePerksChooser : MonoBehaviour
         }
     }
 
-    if (card_1_Data)
-    {
-      card_1_Image.sprite = card_1_Data.ico;
-      card_1_Desc.text = (string)card_1_Data.inventoryitemDefinition.GetStaticProperty("description");
-      card_1_Title.text = (string)card_1_Data.inventoryitemDefinition.displayName;
-      card_1_Button.onClick.AddListener(() =>
-      {
-        MyDebug.Log("Perks window activating perk 1");
-        playerPerkFeature.ownedPerk = (PerkData)card_1_Data;
-        playerPerkFeature.DisablePerkWindow();
-        playerPerkFeature.HidePerk();
-        playerPerkFeature.ActivatePerk();
-      });
-    }
-    if (card_2_Data)
-    {
-      card_2_Image.sprite = card_2_Data.ico;
-      card_2_Desc.text = (string)card_2_Data.inventoryitemDefinition.GetStaticProperty("description");
-      card_2_Title.text = (string)card_2_Data.inventoryitemDefinition.displayName;
-      card_2_Title.text = (string)card_2_Data.inventoryitemDefinition.displayName;
-      card_2_Button.onClick.AddListener(() =>
-      {
-        MyDebug.Log("Perks window activating perk 2");
-        playerPerkFeature.ownedPerk = (PerkData)card_2_Data;
-        playerPerkFeature.DisablePerkWindow();
-        playerPerkFeature.HidePerk();
-        playerPerkFeature.ActivatePerk();
-      });
-    }
-    if (card_3_Data)
-    {
-      card_3_Image.sprite = card_3_Data.ico;
-      card_3_Desc.text = (string)card_3_Data.inventoryitemDefinition.GetStaticProperty("description");
-      card_3_Title.text = (string)card_3_Data.inventoryitemDefinition.displayName;
-      card_3_Title.text = (string)card_3_Data.inventoryitemDefinition.displayName;
-      card_3_Button.onClick.AddListener(() =>
-      {
-        MyDebug.Log("Perks window activating perk 3");
-        playerPerkFeature.ownedPerk = (PerkData)card_3_Data;
-        playerPerkFeature.DisablePerkWindow();
-        playerPerkFeature.HidePerk();
-        playerPerkFeature.ActivatePerk();
-      });
-    }
-
+    PopulatePerkCardFromData(card_1_Image, card_1_Desc, card_1_Title, card_1_Button, card_1_Data);
+    PopulatePerkCardFromData(card_2_Image, card_2_Desc, card_2_Title, card_2_Button, card_2_Data);
+    PopulatePerkCardFromData(card_3_Image, card_3_Desc, card_3_Title, card_3_Button, card_3_Data);
 
   }
 
-  // Update is called once per frame
-  void Update()
+  void PopulatePerkCardFromData(Image cardIcon, TextMeshProUGUI cardDesc, TextMeshProUGUI cardTitle, Button cardButton, ItemData cardData)
   {
-
+    cardIcon.sprite = card_3_Data.ico;
+    cardDesc.text = (string)card_3_Data.inventoryitemDefinition.GetStaticProperty("description");
+    cardTitle.text = (string)card_3_Data.inventoryitemDefinition.displayName;
+    cardButton.onClick.AddListener(() =>
+    {
+      playerPerkFeature.ownedPerk = (PerkData)cardData;
+      playerPerkFeature.DisablePerkWindow();
+      playerPerkFeature.HidePerk();
+      playerPerkFeature.ActivatePerk();
+    });
   }
+
 }

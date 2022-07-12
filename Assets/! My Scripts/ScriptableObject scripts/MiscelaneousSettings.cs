@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections.Generic;
 using GuruLaghima;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "VersionSettingsAsset", menuName = "Workbench/ScriptableObjects/MiscelaneousSettings", order = 1)]
 public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettings>
@@ -39,6 +40,11 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   public int rankForLoss;
   public int rankForBothWin;
   public int rankForBothLost;
+
+  public ValidationSystem<RewardSortingData> HighestRewardTierQualification(float value) => MiscelaneousSettings.Instance.rewardTiers.Where((x) => x.MinimumBetMultiplier <= value).Max();
+
+  [Header("Reward Validation System")]
+  public List<ValidationSystem<RewardSortingData>> rewardTiers = new List<ValidationSystem<RewardSortingData>>();
 
   [Header("Sound")]
   public AudioMixerGroup defaultSFXMixerGroup;

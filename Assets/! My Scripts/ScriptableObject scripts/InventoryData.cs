@@ -30,7 +30,8 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     Clothes,
     Throwables,
     ActivePerks,
-    Abilities
+    Abilities,
+    Relics
 
   }
   #region public fields
@@ -53,6 +54,9 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   [ReadOnly]
   [CustomTooltip("This list is populated from backend")]
   public List<AbilityData> abilities = new List<AbilityData>();
+  [ReadOnly]
+  [CustomTooltip("This list is populated from backend")]
+  public List<RelicData> relics = new List<RelicData>();
   #endregion
 
   #region private fields
@@ -62,6 +66,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   private List<InventoryItemDefinition> allTypes = new List<InventoryItemDefinition>();
   private List<InventoryItemDefinition> activePerksTypes = new List<InventoryItemDefinition>();
   private List<InventoryItemDefinition> abilitiesTypes = new List<InventoryItemDefinition>();
+  private List<InventoryItemDefinition> relicsTypes = new List<InventoryItemDefinition>();
   #endregion
 
   #region 
@@ -115,6 +120,8 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     activePerksTypes.Clear();
     abilities.Clear();
     abilitiesTypes.Clear();
+    relics.Clear();
+    relicsTypes.Clear();
 
   }
 
@@ -141,6 +148,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       ParseClothes(items);
       ParseActivePerks(items);
       ParseAbilities(items);
+      ParseRelics(items);
     }
   }
 
@@ -174,123 +182,57 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       MyDebug.Log(item.definition.displayName + " has mutable property::", item.HasMutableProperty("newlyAdded") + (item.HasMutableProperty("newlyAdded") ? " with value of " + (bool)item.GetDefaultValueOfMutableProperty("newlyAdded") : ""));
     }
     allItems.Add(tmpData);
-
   }
 
   #region 
 
   private void PopulateProjectileDataFromInventoryItem(InventoryItem item)
   {
-    // 
-    if (throwablesTypes.Contains(item.definition))
-    {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
-
-      // add the quantity of this item to the ProjectileData representation for this item type
-      ProjectileData proj = throwables.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
-      proj.AmountOwned += 1;
-      // dont add another entry in the throwables list
-      return;
-    }
     MyDebug.Log("Populating projectile data for ", item.definition.displayName);
-
     throwablesTypes.Add(item.definition);
     ProjectileData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ProjectileData>();
-    tmpData.inventoryitemDefinition = item.definition;
-    tmpData.AmountOwned = 1;
-    // tmpData.NewlyAdded = item.GetMutableProperty();
     throwables.Add(tmpData);
 
   }
   private void PopulateEmoteDataFromInventoryItem(InventoryItem item)
   {
-    // 
-    if (emoteTypes.Contains(item.definition))
-    {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
-
-      // add the quantity of this item to the Emotedata representation for this item type
-      EmoteData emote = emotes.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
-      emote.AmountOwned += 1;
-      // dont add another entry in the throwables list
-      return;
-    }
     MyDebug.Log("Populating emote data for ", item.definition.displayName);
-
     emoteTypes.Add(item.definition);
     EmoteData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<EmoteData>();
-    tmpData.inventoryitemDefinition = item.definition;
-    tmpData.AmountOwned = 1;
     emotes.Add(tmpData);
-
   }
 
   private void PopulateClothesDataFromInventoryItem(InventoryItem item)
   {
-    // 
-    if (clothesTypes.Contains(item.definition))
-    {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
-
-      // add the quantity of this item to the Emotedata representation for this item type
-      RigData clothing = clothes.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
-      clothing.AmountOwned += 1;
-      // dont add another entry in the throwables list
-      return;
-    }
     MyDebug.Log("Populating clothe data for ", item.definition.displayName);
-
     clothesTypes.Add(item.definition);
     RigData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RigData>();
-    tmpData.inventoryitemDefinition = item.definition;
-    tmpData.AmountOwned = 1;
     tmpData.Equipped = (bool)item.GetDefaultValueOfMutableProperty("equipped");
     clothes.Add(tmpData);
-
   }
 
   private void PopulatePerksDataFromInventoryItem(InventoryItem item)
   {
-    // 
-    if (activePerksTypes.Contains(item.definition))
-    {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
-
-      // add the quantity of this item to the perkdata representation for this item type
-      PerkData perk = activePerks.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
-      perk.AmountOwned += 1;
-      // dont add another entry in the perks list
-      return;
-    }
     MyDebug.Log("Populating perk data for ", item.definition.displayName);
-
     activePerksTypes.Add(item.definition);
     PerkData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<PerkData>();
-    tmpData.inventoryitemDefinition = item.definition;
-    tmpData.AmountOwned = 1;
     activePerks.Add(tmpData);
   }
 
   private void PopulateAbilityDataFromInventoryItem(InventoryItem item)
   {
-    // 
-    if (abilitiesTypes.Contains(item.definition))
-    {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
-
-      // add the quantity of this item to the perkdata representation for this item type
-      AbilityData ability = abilities.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
-      ability.AmountOwned += 1;
-      // dont add another entry in the perks list
-      return;
-    }
     MyDebug.Log("Populating ability data for ", item.definition.displayName);
-
     abilitiesTypes.Add(item.definition);
     AbilityData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<AbilityData>();
-    tmpData.inventoryitemDefinition = item.definition;
-    tmpData.AmountOwned = 1;
     abilities.Add(tmpData);
+  }
+
+  private void PopulateRelicDataFromInventoryItem(InventoryItem item)
+  {
+    MyDebug.Log("Populating ability data for ", item.definition.displayName);
+    relicsTypes.Add(item.definition);
+    RelicData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RelicData>();
+    relics.Add(tmpData);
   }
 
   public List<ProjectileData> ParseThrowables(ItemList allItemsList)
@@ -304,6 +246,10 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
       foreach (InventoryItem item in throwablesList)
       {
+        if (throwablesTypes.Contains(item.definition))
+        {
+          continue;
+        }
         PopulateProjectileDataFromInventoryItem(item);
       }
     }
@@ -321,6 +267,10 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
       foreach (InventoryItem item in emotesList)
       {
+        if (emoteTypes.Contains(item.definition))
+        {
+          continue;
+        }
         PopulateEmoteDataFromInventoryItem(item);
       }
     }
@@ -337,6 +287,10 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
       foreach (InventoryItem item in clothesList)
       {
+        if (clothesTypes.Contains(item.definition))
+        {
+          continue;
+        }
         PopulateClothesDataFromInventoryItem(item);
       }
     }
@@ -354,6 +308,10 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
       foreach (InventoryItem item in perksList)
       {
+        if (activePerksTypes.Contains(item.definition))
+        {
+          continue;
+        }
         PopulatePerksDataFromInventoryItem(item);
       }
     }
@@ -370,10 +328,35 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
       foreach (InventoryItem item in abilityList)
       {
+        if (abilitiesTypes.Contains(item.definition))
+        {
+          continue;
+        }
         PopulateAbilityDataFromInventoryItem(item);
       }
     }
     return abilities;
+  }
+
+  private List<RelicData> ParseRelics(ItemList allItemsList)
+  {
+    if (allItemsList != null)
+    {
+
+      ItemList relicList = GameFoundationSdk.inventory.CreateList();
+
+      allItemsList.Find(GameFoundationSdk.tags.Find(Keys.RELICS_TAG), relicList);
+
+      foreach (InventoryItem item in relicList)
+      {
+        if (relicsTypes.Contains(item.definition))
+        {
+          continue;
+        }
+        PopulateRelicDataFromInventoryItem(item);
+      }
+    }
+    return relics;
   }
   #endregion
 

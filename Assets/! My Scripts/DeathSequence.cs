@@ -18,6 +18,7 @@ namespace Workbench.ProjectDilemma
     public string labelText;
     public float duration;
     public Sprite backgroundSprite;
+    public DeathSequenceData DeathSequenceData;
     #endregion
     /*/// <summary>
     /// Override to default (death sequences where both cooperate or betray)
@@ -37,6 +38,10 @@ namespace Workbench.ProjectDilemma
     private void Start()
     {
       Invoke("SelfDestruct", duration);
+      if (DeathSequenceData)
+      {
+        GameEvents.OnDeathSequenceActivated?.Invoke(DeathSequenceData);
+      }
     }
     #endregion
 

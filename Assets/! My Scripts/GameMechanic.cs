@@ -234,6 +234,8 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region public fields
+    public bool SkippedOutcomeSequence = false;
+
     [Foldout("Debug")]
     [ReadOnly]
     public bool canChoose = false;
@@ -311,6 +313,7 @@ namespace Workbench.ProjectDilemma
     private GameObject localPlayerDecisionText;
     private Animator activeDeathBookAnimator;
     int decisionsMade;
+    private bool inOutcomeSequence;
     #endregion
 
     #region public methods
@@ -446,7 +449,8 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.saveButton.enabled = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
       otherPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = false;
-      if (!PhotonNetwork.IsConnected){
+      if (!PhotonNetwork.IsConnected)
+      {
         otherPlayerSpot.outfitLoader.Init();
       }
 
@@ -829,14 +833,29 @@ namespace Workbench.ProjectDilemma
     public void PrepareForEndScreen()
     {
       ActivateProperModelForEndScreen();
-      CalculatePointsAfterOutcome();
-      CalculateRankAfterOutcome();
-      CalculateXPAfterOutcome();
-      CalculateRewardsAfterOutcome();
+
+      int ourTotalPoints = RewardCalculator.Instance.CalculatePointsAfterOutcome();
+      if (totalPointsCounter)
+      {
+        // we show the total difference of points here (raw)
+        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourTotalPoints >= 0) ? Color.green : Color.red;
+        totalPointsCounter.newAmount = ourTotalPoints;
+      }
+      if (BankManager.Instance)
+        BankManager.Instance.WalletEvaluate(ourTotalPoints);
+      localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
+
+      Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
+      int ourTotalRank = RewardCalculator.Instance.CalculateRankAfterOutcome();
+      GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
+
+      Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
+      int ourTotalXp = RewardCalculator.Instance.CalculateXPAfterOutcome();
+      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
+
+      RewardCalculator.Instance.CalculateRewardsAfterOutcome();
       SyncDataToOtherPlayer();
 
-      //im triggering the OnGameEnded event here after all the calculations are done
-      GameEvents.OnGameEnded?.Invoke();
     }
 
     public void ActivateProperModelForEndScreen()
@@ -847,126 +866,6 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.endScenePlayerModelLeft.SetActive(false);
       otherPlayerSpot.endScenePlayerModelRight.SetActive(true);
 
-    }
-
-    public void CalculatePointsAfterOutcome()
-    {
-      //Currency softCurrency = null;
-      //if (GameFoundationSdk.IsInitialized)
-      //  softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
-      // set up some stuff depending on outcome
-      //switch (votingOutcome)
-      //{
-      //  case Outcome.Won:
-      //    //calculate points for each player
-      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForWin;
-      //    break;
-      //  case Outcome.Lost:
-      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForLoss;
-      //    break;
-      //  case Outcome.BothWon:
-      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForBothWon;
-      //    break;
-      //  case Outcome.BothLost:
-      //    ourBasePoints = MiscelaneousSettings.Instance.pointsForBothLost;
-      //    break;
-      //  default:
-      //    break;
-      //}
-      int ourTotalPoints = (int)(BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BASE_POINTS) +
-        (BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BASE_POINTS) *
-        BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_POINTS) / 100) +
-        BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_POINTS));
-      if (BonusModifiersManager.Instance.CheckModifierBonuses(BonusModifiersKeys.IMMUNITY_TO_LOSS) && ourTotalPoints < 0)
-      {
-        ourTotalPoints = 0;
-      }
-      if (totalPointsCounter)
-      {
-        // we show the total difference of points here (raw)
-        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourTotalPoints >= 0) ? Color.green : Color.red;
-        totalPointsCounter.newAmount = ourTotalPoints;
-      }
-      //ourTotalPoints = (localPlayerPoints + ourTotalPoints < 0) ? localPlayerPoints : ourTotalPoints;
-      //if (GameFoundationSdk.IsInitialized)
-      //  GameFoundationSdk.wallet.Set(softCurrency, localPlayerPoints + ourTotalPoints);
-      if (BankManager.Instance)
-        BankManager.Instance.WalletEvaluate(ourTotalPoints);
-      // we show current players' points here (post zero check)
-      localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
-    }
-    public void CalculateXPAfterOutcome()
-    {
-      Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
-      int ourTotalXp;
-      int ourBaseXp = 0;
-      // set up some stuff depending on outcome
-      switch (votingOutcome)
-      {
-        case Outcome.Won:
-          ourBaseXp = MiscelaneousSettings.Instance.xpForWin;
-          break;
-        case Outcome.Lost:
-          ourBaseXp = MiscelaneousSettings.Instance.xpForLoss;
-          break;
-        case Outcome.BothWon:
-          ourBaseXp = MiscelaneousSettings.Instance.xpForBothWon;
-          break;
-        case Outcome.BothLost:
-          ourBaseXp = MiscelaneousSettings.Instance.xpForBothLost;
-          break;
-        default:
-          break;
-      }
-      ourTotalXp = ourBaseXp + (ourBaseXp * (int)BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.PERCENT_BONUS_EXPERIENCE) / 100) +
-        (int)BonusModifiersManager.Instance.CalculateModifierBonuses(BonusModifiersKeys.FLAT_BONUS_EXPERIENCE);
-      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
-    }
-    public void CalculateRankAfterOutcome()
-    {
-      Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
-      int ourTotalRank;
-      int ourBaseRank = 0;
-      // set up some stuff depending on outcome
-      switch (votingOutcome)
-      {
-        case Outcome.Won:
-          //calculate points for each player
-          ourBaseRank = MiscelaneousSettings.Instance.rankForWin;
-          break;
-        case Outcome.Lost:
-          ourBaseRank = MiscelaneousSettings.Instance.rankForLoss;
-          break;
-        case Outcome.BothWon:
-          ourBaseRank = MiscelaneousSettings.Instance.rankForBothWin;
-          break;
-        case Outcome.BothLost:
-          ourBaseRank = MiscelaneousSettings.Instance.rankForBothLost;
-          break;
-        default:
-          break;
-      }
-      //for now -- missing formula
-      ourTotalRank = ourBaseRank;
-      GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
-    }
-
-    public void CalculateRewardsAfterOutcome()
-    {
-      // this should work?
-      foreach (string rewardKey in BonusModifiersManager.Instance.ReadModifierBonuses(BonusModifiersKeys.EARN_ITEM_REWARD))
-      {
-        StartCoroutine(ClaimReward(rewardKey));
-      }
-      if (MasterData.Instance)
-      {
-        foreach (string rewardKey in BonusModifiersManager.Instance.ReadModifierBonuses(BonusModifiersKeys.EARN_CARD_REWARD))
-        {
-          RewardData reward = MasterData.Instance.allRewards.Find((x) => x.Key == rewardKey);
-          if (reward)
-            reward.AmountOwned++;
-        }
-      }
     }
 
     // we send an RPC to other player containing our total points, rank, xp..
@@ -1102,6 +1001,17 @@ namespace Workbench.ProjectDilemma
       }
 
     }
+
+    public void SkipOutcomeSequence()
+    {
+      if (inOutcomeSequence)
+        SkippedOutcomeSequence = true;
+    }
+
+    public void GameEnded()
+    {
+      GameEvents.OnGameEnded?.Invoke();
+    }
     #endregion
 
     #region IEnumerator wrappers
@@ -1203,53 +1113,6 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region coroutines
-    IEnumerator ClaimReward(string rewardKey)
-    {
-      var reward = GameFoundationSdk.rewards.FindReward(rewardKey);
-
-      if (reward == null)
-      {
-        MyDebug.Log("ERROR: Reward value is null, are you missing a definition?", Color.red);
-        yield break;
-      }
-      string claimableKey = reward.GetLastClaimableRewardItemKey();
-
-      // We use a using block to automatically release the deferred promise handler.
-      using (var deferredResult = GameFoundationSdk.rewards.Claim(reward.rewardDefinition, claimableKey))
-      {
-        // Wait for the process to finish
-        while (!deferredResult.isDone)
-        {
-          yield return null;
-        }
-
-        // The process failed
-        if (!deferredResult.isFulfilled)
-        {
-          Debug.LogException(deferredResult.error);
-        }
-        // The process succeeded
-        else
-        {
-          var result = deferredResult.result;
-
-          foreach (var tradable in result.products)
-          {
-            if (tradable is ItemData itemData)
-            {
-              //we disable the current quest
-              itemData.ActivatedCardQuest = false;
-              MyDebug.Log("You earned reward = ", itemData.name, Color.green);
-            }
-            else if (tradable is TradableDefinition tradableDefinition)
-            {
-              MyDebug.Log("You earned reward = ", tradableDefinition.displayName, Color.green);
-            }
-          }
-        }
-      }
-    }
-
     IEnumerator GameSequence()
     {
       GameStarted?.Invoke();
@@ -1338,8 +1201,24 @@ namespace Workbench.ProjectDilemma
       // we wait for the sequence to end to show the end screen
       if (outcomeSequence)
       {
+        float timer = outcomeSequence.GetComponent<DeathSequence>().duration;
         MyDebug.Log("OutcomeSequencePhase", "chosen death sequence started");
-        yield return new WaitForSeconds(outcomeSequence.GetComponent<DeathSequence>().duration);
+        inOutcomeSequence = true;
+        while (timer > 0)
+        {
+          timer -= Time.deltaTime;
+
+          // allow sequence to be skipped
+          if (SkippedOutcomeSequence)
+          {
+            timer = 0;
+            SkippedOutcomeSequence = false;
+          }
+
+          yield return null;
+        }
+        inOutcomeSequence = false;
+
         MyDebug.Log("OutcomeSequencePhase", "chosen death sequence ended");
       }
 

@@ -21,13 +21,10 @@ public class Projectile : MonoBehaviour
   [HorizontalLine(order = 1)]
   [SerializeField] Rigidbody _rb;
   [SerializeField] Collider _col;
-  //[SerializeField] [Layer] int explosionlayerMask;
+
 
   [Header("Custom Properties", order = 0)]
   [HorizontalLine(order = 1)]
-  [Foldout("Impact Trigger")][SerializeField] private bool hit;
-  [Foldout("Impact Trigger")][SerializeField] private bool explode;
-  [Foldout("Impact Trigger")][SerializeField] private float explodeRadius;
   [Foldout("Impact Trigger")][SerializeField] private bool bounce;
   [Foldout("Impact Trigger")][SerializeField] private bool isInfinite;
   [Foldout("Impact Trigger")][SerializeField][DisableIf("isInfinite")] private int bounceAmount;
@@ -56,17 +53,20 @@ public class Projectile : MonoBehaviour
 
   #region Private Fields
   private int bounceNumber = 0;
-  //private int arenaPointsMultiplier = 1;//1 should be default value
   private bool projectileDisabled = false;
+  private int ownerId = -1; //setting -1 for default since viewId cant be negative
   #endregion
 
   #region Public Methods
-  public void SetProjectile(Vector3 startPosition, Vector3 direction, float strength, float? customGravity = null) //int pointsMultiplier = 1/*the value from the arena*/)
+  public void SetProjectile(int viewId, Vector3 startPosition, Vector3 direction, float strength, float? customGravity = null) //int pointsMultiplier = 1/*the value from the arena*/)
   {
     // set gravity (some of these things I will apply in wolfsbane) ! remove this comment later
     if (customGravity != null)
       gravity = (float)customGravity;
     gravity = (projectileType == ProjectileType.PhysicsDriven) ? gravity : 0f;
+
+    // set the owner id
+    ownerId = viewId;
 
     // initialy we disable the collider, so that player doesnt collide with it
     _col.enabled = false;
@@ -146,7 +146,7 @@ public class Projectile : MonoBehaviour
 
     if (projectileType == ProjectileType.PhysicsDriven)
     {
-      _rb.velocity += new Vector3(0, gravity /* 2*/ * Time.fixedDeltaTime, 0);
+      _rb.velocity += new Vector3(0, gravity * Time.fixedDeltaTime, 0);
     }
 
   }
@@ -156,6 +156,14 @@ public class Projectile : MonoBehaviour
   private void ProjectileDetection(Collision collision)
   {
     if (projectileDisabled) return;
+
+    
+    TargetPlaceholder target = collision.gameObject.GetComponent<TargetPlaceholder>();
+    if (target != null && GameMechanic.Instance.localPlayerSpot.GetComponent<Photon.Pun.PhotonView>().ViewID == ownerId)
+    {
+      //only activate this event for the owner of this projectile
+      GameEvents.OnTargetHit?.Invoke(target.TargetData);
+    }
 
     Debug.Log("we hit " + collision.gameObject.name);
     // local fx on collision
