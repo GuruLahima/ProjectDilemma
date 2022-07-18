@@ -26,12 +26,12 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
   public enum ItemType
   {
-    Emotes,
-    Clothes,
-    Throwables,
-    ActivePerks,
-    Abilities,
-    Relics
+    emotes,
+    cosmetics,
+    throwables,
+    perks,
+    abilities,
+    relics
 
   }
   #region public fields
@@ -72,16 +72,14 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   #region 
   public void Equip(ItemData item, bool equip)
   {
-    MyDebug.Log("Equipping ", item.Key + ": " + equip);
+    // MyDebug.Log("Equipping ", item.Key + ": " + equip);
     if (allTypes.Contains(item.inventoryitemDefinition))
     {
-      MyDebug.Log("in singleton");
       ItemList allItemsOfThisType = GameFoundationSdk.inventory.CreateList();
       GameFoundationSdk.inventory.FindItems(item.inventoryitemDefinition, allItemsOfThisType);
       foreach (InventoryItem itm in allItemsOfThisType)
       {
 
-        MyDebug.Log("in GFSDK inventory");
         itm.SetMutableProperty(Keys.ITEMPROPERTY_EQUIPPED, equip);
       }
       item.Equipped = equip;
@@ -157,7 +155,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     // 
     if (allTypes.Contains(item.definition))
     {
-      MyDebug.Log("Adding quantity to ", item.definition.displayName);
+      // MyDebug.Log("Adding quantity to ", item.definition.displayName);
 
       // add the quantity of this item to the ProjectileData representation for this item type
       ItemData proj = allItems.Find((obj) => { return obj.inventoryitemDefinition == item.definition; });
@@ -166,6 +164,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       return;
     }
     MyDebug.Log("Populating item data for ", item.definition.displayName);
+    MyDebug.Log("UpgraderView:: item.GetMutableProperty(equipped)", (bool)item.GetMutableProperty("equipped"));
 
 
     allTypes.Add(item.definition);
@@ -179,7 +178,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
         tmpData.Equipped = (bool)item.GetMutableProperty("equipped");
       if (item.HasMutableProperty("newlyAdded"))
         tmpData.NewlyAdded = (bool)item.GetMutableProperty("newlyAdded");
-      MyDebug.Log(item.definition.displayName + " has mutable property::", item.HasMutableProperty("newlyAdded") + (item.HasMutableProperty("newlyAdded") ? " with value of " + (bool)item.GetDefaultValueOfMutableProperty("newlyAdded") : ""));
+      MyDebug.Log(item.definition.displayName + " has mutable property::", item.HasMutableProperty("equipped") + (item.HasMutableProperty("equipped") ? " with value of " + (bool)item.GetMutableProperty("equipped") : ""));
     }
     allItems.Add(tmpData);
   }
@@ -188,7 +187,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
   private void PopulateProjectileDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating projectile data for ", item.definition.displayName);
+    // MyDebug.Log("Populating projectile data for ", item.definition.displayName);
     throwablesTypes.Add(item.definition);
     ProjectileData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ProjectileData>();
     throwables.Add(tmpData);
@@ -196,7 +195,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   }
   private void PopulateEmoteDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating emote data for ", item.definition.displayName);
+    // MyDebug.Log("Populating emote data for ", item.definition.displayName);
     emoteTypes.Add(item.definition);
     EmoteData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<EmoteData>();
     emotes.Add(tmpData);
@@ -204,16 +203,16 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
   private void PopulateClothesDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating clothe data for ", item.definition.displayName);
+    // MyDebug.Log("Populating clothe data for ", item.definition.displayName);
     clothesTypes.Add(item.definition);
     RigData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RigData>();
-    tmpData.Equipped = (bool)item.GetDefaultValueOfMutableProperty("equipped");
+    // tmpData.Equipped = (bool)item.GetDefaultValueOfMutableProperty("equipped");
     clothes.Add(tmpData);
   }
 
   private void PopulatePerksDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating perk data for ", item.definition.displayName);
+    // MyDebug.Log("Populating perk data for ", item.definition.displayName);
     activePerksTypes.Add(item.definition);
     PerkData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<PerkData>();
     activePerks.Add(tmpData);
@@ -221,7 +220,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
   private void PopulateAbilityDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating ability data for ", item.definition.displayName);
+    // MyDebug.Log("Populating ability data for ", item.definition.displayName);
     abilitiesTypes.Add(item.definition);
     AbilityData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<AbilityData>();
     abilities.Add(tmpData);
@@ -229,7 +228,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
 
   private void PopulateRelicDataFromInventoryItem(InventoryItem item)
   {
-    MyDebug.Log("Populating ability data for ", item.definition.displayName);
+    // MyDebug.Log("Populating relic data for ", item.definition.displayName);
     relicsTypes.Add(item.definition);
     RelicData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RelicData>();
     relics.Add(tmpData);

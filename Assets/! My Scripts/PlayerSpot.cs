@@ -53,7 +53,8 @@ namespace Workbench.ProjectDilemma
     public PerkActivator operatePerk;
     public AbilityActivator magnifyingGlass;
     public QuestActivator questActivator;
-    public BankActivator bankActivator;
+    public RelicActivator relicActivator;
+    public ExtrasActivator extrasActivator;
     public OutfitLoader outfitLoader;
     [HorizontalLine(color: EColor.White)]
     public Transform character;

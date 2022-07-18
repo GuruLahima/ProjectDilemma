@@ -81,7 +81,7 @@ namespace GuruLaghima.ProjectDilemma
 
     private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
-      UpdateInventory();
+      UpdateInventory(); // idk why this was here. probably needs to be deleted. or maybe? nah.
     }
 
     /// <summary>
@@ -90,6 +90,16 @@ namespace GuruLaghima.ProjectDilemma
     private void OnDisable()
     {
       UnsubscribeFromGameFoundationEvents();
+    }
+
+    private void Update()
+    {
+      // This flag will be set to true when something has changed in the InventoryManager (either items were added or removed)
+      if (m_InventoryChanged)
+      {
+        UpdateInventory();
+        m_InventoryChanged = false;
+      }
     }
     #endregion
 
@@ -108,6 +118,10 @@ namespace GuruLaghima.ProjectDilemma
     }
 
     /// <summary>
+    /// Flag for whether the Inventory has changes in it that have not yet been updated in the UI.
+    /// </summary>
+    private bool m_InventoryChanged;
+    /// <summary>
     /// Listener for changes in GameFoundationSdk.inventory. Will get called whenever an item is added or removed.
     /// Because many items can get added or removed at a time, we will have the listener only set a flag
     /// that changes exist, and on our next update, we will check the flag to see whether changes to the UI
@@ -116,7 +130,8 @@ namespace GuruLaghima.ProjectDilemma
     /// <param name="itemChanged">This parameter will not be used, but must exist so the signature is compatible with the inventory callbacks so we can bind it.</param>
     private void OnInventoryItemChanged(InventoryItem itemChanged)
     {
-      UpdateInventory();
+      m_InventoryChanged = true;
+      // UpdateInventory();
     }
 
     void UpdateInventory()
@@ -142,6 +157,13 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public methods
 
+    [ContextMenu("Create Item")]
+
+    public void CreateItem()
+    {
+      AddItem("cosmetic_bearMask");
+    }
+
     /// <summary>
     /// Adds a single item to the main inventory.
     /// </summary>
@@ -151,7 +173,10 @@ namespace GuruLaghima.ProjectDilemma
       {
         // This will create a new item inside the InventoryManager.
         var itemDefinition = GameFoundationSdk.catalog.Find<InventoryItemDefinition>(itemDefinitionKey);
-        GameFoundationSdk.inventory.CreateItem(itemDefinition);
+        MyDebug.Log("UpgraderView:: creating item", itemDefinition.displayName);
+        InventoryItem tempRef = GameFoundationSdk.inventory.CreateItem(itemDefinition);
+        MyDebug.Log("UpgraderView:: created item", tempRef.definition.key);
+
       }
       catch (Exception exception)
       {
@@ -233,6 +258,24 @@ namespace GuruLaghima.ProjectDilemma
       {
         OnGameFoundationException(exception);
       }
+    }
+
+    public List<InventoryItemDefinition> FetchItemTypesByRarity(ItemRarity rarity, string tag = "")
+    {
+      List<InventoryItemDefinition> matchingItemTypes = new List<InventoryItemDefinition>();
+      GameFoundationSdk.catalog.FindItems(GameFoundationSdk.tags.Find(tag), matchingItemTypes);
+      return matchingItemTypes.FindAll((itemType =>
+      {
+        if (itemType.HasStaticProperty("ingame_ScriptableObject"))
+        {
+          Property prop = itemType.GetStaticProperty("ingame_ScriptableObject");
+          ItemData itemD = prop.AsAsset<ItemData>();
+          if (itemD)
+            if (itemD.Rarity == rarity)
+              return true;
+        }
+        return false;
+      }));
     }
 
     #endregion

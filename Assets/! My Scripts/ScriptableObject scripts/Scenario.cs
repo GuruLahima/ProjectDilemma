@@ -20,9 +20,13 @@ namespace Workbench.ProjectDilemma
     // alwyays randomly chosen
     public List<OwnableDeathSequence> defaultBothCooperateSequences = new List<OwnableDeathSequence>();
 
+
     public ValidationSystem<RelicData> HighestRelicTierQualification(float value) => this.scenarioSpecificRelicTiers.Where((x) => x.MinimumBetMultiplier <= value).Max();
 
+    [HorizontalLine]
     public List<ValidationSystem<RelicData>> scenarioSpecificRelicTiers = new List<ValidationSystem<RelicData>>();
 
+    [HorizontalLine]
+    public List<BonusModifiersWrapper> scenarioBonusModifiers = new List<BonusModifiersWrapper>();
   }
 }

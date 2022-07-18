@@ -22,12 +22,16 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public InventoryView parentView;
   public NewItemsTracker notificationHandler;
   public RecyclerView recyclerView;
+  public UpgraderView upgraderView;
+  public RelicView relicView;
   #endregion
 
   #region public fields 
   public bool usesRadialMenu = false;
   public List<DictWrapper<MMFeedbacks>> feedbacks = new List<DictWrapper<MMFeedbacks>>();
   public bool usedInRecycler;
+  public bool usedForUpgrader;
+  public bool usedByRelics;
   #endregion
 
   #region exposed fields
@@ -65,9 +69,18 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
       recyclerView.ItemSelected(this);
       return;
     }
+    if (usedForUpgrader)
+    {
+      upgraderView.ItemSelected(this);
+      return;
+    }
     if (usesRadialMenu)
     {
       ShowRadialMenu();
+    }
+    if (usedByRelics)
+    {
+      relicView.ItemSelected(this);
     }
     else
     {
@@ -87,11 +100,11 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   }
   public void Equip(bool equip)
   {
+    //don't do anything if we have already equipped this item
     if (parentView.mustHaveOneEquippedAtAllTimes)
-    {
-      if (parentView.equippedItem == this)
-        return;
-    }
+      if (parentView.equippedItem)
+        if (parentView.equippedItem.whoDis == whoDis)
+          return;
 
     // if this is a clothing item add it to character 
     if (GetComponentInChildren<ClothingPlaceholder>().Clothing && equip)
@@ -105,15 +118,27 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     // if only one item of this type can be equipped then unequip the previously equipped one.
     if (parentView.onlyOneItemPerInventory)
     {
-      parentView.UnequipPreviousitem();
-      if (equip)
-        parentView.equippedItem = this;
+      if (parentView.equippedItem)
+        if (parentView.equippedItem.whoDis != whoDis)
+        {
+          parentView.UnequipPreviousitem();
+          if (equip)
+            parentView.equippedItem = this;
+        }
     }
 
     if (equip)
+    {
+      // MyDebug.Log("Equipping OnEquipped", whoDis.Key);
+
       OnEquipped?.Invoke();
+    }
     else
+    {
+      // MyDebug.Log("Equipping OnUnquipped", whoDis.Key);
+
       OnUnequipped?.Invoke();
+    }
   }
 
   public void SetItemData(ItemData inventoryItemType)

@@ -20,7 +20,6 @@ public class NewItemsTracker : MonoBehaviour
     }
     set
     {
-      MyDebug.Log("new items in " + this.name, value);
       if (value <= 0)
       {
         if (inventoryNotification)

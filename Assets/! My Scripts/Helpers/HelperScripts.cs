@@ -12,6 +12,10 @@ namespace GuruLaghima
 {
   public class HelperFunctions
   {
+    public static T ChooseRandomItemFromCollection<T>(List<T> list)
+    {
+      return list[UnityEngine.Random.Range(0, list.Count)];
+    }
 
     public static bool ValidateCollectedData(object[] args)
     {

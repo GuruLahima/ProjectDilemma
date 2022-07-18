@@ -114,6 +114,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] string debugScenario;
 
     [SerializeField] bool loadDebugScenario = false;
+    [SerializeField] GameObject garageButtonNotification;
     #endregion
 
     #region Private Fields
@@ -249,6 +250,13 @@ namespace Workbench.ProjectDilemma
 
       // disable outlines of garage objects
       cakeslice.Outline.eraseRendererGlobal = true;
+
+      // if player has already entered garage don't show notification for garage button
+      if (PlayerPrefs.GetInt("has_entered_garage", 0) == 1)
+      {
+        garageButtonNotification.SetActive(false);
+      }
+
     }
 
     bool muted;
@@ -400,7 +408,10 @@ namespace Workbench.ProjectDilemma
         hideMenuFeedbacks.PlayFeedbacks();
     }
 
-
+    public void EnteredGarage()
+    {
+      PlayerPrefs.SetInt("has_entered_garage", 1);
+    }
 
     #endregion
 
@@ -646,6 +657,30 @@ namespace Workbench.ProjectDilemma
       return temphashtable;
     }
 
+
+    public static int CalcCurrentLevel()
+    {
+      // xp
+      Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
+      int xp = (int)GameFoundationSdk.wallet.Get(xpAsCurrency);
+      int accumulatedLevelThreshold = 0;
+      int currentLevel = 0;
+      int currentLevelThreshold = 0;
+      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
+      {
+        currentLevelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
+        accumulatedLevelThreshold += currentLevelThreshold;
+        if (xp >= accumulatedLevelThreshold)
+        {
+          currentLevel = i;
+        }
+        else
+        {
+          break;
+        }
+      }
+      return currentLevel;
+    }
 
     private void InitializeCardDetals()
     {

@@ -423,7 +423,8 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.operatePerk.Init();
       localPlayerSpot.outfitLoader.Init();
       localPlayerSpot.questActivator.Init();
-      localPlayerSpot.bankActivator.Init();
+      localPlayerSpot.relicActivator.Init();
+      localPlayerSpot.extrasActivator.Init();
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -463,6 +464,9 @@ namespace Workbench.ProjectDilemma
       }
       MyDebug.Log("otherPlayerPoints", otherPlayerPoints.ToString());
       otherPlayerPointsCounter.Text.text = otherPlayerPoints.ToString();
+
+      //
+      GameEvents.OnScenario?.Invoke(ScenarioManager.instance.thisScenario);
 
       if (PhotonNetwork.IsConnected)
       {
@@ -977,6 +981,10 @@ namespace Workbench.ProjectDilemma
 
       // stop game sequence
       StopCoroutine(gameSequence.rootCoroutine);
+
+      // consider it as another end of discussion phase
+      DiscussionEnded?.Invoke();
+      DiscussionEndedUnityEvent?.Invoke();
 
       // run postgame screen sequence
       postGameSequence.rootCoroutine = postGameSequence.RunSequence(this);

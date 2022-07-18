@@ -39,6 +39,7 @@ namespace GuruLaghima.ProjectDilemma
 
     [SerializeField] UnityEvent OnItemSelected;
     [SerializeField] UnityEvent OnItemRecycled;
+    [SerializeField] UnityEvent OnRecyclerUnlocked;
     #endregion
 
     #region property keys
@@ -53,7 +54,17 @@ namespace GuruLaghima.ProjectDilemma
     #endregion
 
     #region Monobehaviors
+    private void Start()
+    {
 
+      // unlock recycler only if unlocking level has been reached
+      GameParameter starterPack = GameFoundationSdk.catalog.Find<GameParameter>(ProjectDilemmaCatalog.GameParameters.recycler_unlock_level.key);
+      bool unlocked = LauncherScript.CalcCurrentLevel() >= starterPack[ProjectDilemmaCatalog.GameParameters.recycler_unlock_level.StaticProperties.unlock_level];
+      if (unlocked)
+      {
+        OnRecyclerUnlocked?.Invoke();
+      }
+    }
     #endregion
 
     #region public methods
@@ -73,13 +84,13 @@ namespace GuruLaghima.ProjectDilemma
 
     public void Recycle()
     {
-      // receive the reward
+      // receive the reward (duplicates count x currency reward per item)
       Currency m_CoinDefinition = GameFoundationSdk.catalog.Find<Currency>(ProjectDilemmaCatalog.Currencies.currency_dilemmaPoints.key);
       GameFoundationSdk.wallet.Add(m_CoinDefinition, (long)(this.selectedItem.whoDis.recyclingRewardAmount * this.selectedItem.whoDis.AmountOwned));
 
       MyDebug.Log("New amount", GameFoundationSdk.wallet.Get(m_CoinDefinition));
 
-      // discard one copy of the object. wait, how do we tell how any copies we want discarded? or all duplicates?
+      // discard duplicates
       ItemList duplicates = GameFoundationSdk.inventory.CreateList();
       int someInt = GameFoundationSdk.inventory.FindItems(this.selectedItem.whoDis.inventoryitemDefinition, duplicates, true);
       if (duplicates.Count > 1)

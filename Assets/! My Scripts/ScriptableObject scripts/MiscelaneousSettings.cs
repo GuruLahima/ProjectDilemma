@@ -49,6 +49,15 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   [Header("Sound")]
   public AudioMixerGroup defaultSFXMixerGroup;
 
+  [Header("Upgrader settings")]
+  public Sprite upgrader_mistery_mask_image;
+  public Sprite upgrader_mistery_chest_image;
+  public Sprite upgrader_mistery_pants_image;
+  public Sprite upgrader_mistery_shoes_image;
+  public Sprite upgrader_mistery_gloves_image;
+  public Sprite upgrader_mistery_random_item_image;
+
+
 #if UNITY_EDITOR
   [MenuItem("CONTEXT/MiscelaneousSettings/Reset (Custom)")]
   static void CustomReset(MenuCommand command)

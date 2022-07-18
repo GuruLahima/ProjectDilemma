@@ -168,10 +168,10 @@ namespace Workbench.ProjectDilemma
       }
       bonusAdded = true;
 
-      ObjectiveData.BonusModifiersWrapper[] mod = ownedPerk.GetBonusModifiers(condition);
-      foreach (ObjectiveData.BonusModifiersWrapper pm in mod)
+      BonusModifiersWrapper[] mod = ownedPerk.GetBonusModifiers(condition);
+      foreach (BonusModifiersWrapper pm in mod)
       {
-        BonusModifierManager.Instance.AddModifier(pm.ModifierKey, pm.GetValue());
+        BonusModifierManager.Instance.AddModifier(pm);
       }
     }
     #endregion

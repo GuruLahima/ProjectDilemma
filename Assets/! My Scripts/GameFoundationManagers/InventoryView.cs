@@ -74,8 +74,19 @@ namespace GuruLaghima.ProjectDilemma
 
     #region exposed fields
     [SerializeField] bool usedForRecycler;
+    [SerializeField] bool usedInUpgrader;
+    [SerializeField] bool usedByRelics;
     [ShowIf("usedForRecycler")]
     [SerializeField] RecyclerView recyclerView;
+    [ShowIf("usedInUpgrader")]
+    [SerializeField] UpgraderView upgraderView;
+    [ShowIf("usedByRelics")]
+    [SerializeField] RelicView relicView;
+    [HideIf("showEquipedOnly")]
+    [SerializeField] bool showUnequipedOnly;
+    [HideIf("showUnequipedOnly")]
+    [SerializeField] bool showEquipedOnly;
+    [SerializeField] bool ownedOnly;
 
     #endregion
 
@@ -315,9 +326,8 @@ namespace GuruLaghima.ProjectDilemma
     /// <summary>
     /// This will fill out the main text box with information about the main inventory.
     /// </summary>
-    private void RefreshUI()
+    public void RefreshUI()
     {
-
       ClearUI();
 
       PopulateUI();
@@ -327,33 +337,37 @@ namespace GuruLaghima.ProjectDilemma
     private void PopulateUI()
     {
       MyDebug.Log("Updating Inventory UI");
+      if (itemTag == "")
+      {
+        itemTag = itemType.ToString();
+      }
       List<ItemData> tempList = new List<ItemData>();
       // Loop through every type of item within the inventory and display its name and quantity.
       List<InventoryItemDefinition> allClothesDefinitions = new List<InventoryItemDefinition>();
       GameFoundationSdk.catalog.FindItems<InventoryItemDefinition>(GameFoundationSdk.tags.Find(Keys.CLOTHES_TAG), allClothesDefinitions);
       switch (itemType)
       {
-        case InventoryData.ItemType.Emotes:
+        case InventoryData.ItemType.emotes:
           MyDebug.Log("Updating Emotes");
           PopulateUIForItemType(itemTag, InventoryData.Instance.emotes);
           break;
-        case InventoryData.ItemType.Throwables:
+        case InventoryData.ItemType.throwables:
           MyDebug.Log("Updating Throwables");
           PopulateUIForItemType(itemTag, InventoryData.Instance.throwables);
           break;
-        case InventoryData.ItemType.Clothes:
+        case InventoryData.ItemType.cosmetics:
           MyDebug.Log("Updating Clothes");
           PopulateUIForItemType(itemTag, InventoryData.Instance.clothes);
           break;
-        case InventoryData.ItemType.ActivePerks:
+        case InventoryData.ItemType.perks:
           MyDebug.Log("Updating perks");
           PopulateUIForItemType(itemTag, InventoryData.Instance.activePerks);
           break;
-        case InventoryData.ItemType.Abilities:
+        case InventoryData.ItemType.abilities:
           MyDebug.Log("Updating abilities");
           PopulateUIForItemType(itemTag, InventoryData.Instance.abilities);
           break;
-        case InventoryData.ItemType.Relics:
+        case InventoryData.ItemType.relics:
           MyDebug.Log("Updating relics");
           PopulateUIForItemType(itemTag, InventoryData.Instance.relics);
           break;
@@ -365,11 +379,27 @@ namespace GuruLaghima.ProjectDilemma
 
     void PopulateUIForItemType(string itemType, IEnumerable<ItemData> itemList)
     {
+      MyDebug.Log("itemList for item type " + itemType, " has " + itemList.Count() + " items");
+      foreach (ItemData inventoryItemType in itemList)
+      {
+        MyDebug.Log("inventoryItemType ", inventoryItemType.Key);
+        MyDebug.Log("itemType ", itemType);
+        MyDebug.Log("has tag " + itemType, inventoryItemType.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)));
+      }
       foreach (ItemData inventoryItemType in itemList.Where((obj) => { return itemType == "" ? true : obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
       {
         if (usedForRecycler)
           if (inventoryItemType.AmountOwned < 2)
             continue;
+        if (usedInUpgrader)
+          if (inventoryItemType.AmountOwned < inventoryItemType.amountNeededTorUpgrade)
+            continue;
+        if (showUnequipedOnly && inventoryItemType.Equipped)
+          continue;
+        if (showEquipedOnly && !inventoryItemType.Equipped)
+          continue;
+        if (ownedOnly && !inventoryItemType.Owned)
+          continue;
         InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
         newItem.parentView = this;
         newItem.notificationHandler = this.GetComponent<NewItemsTracker>();
@@ -403,6 +433,18 @@ namespace GuruLaghima.ProjectDilemma
           newItem.usedInRecycler = true;
           newItem.recyclerView = this.recyclerView;
         }
+        // if this view is used for the recycler feature then this item should have the information to which object to send data about itself
+        if (usedInUpgrader)
+        {
+          newItem.usedForUpgrader = true;
+          newItem.upgraderView = this.upgraderView;
+        }
+        if (usedByRelics)
+        {
+          newItem.usedByRelics = true;
+          newItem.relicView = this.relicView;
+        }
+
         if (newItem.GetComponentInChildren<ClothingPlaceholder>())
           newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
         inventoryItems.Add(newItem);

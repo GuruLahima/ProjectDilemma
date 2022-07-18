@@ -24,8 +24,9 @@ public class ObjectiveData : ItemData
     return new BonusModifiersWrapper[0];
   }
   #endregion
-
-  #region Class Definition
+}
+namespace Workbench.ProjectDilemma
+{
   [System.Serializable]
   public class BonusModifiersConditionWrapper
   {
@@ -36,6 +37,7 @@ public class ObjectiveData : ItemData
   public class BonusModifiersWrapper
   {
     public BonusModifierData ModifierKey;
+    public UpgradeData UpgradeableBy;
 
     public float ModifierValueFloat;
     public bool ModifierValueBool;
@@ -53,7 +55,6 @@ public class ObjectiveData : ItemData
       };
     }
   }
-  #endregion
 }
 public enum ObjectiveCondition
 {

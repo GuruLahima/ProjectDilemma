@@ -30,6 +30,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class ability_magnifyingGlass
@@ -45,6 +46,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class throwable_egg
@@ -59,6 +61,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class throwable_rose
@@ -73,6 +76,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class throwable_waterbaloon
@@ -87,6 +91,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class throwable_tomato
@@ -101,6 +106,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class throwable_cupcake
@@ -115,6 +121,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class emote_angry
@@ -134,6 +141,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class emote_flex
@@ -153,6 +161,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class emote_cry
@@ -172,6 +181,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class emote_kiss
@@ -191,6 +201,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_bearMask
@@ -205,6 +216,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_cargoPants
@@ -219,6 +231,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_dobermanMask
@@ -233,6 +246,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_hoodie
@@ -247,6 +261,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_jeans
@@ -261,6 +276,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_jockJacker
@@ -275,6 +291,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_motorcycleJacket
@@ -289,6 +306,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_owlMask
@@ -303,6 +321,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_pufferJacket
@@ -317,6 +336,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_rabbitMask
@@ -331,6 +351,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_rainCoat
@@ -345,6 +366,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_shorts
@@ -359,6 +381,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class cosmetic_trainerPants
@@ -373,6 +396,7 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
         public class perk_doubleDown
@@ -387,6 +411,262 @@ public class ProjectDilemmaCatalog
             public class Properties
             {
                 public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_gambit
+        {
+            public const string key = "perk_gambit";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_magicEightball
+        {
+            public const string key = "perk_magicEightball";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_mirageOfFortune
+        {
+            public const string key = "perk_mirageOfFortune";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_parallelInfusion
+        {
+            public const string key = "perk_parallelInfusion";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_safeGuard
+        {
+            public const string key = "perk_safeGuard";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_theFool
+        {
+            public const string key = "perk_theFool";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_vigorousMind
+        {
+            public const string key = "perk_vigorousMind";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class perk_wheelOfFortune
+        {
+            public const string key = "perk_wheelOfFortune";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_deerMask
+        {
+            public const string key = "cosmetic_deerMask";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_defaultMask
+        {
+            public const string key = "cosmetic_defaultMask";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_defaultPants
+        {
+            public const string key = "cosmetic_defaultPants";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_kingpinVest
+        {
+            public const string key = "cosmetic_kingpinVest";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_kingpinMask
+        {
+            public const string key = "cosmetic_kingpinMask";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_kingpinPants
+        {
+            public const string key = "cosmetic_kingpinPants";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_kingpinGloves
+        {
+            public const string key = "cosmetic_kingpinGloves";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class cosmetic_kingpinShoes
+        {
+            public const string key = "cosmetic_kingpinShoes";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class relic_basicRelic
+        {
+            public const string key = "relic_basicRelic";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
             }
         }
     }
@@ -427,6 +707,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_bunchOfCupcakes
@@ -437,6 +718,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_bouquetOfRoses
@@ -447,6 +729,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_boxOfWaterBaloons
@@ -457,6 +740,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_bagOfTomatoes
@@ -467,6 +751,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_xp
@@ -477,6 +762,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class waveEmote
@@ -487,6 +773,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_bearMask
@@ -497,6 +784,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_rabbitMask
@@ -507,6 +795,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_dobermanMask
@@ -517,6 +806,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_owlMask
@@ -527,6 +817,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_hoodie
@@ -537,6 +828,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_jockJacket
@@ -547,6 +839,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_motorcycleJacket
@@ -557,6 +850,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_pufferJacket
@@ -567,6 +861,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_raincoat
@@ -577,6 +872,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_jeans
@@ -587,6 +883,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_cargoPants
@@ -597,6 +894,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_shorts
@@ -607,6 +905,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_trainerPants
@@ -617,6 +916,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_angry
@@ -627,6 +927,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_cry
@@ -637,6 +938,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_flex
@@ -647,6 +949,7 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
         public class transaction_kiss
@@ -657,6 +960,18 @@ public class ProjectDilemmaCatalog
                 public const string transaction_icon = "transaction_icon";
                 public const string item_icon = "item_icon";
                 public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
+            }
+        }
+        public class transaction_deerMask
+        {
+            public const string key = "transaction_deerMask";
+            public class StaticProperties
+            {
+                public const string transaction_icon = "transaction_icon";
+                public const string item_icon = "item_icon";
+                public const string promotion_badge = "promotion_badge";
+                public const string repeatable = "repeatable";
             }
         }
     }
@@ -669,5 +984,21 @@ public class ProjectDilemmaCatalog
     }
     public class GameParameters
     {
+        public class recycler_unlock_level
+        {
+            public const string key = "recycler_unlock_level";
+            public class StaticProperties
+            {
+                public const string unlock_level = "unlock_level";
+            }
+        }
+        public class upgrader_unlock_level
+        {
+            public const string key = "upgrader_unlock_level";
+            public class StaticProperties
+            {
+                public const string unlock_level = "unlock_level";
+            }
+        }
     }
 }

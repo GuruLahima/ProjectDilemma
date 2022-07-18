@@ -33,9 +33,10 @@ public class ItemData : ScriptableObject
   // for handling shop population, if item should not show up
   public bool ShowInShop = true;
   [HorizontalLine]
-  // how much does this item give when recycled
   public ItemRarity Rarity;
+  // how much does this item give when recycled
   public float recyclingRewardAmount = 10f;
+  public int amountNeededTorUpgrade;
 
 
   [ShowAssetPreview]
@@ -51,7 +52,7 @@ public class ItemData : ScriptableObject
     set
     {
       _activatedCardQuest = value;
-      Debug.Log((_activatedCardQuest ? "Added quest for: " : "Removed quest for: ") + (RewardData != null ? RewardData.name : "empty"));
+      // Debug.Log((_activatedCardQuest ? "Added quest for: " : "Removed quest for: ") + (RewardData != null ? RewardData.name : "empty"));
     }
   }
   [Foldout("Earning this item")]
@@ -60,4 +61,4 @@ public class ItemData : ScriptableObject
   public RewardData RewardData;
 }
 
-public enum ItemRarity : byte { None = default, Common = 0, Uncommon = 1, Rare = 2, VeryRare = 3, Epic = 4, Legendary = 5, Unique = 6 }
+public enum ItemRarity : byte { Common = 0, Uncommon = 1, Rare = 2, VeryRare = 3, Epic = 4, Legendary = 5, Unique = 6 }
