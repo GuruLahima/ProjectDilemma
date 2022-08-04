@@ -48,10 +48,10 @@ namespace Workbench.ProjectDilemma
     public Image deathBookRightPage;
     public DeathSequence_UI_Item deathItemPrefab;
     [HorizontalLine(color: EColor.White)]
-    public ThrowablesActivator projectileThrow;
-    public EmoteActivator playerEmote;
-    public PerkActivator operatePerk;
-    public AbilityActivator magnifyingGlass;
+    public ThrowablesActivator throwablesActivator;
+    public EmoteActivator emoteActivator;
+    public PerkActivator perkActivator;
+    public AbilityActivator abilityActivator;
     public QuestActivator questActivator;
     public RelicActivator relicActivator;
     public ExtrasActivator extrasActivator;
@@ -62,6 +62,7 @@ namespace Workbench.ProjectDilemma
     public int[] clothesId;
 
     [HideInInspector] public bool playerLoaded;
+    [HideInInspector] public bool playerVotedExtraTime;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]

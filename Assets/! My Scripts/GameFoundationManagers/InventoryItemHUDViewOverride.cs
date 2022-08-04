@@ -16,27 +16,32 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
 {
   #region references
 
+  [Header("UI stuff")]
   public GameObject notificationIcon;
+  public GameObject quantityTextFieldParent;
+  public Image rarityGraphic;
+  [SerializeField] TextMeshProUGUI title;
+  [Header("References")]
   public ItemData whoDis;
-
   public InventoryView parentView;
   public NewItemsTracker notificationHandler;
   public RecyclerView recyclerView;
-  public UpgraderView upgraderView;
+  public CombinerView combinerView;
   public RelicView relicView;
+  public BookView bookView;
   #endregion
 
   #region public fields 
   public bool usesRadialMenu = false;
   public List<DictWrapper<MMFeedbacks>> feedbacks = new List<DictWrapper<MMFeedbacks>>();
   public bool usedInRecycler;
-  public bool usedForUpgrader;
+  public bool usedForCombiner;
   public bool usedByRelics;
+  public bool usedByBook;
   #endregion
 
   #region exposed fields
 
-  [SerializeField] TextMeshProUGUI title;
   public MMFeedbacks notificationPopFeedback;
   #endregion
 
@@ -62,6 +67,14 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     title.text = text;
   }
 
+  public void HandleHover()
+  {
+    if (usedByBook)
+    {
+      bookView.ItemHovered(this);
+    }
+  }
+
   public void HandleClick()
   {
     if (usedInRecycler)
@@ -69,14 +82,19 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
       recyclerView.ItemSelected(this);
       return;
     }
-    if (usedForUpgrader)
+    if (usedForCombiner)
     {
-      upgraderView.ItemSelected(this);
+      combinerView.ItemSelected(this);
       return;
     }
     if (usesRadialMenu)
     {
       ShowRadialMenu();
+    }
+    if (usedByBook)
+    {
+      bookView.ItemSelected(this);
+      return;
     }
     if (usedByRelics)
     {
@@ -101,30 +119,35 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public void Equip(bool equip)
   {
     //don't do anything if we have already equipped this item
-    if (parentView.mustHaveOneEquippedAtAllTimes)
-      if (parentView.equippedItem)
-        if (parentView.equippedItem.whoDis == whoDis)
-          return;
+    // if (parentView.mustHaveOneEquippedAtAllTimes)
+    //   if (parentView.equippedItem)
+    //     if (parentView.equippedItem.whoDis == whoDis)
+    //       return;
 
     // if this is a clothing item add it to character 
-    if (GetComponentInChildren<ClothingPlaceholder>().Clothing && equip)
+    if (GetComponentInChildren<ClothingPlaceholder>())
     {
-      GetComponentInChildren<ClothingPlaceholder>().AddToCharacter();
+      if (GetComponentInChildren<ClothingPlaceholder>().Clothing && equip)
+      {
+        GetComponentInChildren<ClothingPlaceholder>().AddToCharacter();
+      }
     }
+
 
     if (InventoryData.Instance)
       InventoryData.Instance.Equip(whoDis, equip);
 
-    // if only one item of this type can be equipped then unequip the previously equipped one.
-    if (parentView.onlyOneItemPerInventory)
+    if (equip)
     {
-      if (parentView.equippedItem)
-        if (parentView.equippedItem.whoDis != whoDis)
-        {
-          parentView.UnequipPreviousitem();
-          if (equip)
-            parentView.equippedItem = this;
-        }
+      // MyDebug.Log("AddCLothing:: Equipping", this.whoDis.name);
+      // if only one item of this type can be equipped then unequip the previously equipped one.
+      if (parentView.onlyOneItemPerInventory)
+        if (parentView.equippedItem)
+          if (parentView.equippedItem.whoDis != whoDis)
+            parentView.UnequipPreviousitem();
+
+      // record this item as the last equipped item
+      parentView.equippedItem = this;
     }
 
     if (equip)

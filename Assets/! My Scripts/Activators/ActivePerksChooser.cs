@@ -69,9 +69,9 @@ public class ActivePerksChooser : MonoBehaviour
 
   void PopulatePerkCardFromData(Image cardIcon, TextMeshProUGUI cardDesc, TextMeshProUGUI cardTitle, Button cardButton, ItemData cardData)
   {
-    cardIcon.sprite = card_3_Data.ico;
-    cardDesc.text = (string)card_3_Data.inventoryitemDefinition.GetStaticProperty("description");
-    cardTitle.text = (string)card_3_Data.inventoryitemDefinition.displayName;
+    cardIcon.sprite = cardData.ico;
+    cardDesc.text = (string)cardData.inventoryitemDefinition.GetStaticProperty("description");
+    cardTitle.text = (string)cardData.inventoryitemDefinition.displayName;
     cardButton.onClick.AddListener(() =>
     {
       playerPerkFeature.ownedPerk = (PerkData)cardData;

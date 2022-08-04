@@ -2,10 +2,13 @@ using UnityEngine;
 using NaughtyAttributes;
 using UnityEngine.GameFoundation;
 using Workbench.ProjectDilemma;
+using System.Collections.Generic;
+using GuruLaghima.ProjectDilemma;
 
 [CreateAssetMenu(fileName = "New Item Data", menuName = "Workbench/ScriptableObjects/ItemData", order = 1)]
 public class ItemData : ScriptableObject
 {
+  [Header("Item data")]
 
   [SerializeField] protected bool restoreValuesOnAwake = true;
   public virtual void OnEnable()
@@ -38,6 +41,8 @@ public class ItemData : ScriptableObject
   public float recyclingRewardAmount = 10f;
   public int amountNeededTorUpgrade;
 
+  public List<InventoryView> inventoriesUsingThisItem = new List<InventoryView>();
+
 
   [ShowAssetPreview]
   public Sprite ico;
@@ -61,4 +66,4 @@ public class ItemData : ScriptableObject
   public RewardData RewardData;
 }
 
-public enum ItemRarity : byte { Common = 0, Uncommon = 1, Rare = 2, VeryRare = 3, Epic = 4, Legendary = 5, Unique = 6 }
+public enum ItemRarity : byte { Common = 0, Rare = 1, Epic = 2, Legendary = 3, Unique = 4}

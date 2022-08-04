@@ -7,6 +7,7 @@ using UnityEngine.Audio;
 using System.Collections.Generic;
 using GuruLaghima;
 using System.Linq;
+using System;
 
 [CreateAssetMenu(fileName = "VersionSettingsAsset", menuName = "Workbench/ScriptableObjects/MiscelaneousSettings", order = 1)]
 public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettings>
@@ -57,6 +58,14 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   public Sprite upgrader_mistery_gloves_image;
   public Sprite upgrader_mistery_random_item_image;
 
+  [Header("Item Rarity colors")]
+  public MyGenericDictionary<ItemRarity, Color> dictionaryOfColorsByRarity = new MyGenericDictionary<ItemRarity, Color>();
+
+  public Color GetRarityColor(ItemRarity rarity)
+  {
+
+    return dictionaryOfColorsByRarity.GetItems()[rarity];
+  }
 
 #if UNITY_EDITOR
   [MenuItem("CONTEXT/MiscelaneousSettings/Reset (Custom)")]
@@ -65,5 +74,6 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
     MiscelaneousSettings thisObj = (MiscelaneousSettings)command.context;
     thisObj.Reset();
   }
+
 #endif
 }

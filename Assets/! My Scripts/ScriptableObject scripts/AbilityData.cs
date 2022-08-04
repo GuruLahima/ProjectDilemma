@@ -7,16 +7,11 @@ using Workbench.ProjectDilemma;
 public class AbilityData : ItemData
 {
   #region Public Fields
-  public SelectionMenuContainer Icon;
-  public ObjectiveBase quest;
+  public AbilityBase Ability;
   #endregion
 
   #region Public Methods
 
   #endregion
 
-  #region Class Definition
-
-
-  #endregion
 }

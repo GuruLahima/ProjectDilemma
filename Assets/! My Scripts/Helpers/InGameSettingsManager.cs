@@ -38,7 +38,6 @@ public class InGameSettingsManager : MonoBehaviour
 
   private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
   {
-    MyDebug.Log("Loaded scene", arg0.name);
     LoadSettings();
   }
 
@@ -143,7 +142,7 @@ public class InGameSettingsManager : MonoBehaviour
   void FetchDataFromStorage(InGameSetting setting)
   {
     // 
-    MyDebug.Log("fetch data for setting", setting.settingKey);
+    // MyDebug.Log("fetch data for setting", setting.settingKey);
 
     if (PlayerPrefs.HasKey(setting.settingKey))
     {
@@ -152,17 +151,17 @@ public class InGameSettingsManager : MonoBehaviour
         case ValueType.Float:
           float valf = PlayerPrefs.GetFloat(setting.settingKey, 0);
           setting.settingValue = valf;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.Int:
           int vali = PlayerPrefs.GetInt(setting.settingKey, 0);
           setting.settingValue = vali;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.String:
           string vals = PlayerPrefs.GetString(setting.settingKey, "");
           setting.settingValue = vals;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         default:
           setting.settingValue = null;
@@ -175,15 +174,15 @@ public class InGameSettingsManager : MonoBehaviour
       {
         case ValueType.Float:
           setting.settingValue = setting.defaultValueFloat;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.Int:
           setting.settingValue = setting.defaultValueInt;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         case ValueType.String:
           setting.settingValue = setting.defaultValueString;
-          MyDebug.Log("setting val", setting.settingValue);
+          // MyDebug.Log("setting val", setting.settingValue);
           break;
         default:
           setting.settingValue = null;
@@ -308,7 +307,7 @@ public class InGameSettingsManager : MonoBehaviour
         if (setting.uiElementReference && setting.uiElementReference.GetComponent<HorizontalSelector>())
         {
           int newValue = setting.uiElementReference.GetComponent<HorizontalSelector>().index;
-          MyDebug.Log("saving horizontalselector value", newValue);
+          // MyDebug.Log("saving horizontalselector value", newValue);
           PlayerPrefs.SetInt(setting.settingKey, newValue);
           setting.settingValue = newValue;
         }

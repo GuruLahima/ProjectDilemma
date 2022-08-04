@@ -15,7 +15,7 @@ namespace Workbench.ProjectDilemma
   public class ScenariosManager : SingletonScriptableObject<ScenariosManager>
   {
 
-    [HideInInspector] public List<string> approvedScenariosNames;
+    public List<string> approvedScenariosNames;
 
 
 
@@ -62,7 +62,7 @@ namespace Workbench.ProjectDilemma
         // fetch the GUIDs of all the approved scenes
         string[] approvedFolders = new string[] { approvedScenesPath };
         string[] scenesGUIDs = AssetDatabase.FindAssets("t:scene", approvedFolders);
-        MyDebug.Log("Found " + scenesGUIDs.Length.ToString() + " approved scenearios");
+        MyDebug.Log("Found " + scenesGUIDs.Length.ToString() + " approved scenarios");
 
         if (scenesGUIDs.Length > 0)
         {

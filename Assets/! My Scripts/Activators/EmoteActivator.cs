@@ -56,7 +56,7 @@ namespace Workbench.ProjectDilemma
       if (OnCooldown) return;
       //we are adding cooldown where the animation is played
       // this way we take the duration of the animation
-      AddCooldown();
+
 
       ActiveState = false;
       radialMenu.Deactivate();
@@ -71,8 +71,8 @@ namespace Workbench.ProjectDilemma
           if (container.container is EmoteData)
           {
             emoteSelected = container.container as EmoteData;
-            //AddCooldown(emoteSelected.ApproxDuration); // <== cooldown is added here
-            //StartCoroutine(AnimationDisablesInput(emoteSelected.ApproxDuration));
+            AddCooldown(); //add cooldown only if we select an emote
+            StartCoroutine(AnimationDisablesInput(emoteSelected.ApproxDuration));
             if (PhotonNetwork.IsConnected)
             {
               int viewID = GameMechanic.Instance.localPlayerSpot.GetComponent<PhotonView>().ViewID;
@@ -93,22 +93,8 @@ namespace Workbench.ProjectDilemma
     IEnumerator AnimationDisablesInput(float duration)
     {
       AnimationStart?.Invoke();
-
-      if (!PlayerInputManager.Instance.inputConditions.Contains(ICKeys.EMOTE_PLAYING))
-      {
-        PlayerInputManager.Instance.inputConditions.Add(ICKeys.EMOTE_PLAYING);
-      }
-      else
-      {
-        yield break;
-      }
       yield return new WaitForSeconds(duration);
-      if (PlayerInputManager.Instance.inputConditions.Contains(ICKeys.EMOTE_PLAYING))
-      {
-        PlayerInputManager.Instance.inputConditions.Remove(ICKeys.EMOTE_PLAYING);
-      }
       AnimationEnd?.Invoke();
-
     }
     #endregion
 

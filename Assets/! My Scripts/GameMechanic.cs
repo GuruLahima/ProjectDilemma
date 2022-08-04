@@ -120,6 +120,15 @@ namespace Workbench.ProjectDilemma
     public UnityEvent OnRanOutOfTime;
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent DiscussionEndedUnityEvent;
+
+    [Foldout("End screen references")]
+    public UnityEvent<string> On1StarsEarned;
+    [Foldout("End screen references")]
+    public UnityEvent<string> On2StarsEarned;
+    [Foldout("End screen references")]
+    public UnityEvent<string> On3StarsEarned;
+    [Foldout("End screen references")]
+    public UnityEvent OnAllRewardsClaimed;
     #endregion
 
     #region exposed fields
@@ -134,6 +143,10 @@ namespace Workbench.ProjectDilemma
     [HorizontalLine(color: EColor.White)]
     [SerializeField] public PlayerSpot playerOneSpot;
     [SerializeField] public PlayerSpot playerTwoSpot;
+    [SerializeField] Collider voteExtraTimeButtonP1;
+    [SerializeField] Collider voteExtraTimeButtonP2;
+    [SerializeField] float extraTimeAdded;
+    [SerializeField] float extraTimeDiminishPerVote;
     [HorizontalLine(color: EColor.White)]
     public UnityEvent OnEndOfCinematic;
 
@@ -209,7 +222,23 @@ namespace Workbench.ProjectDilemma
     [SerializeField] GameObject localPlayerDecisionTextSave;
     [HorizontalLine(color: EColor.White)]
     [Foldout("End screen references")]
-    [SerializeField] NumberCounter totalPointsCounter;
+    [SerializeField] ValueCounter coinsCounter;
+    [Foldout("End screen references")]
+    [SerializeField] TextMeshProUGUI coinsCounterText;
+    [Foldout("End screen references")]
+    [SerializeField] ValueCounter experienceCounter;
+    [Foldout("End screen references")]
+    [SerializeField] ValueCounter levelBarCounter;
+    [Foldout("End screen references")]
+    [SerializeField] UnityEngine.UI.Slider experienceSlider;
+    [Foldout("End screen references")]
+    [SerializeField] TextMeshProUGUI levelText;
+    [Foldout("End screen references")]
+    [SerializeField] TextMeshProUGUI experienceText;
+    [Foldout("End screen references")]
+    [SerializeField] float rewardActivationSpeed;
+    [Foldout("End screen references")]
+    [SerializeField] float starActivationSpeed;
     [Foldout("End screen references")]
     [SerializeField] NumberCounter localPlayerPointsCounter;
     [Foldout("End screen references")]
@@ -230,6 +259,21 @@ namespace Workbench.ProjectDilemma
     [SerializeField] TextMeshProUGUI postcardNameField;
     [Foldout("End screen references")]
     [SerializeField] TMP_InputField postcardTextField;
+    [Foldout("End screen references")]
+    [SerializeField] private RewardDisplayPlaceholder placeholderPrefab;
+    [Foldout("End screen references")]
+    [SerializeField] private Transform rewardsDisplayContent;
+    [Foldout("End screen references")]
+    [SerializeField] private TextMeshProUGUI experienceBonusesText;
+    [Foldout("End screen references")]
+    [SerializeField] private TextMeshProUGUI coinsBonusesText;
+    [Foldout("End screen references")]
+    [SerializeField] private string victoryMessageStar;
+    [Foldout("End screen references")]
+    [SerializeField] private string questCompletedMessageStar;
+    [Foldout("End screen references")]
+    [SerializeField] private string perkCompletedMessageStar;
+
 
     #endregion
 
@@ -314,6 +358,8 @@ namespace Workbench.ProjectDilemma
     private Animator activeDeathBookAnimator;
     int decisionsMade;
     private bool inOutcomeSequence;
+    private List<RewardDisplayPlaceholder> listOfRewardPlaceholders = new List<RewardDisplayPlaceholder>();
+    private float discussionTimer; // i extracted this timer because we are modifying it outside the function
     #endregion
 
     #region public methods
@@ -412,19 +458,21 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.killButton.enabled = true;
       localPlayerSpot.saveButton.enabled = true;
       // localPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = true;
-      localPlayerSpot.projectileThrow.canon.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
-      PlayerInputManager.Instance.throwablesActivator = localPlayerSpot.projectileThrow;
-      PlayerInputManager.Instance.emoteActivator = localPlayerSpot.playerEmote;
-      PlayerInputManager.Instance.perkActivator = localPlayerSpot.operatePerk;
-      PlayerInputManager.Instance.abilityActivator = localPlayerSpot.magnifyingGlass;
+      localPlayerSpot.throwablesActivator.canon.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
+      PlayerInputManager.Instance.throwablesActivator = localPlayerSpot.throwablesActivator;
+      PlayerInputManager.Instance.emoteActivator = localPlayerSpot.emoteActivator;
+      PlayerInputManager.Instance.perkActivator = localPlayerSpot.perkActivator;
+      PlayerInputManager.Instance.abilityActivator = localPlayerSpot.abilityActivator;
       // we can maybe use SendMessage to call all of these together, but I will leave it be for now
-      localPlayerSpot.projectileThrow.Init();
-      localPlayerSpot.playerEmote.Init();
-      localPlayerSpot.operatePerk.Init();
-      localPlayerSpot.outfitLoader.Init();
+      localPlayerSpot.throwablesActivator.Init();
+      localPlayerSpot.emoteActivator.Init();
+      localPlayerSpot.perkActivator.Init();
+      // localPlayerSpot.outfitLoader.Init();
       localPlayerSpot.questActivator.Init();
       localPlayerSpot.relicActivator.Init();
       localPlayerSpot.extrasActivator.Init();
+      localPlayerSpot.abilityActivator.Init();
+      localPlayerSpot.outfitLoader.Init();
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -449,7 +497,7 @@ namespace Workbench.ProjectDilemma
       otherPlayerSpot.killButton.enabled = false;
       otherPlayerSpot.saveButton.enabled = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
-      otherPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = false;
+      otherPlayerSpot.throwablesActivator.canon.playerHasControlOverCamera = false;
       if (!PhotonNetwork.IsConnected)
       {
         otherPlayerSpot.outfitLoader.Init();
@@ -839,12 +887,7 @@ namespace Workbench.ProjectDilemma
       ActivateProperModelForEndScreen();
 
       int ourTotalPoints = RewardCalculator.Instance.CalculatePointsAfterOutcome();
-      if (totalPointsCounter)
-      {
-        // we show the total difference of points here (raw)
-        totalPointsCounter.GetComponent<TextMeshProUGUI>().color = (ourTotalPoints >= 0) ? Color.green : Color.red;
-        totalPointsCounter.newAmount = ourTotalPoints;
-      }
+      coinsCounter.newAmount = ourTotalPoints;
       if (BankManager.Instance)
         BankManager.Instance.WalletEvaluate(ourTotalPoints);
       localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
@@ -855,11 +898,65 @@ namespace Workbench.ProjectDilemma
 
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
       int ourTotalXp = RewardCalculator.Instance.CalculateXPAfterOutcome();
+      ourTotalXp += 40; // testing purposes
+
+      int totalRequiredXp = 0; int ourLevel = 0; int lastLevelExperience = 0;
+      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count; i++)
+      {
+        totalRequiredXp += MiscelaneousSettings.Instance.levelsDistribution[i];
+        if (ourTotalXp >= totalRequiredXp)
+        {
+          lastLevelExperience = totalRequiredXp;
+          continue;
+        }
+        else
+        {
+          ourLevel = i;
+          break;
+        }
+      }
+      experienceSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[ourLevel];
+      levelText.text = ourLevel.ToString();
+      experienceText.text = $"{ourTotalXp - lastLevelExperience}/{MiscelaneousSettings.Instance.levelsDistribution[ourLevel]}";
+      experienceCounter.newAmount = ourTotalXp;
+      levelBarCounter.newAmount = ourTotalXp - lastLevelExperience;
       GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
 
       RewardCalculator.Instance.CalculateRewardsAfterOutcome();
       SyncDataToOtherPlayer();
 
+    }
+    public void ClaimReward(RewardDisplayPlaceholder placeholder)
+    {
+      placeholder.rewardData.NewlyAdded = false;
+      placeholder.gameObject.SetActive(false);
+      if (listOfRewardPlaceholders.Contains(placeholder))
+      {
+        listOfRewardPlaceholders.Remove(placeholder);
+      }
+      if (listOfRewardPlaceholders.Count > 0)
+      {
+        listOfRewardPlaceholders[0].gameObject.SetActive(true);
+      }
+      else
+      {
+        OnAllRewardsClaimed?.Invoke();
+      }
+    }
+    public void ClaimRewardAll()
+    {
+      foreach (RewardDisplayPlaceholder placeholder in listOfRewardPlaceholders)
+      {
+        placeholder.rewardData.NewlyAdded = false;
+        placeholder.gameObject.SetActive(false);
+      }
+      listOfRewardPlaceholders.Clear();
+      OnAllRewardsClaimed?.Invoke();
+    }
+
+    public void LevelBar()
+    {
+      levelBarCounter.Value = levelBarCounter.newAmount;
     }
 
     public void ActivateProperModelForEndScreen()
@@ -972,7 +1069,6 @@ namespace Workbench.ProjectDilemma
       }
 
     }
-
     public void OnPlayerDisconnect()
     {
       votingOutcome = Outcome.Won;
@@ -991,6 +1087,21 @@ namespace Workbench.ProjectDilemma
       StartCoroutine(postGameSequence.rootCoroutine);
     }
 
+    public void VoteExtraTime()
+    {
+      if (PhotonNetwork.IsConnected)
+      {
+        RPCManager.Instance.photonView.RPC("RPC_SyncExtraTimeVote", RpcTarget.AllViaServer, localPlayerSpot.GetComponent<PhotonView>().ViewID);
+      }
+      else
+      {
+        localPlayerSpot.playerVotedExtraTime = true;
+        otherPlayerSpot.playerVotedExtraTime = true;
+        GameMechanic.Instance.CheckPlayersVotedExtraTime();
+      }
+
+    }
+
     // normaly we call this function via RPC twice, it fails the first time when only one of the player is loaded
     // and succeeds the second time when both players load.
     public void CheckPlayersLoaded()
@@ -1001,13 +1112,50 @@ namespace Workbench.ProjectDilemma
         {
           MyDebug.Log("Both players have successfuly loaded", Color.green);
           GameEvents.OnBothPlayerLoaded?.Invoke();
+          GameMechanic.Instance.localPlayerSpot.outfitLoader.Init();
         }
         else
         {
           MyDebug.Log("Waiting for both players to load", Color.yellow);
         }
       }
+    }
+    public void CheckPlayersVotedExtraTime()
+    {
+      if (localPlayerSpot && otherPlayerSpot)
+      {
+        if (localPlayerSpot.playerVotedExtraTime && otherPlayerSpot.playerVotedExtraTime)
+        {
+          //reset values for the next vote
+          localPlayerSpot.playerVotedExtraTime = false;
+          otherPlayerSpot.playerVotedExtraTime = false;
+          MyDebug.Log("Both players voted for extra time", Color.green);
+          AddExtraTimeDiscussion();
+          GameEvents.OnVotedExtraTime?.Invoke();
+        }
+        else
+        {
+          MyDebug.Log("Waiting for both players to vote for extra time", Color.yellow);
+        }
+      }
+    }
 
+    public void AddExtraTimeDiscussion()
+    {
+      if (extraTimeAdded <= 0)
+      {
+        return;
+      }
+      discussionTimer += extraTimeAdded;
+      extraTimeAdded -= extraTimeDiminishPerVote;
+      if (extraTimeAdded <= 0)
+      {
+        if (voteExtraTimeButtonP1)
+          voteExtraTimeButtonP1.enabled = false;
+        if (voteExtraTimeButtonP2)
+          voteExtraTimeButtonP2.enabled = false;
+      }
+      localPlayerSpot.gameTimer.ResetTimer(discussionTimer); //
     }
 
     public void SkipOutcomeSequence()
@@ -1038,6 +1186,22 @@ namespace Workbench.ProjectDilemma
     public void ShowOutcomeSequenceWrapper()
     {
       currentCoroutine = OutcomeSequencePhase();
+    }
+    public void StarRewardsSequenceWrapper()
+    {
+      currentCoroutine = StarRewardsCoroutine();
+    }
+    public void ClaimRewardsSequenceWrapper()
+    {
+      currentCoroutine = ClaimRewardsCoroutine();
+    }
+    public void ExperienceRewardsSequenceWrapper()
+    {
+      currentCoroutine = ExperienceRewardsCoroutine();
+    }
+    public void CoinsRewardsSequenceWrapper()
+    {
+      currentCoroutine = CoinsRewardsCoroutine();
     }
     #endregion
 
@@ -1160,17 +1324,17 @@ namespace Workbench.ProjectDilemma
       canChoose = true;
 
       // this phase lasts until time runs out or both players choose
-      float timer = duration;
-      while (!(madeChoice && theyMadeChoice) && timer > 0)
+      discussionTimer = duration;
+      while (!(madeChoice && theyMadeChoice) && discussionTimer > 0)
       {
-        timer -= Time.deltaTime;
+        discussionTimer -= Time.deltaTime;
         yield return null;
       }
 
       canChoose = false;
-      if (timer > 0)
+      if (discussionTimer > 0)
       {
-        GameEvents.OnPlayersChoseTimeLeft?.Invoke(timer);
+        GameEvents.OnPlayersChoseTimeLeft?.Invoke(discussionTimer);
       }
       MyDebug.Log("DiscussionPhase coroutine ended");
 
@@ -1447,10 +1611,117 @@ namespace Workbench.ProjectDilemma
         _deathSequence.ActivateOutcome((DeathSequence.OutcomeSequence)localPlayerSpot.playerSpot);
       }
     }
+    IEnumerator StarRewardsCoroutine()
+    {
+      int stars = 0;
+      if (votingOutcome == Outcome.BothWon || votingOutcome == Outcome.Won)
+      {
+        stars++;
+        ActivateStarEvents(stars, victoryMessageStar);
+        yield return new WaitForSeconds(starActivationSpeed);
+      }
+      if (localPlayerSpot.perkActivator.PerkActivated)
+      {
+        stars++;
+        ActivateStarEvents(stars, perkCompletedMessageStar);
+        yield return new WaitForSeconds(starActivationSpeed);
+      }
+      foreach (RewardData reward in MasterData.Instance.allRewards)
+      {
+        if (reward.NewlyAdded)
+        {
+          stars++;
+          ActivateStarEvents(stars, questCompletedMessageStar);
+          yield return new WaitForSeconds(starActivationSpeed);
+          break;
+        }
+      }
+    }
+    IEnumerator ClaimRewardsCoroutine()
+    {
+      int rewardsObtained = 0;
+      foreach (RewardData reward in MasterData.Instance.allRewards)
+      {
+        if (reward.NewlyAdded)
+        {
+          for (int i = 0; i < reward.AllClaimRewards.Count; i++)
+          {
+            rewardsObtained++;
+            var placeholder = Instantiate(placeholderPrefab, rewardsDisplayContent);
+            placeholder.rewardData = reward;
+            placeholder.Set(reward.AllClaimRewards[i].ClaimRewardText, reward.AllClaimRewards[i].ClaimRewardIcon);
+            listOfRewardPlaceholders.Add(placeholder);
+            if (rewardsObtained > 1)
+            {
+              placeholder.gameObject.SetActive(false);
+            }
+          }
+        }
+      }
+      if (listOfRewardPlaceholders.Count <= 0)
+      {
+        OnAllRewardsClaimed?.Invoke();
+      }
+      yield return new WaitUntil(() => listOfRewardPlaceholders.Count <= 0);
+    }
+    IEnumerator CoinsRewardsCoroutine()
+    {
+      coinsCounterText.color = coinsCounter.newAmount >= 0 ? Color.green : Color.red;
+      coinsCounter.Duration = rewardActivationSpeed + RewardDisplayManager.Instance.CoinsRewards.Count * rewardActivationSpeed - Mathf.Epsilon;
+      coinsCounter.Value = coinsCounter.newAmount;
+      int i = 0;
+      coinsBonusesText.text = "";
+      WaitForSeconds Wait = new WaitForSeconds(rewardActivationSpeed);
+      while (i < RewardDisplayManager.Instance.CoinsRewards.Count)
+      {
+        if (i > 0)
+        {
+          coinsBonusesText.text += "\n";
+        }
+        coinsBonusesText.text += $"{RewardDisplayManager.Instance.CoinsRewards[i]}";
+        i++;
+        yield return Wait;
+      }
+    }
+    IEnumerator ExperienceRewardsCoroutine()
+    {
+      experienceCounter.Duration = rewardActivationSpeed + RewardDisplayManager.Instance.ExperienceRewards.Count * rewardActivationSpeed - Mathf.Epsilon;
+      experienceCounter.Value = experienceCounter.newAmount;
+      int i = 0;
+      experienceBonusesText.text = "";
+      WaitForSeconds Wait = new WaitForSeconds(rewardActivationSpeed);
+      while (i < RewardDisplayManager.Instance.ExperienceRewards.Count)
+      {
+        if (i > 0)
+        {
+          experienceBonusesText.text = "\n";
+        }
+        experienceBonusesText.text += $"{RewardDisplayManager.Instance.ExperienceRewards[i]}";
+        i++;
+        yield return Wait;
+      }
+      yield return new WaitForSeconds(2f);
+    }
     #endregion
 
     #region private methods
-
+    void ActivateStarEvents(int star, string message)
+    {
+      switch (star)
+      {
+        case 1:
+          On1StarsEarned?.Invoke(message);
+          break;
+        case 2:
+          On2StarsEarned?.Invoke(message);
+          break;
+        case 3:
+          On3StarsEarned?.Invoke(message);
+          break;
+        default:
+          break;
+      }
+    }
     void InitVoice()
     {
       localPlayerSpot.GetComponent<PhotonVoiceView>().Init();

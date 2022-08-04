@@ -3,21 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Photon.Pun;
+using System.Linq;
 
 namespace Workbench.ProjectDilemma
 {
   public class AbilityActivator : BaseActivatorComponent
   {
     #region Exposed Private Fields
-    [SerializeField] List<TextMeshProUGUI> recentGames = new List<TextMeshProUGUI>(); //temp
-    [SerializeField] float displayDuration;
-    [Tooltip("The name of the player is added on the end of this message")]
-    [SerializeField] string noInfoMessagePrefix;
-    [Tooltip("The name of the player is added on the start of this message")]
-    [SerializeField] string noInfoMessageSuffix;
+
+    #endregion
+
+    #region Private Fields
+    private AbilityData equipedAbility;
+
+    private AbilityBase _equipedAbilityBase;
     #endregion
 
     #region Public Methods
+    public override void Init()
+    {
+      equipedAbility = InventoryData.Instance.abilities.Find((obj) => { return obj.Owned && obj.Equipped; });
+    }
     /// <summary>
     /// Since this will require things such as getting player's last x games CHOICE and the OUTCOME of the game
     /// I will simply leave an empty panel to show for x seconds and we will re-do this script when everything else is done
@@ -25,41 +31,29 @@ namespace Workbench.ProjectDilemma
     public void Use()
     {
       if (OnCooldown) return;
-      AddCooldown();
 
-      ActiveState = true;
-      string PLAYERNAME;
-      if (PhotonNetwork.IsConnected)
+
+      if (equipedAbility)
       {
-        PLAYERNAME = GameMechanic.Instance.otherPlayerSpot.GetComponent<PhotonView>().Owner.NickName;
+        AddCooldown();
+        ActiveState = true;
+        _equipedAbilityBase = Instantiate(equipedAbility.Ability);
+        _equipedAbilityBase.ActivateAbility();
+        if (PhotonNetwork.IsConnected)
+        {
+          int viewID = GameMechanic.Instance.localPlayerSpot.GetComponent<PhotonView>().ViewID;
+          RPCManager.Instance.photonView.RPC("RPC_AbilityActivated", RpcTarget.AllViaServer, viewID);
+        }
+        else
+        {
+          SYNC_AbilityActivation();
+        }
       }
-      else
-      {
-        PLAYERNAME = GameMechanic.Instance.otherPlayerSpot.name;
-      }
-      for (int i = 0; i < recentGames.Count; i++)
-      {
-        recentGames[i].text = $"{noInfoMessagePrefix} {noInfoMessageSuffix}";
-      }
-      if (PhotonNetwork.IsConnected)
-      {
-        int viewID = GameMechanic.Instance.localPlayerSpot.GetComponent<PhotonView>().ViewID;
-        RPCManager.Instance.photonView.RPC("RPC_MagnifyingGlassActivated", RpcTarget.AllViaServer, viewID);
-      }
-      else
-      {
-        SYNC_MagnifyingGlass();
-      }
-      StartCoroutine(Display());
     }
     #endregion
 
     #region Private Methods
-    IEnumerator Display()
-    {
-      yield return new WaitForSeconds(displayDuration);
-      ActiveState = false;
-    }
+
     #endregion
 
     #region Called by RPC
@@ -67,9 +61,9 @@ namespace Workbench.ProjectDilemma
     /// This method is invoked through an RPC call
     /// <para>Here we can initialize stuff that we want both players to see ex: animations</para>
     /// </summary>
-    public void SYNC_MagnifyingGlass()
+    public void SYNC_AbilityActivation()
     {
-      Debug.Log("RPC TEST MAGNIFYING GLASS");
+      Debug.Log("player has activated ability");
     }
     #endregion
   }

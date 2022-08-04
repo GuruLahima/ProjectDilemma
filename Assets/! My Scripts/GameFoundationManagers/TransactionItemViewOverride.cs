@@ -7,16 +7,17 @@ using UnityEngine.Events;
 using System;
 using GuruLaghima;
 using static Workbench.ProjectDilemma.GameMechanic;
+using Workbench.ProjectDilemma;
 
 public class TransactionItemViewOverride : TransactionItemView
 {
 
   [SerializeField] UnityEvent OnTransactionDisabled;
 
-  private void Awake()
+  private void Start()
   {
+    Invoke("AssignClothingData", 1f);
     Invoke("UpdateVisualStatus", 1f);
-
   }
 
   void UpdateVisualStatus()
@@ -31,6 +32,15 @@ public class TransactionItemViewOverride : TransactionItemView
         // 
         OnTransactionDisabled?.Invoke();
       }
+
+  }
+
+  void AssignClothingData()
+  {
+    if (GetComponentInChildren<ClothingPlaceholder>())
+      if (transaction != null)
+        // if (transaction.payout.GetExchange(0) != null)
+        GetComponentInChildren<ClothingPlaceholder>().Clothing = transaction.payout.GetExchange(0).tradableDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RigData>();
   }
 
   public void RecordTransaction()
@@ -38,6 +48,18 @@ public class TransactionItemViewOverride : TransactionItemView
     if (TransactionsData.Instance)
       TransactionsData.Instance.AddTransaction(this.transaction.key);
   }
+
+  public void Equip()
+  {
+    MyDebug.Log("Trying out store item");
+
+    // if this is a clothing item add it to character 
+    if (GetComponentInChildren<ClothingPlaceholder>().Clothing)
+    {
+      GetComponentInChildren<ClothingPlaceholder>().AddToCharacter();
+    }
+  }
+
 
   public void DisableTransaction()
   {

@@ -74,12 +74,12 @@ namespace GuruLaghima.ProjectDilemma
 
     #region exposed fields
     [SerializeField] bool usedForRecycler;
-    [SerializeField] bool usedInUpgrader;
+    [SerializeField] bool usedInCombiner;
     [SerializeField] bool usedByRelics;
     [ShowIf("usedForRecycler")]
     [SerializeField] RecyclerView recyclerView;
-    [ShowIf("usedInUpgrader")]
-    [SerializeField] UpgraderView upgraderView;
+    [ShowIf("usedInCombiner")]
+    [SerializeField] CombinerView combinerView;
     [ShowIf("usedByRelics")]
     [SerializeField] RelicView relicView;
     [HideIf("showEquipedOnly")]
@@ -236,8 +236,8 @@ namespace GuruLaghima.ProjectDilemma
         if (item)
         {
 
-          MyDebug.Log("Hiding item", item.name);
-          MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Hide").key);
+          // MyDebug.Log("Hiding item", item.name);
+          // MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Hide").key);
           item.feedbacks.Find((obj) => obj.key == "Hide")?.element?.PlayFeedbacks();
         }
       }
@@ -250,8 +250,8 @@ namespace GuruLaghima.ProjectDilemma
         if (item)
         {
 
-          MyDebug.Log("Showing item", item.name);
-          MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Show").key);
+          // MyDebug.Log("Showing item", item.name);
+          // MyDebug.Log("using feedback", item.feedbacks.Find((obj) => obj.key == "Show").key);
           item.feedbacks.Find((obj) => obj.key == "Show")?.element?.PlayFeedbacks();
         }
       }
@@ -270,14 +270,13 @@ namespace GuruLaghima.ProjectDilemma
         radialMenu.Activate();
         if (Input.GetMouseButtonDown(0))
         {
-          // when selection ends
-          // close the radial menu 
-          HideRadialMenuSequence();
           inSelection = false;
-
         }
         yield return null;
       }
+      // when selection ends
+      // close the radial menu 
+      HideRadialMenuSequence();
 
       // save the selected position in the RadialMenuData
       if (radialMenuData.orderedItems.Count > lastSelectedSlot.GetSiblingIndex())
@@ -296,16 +295,32 @@ namespace GuruLaghima.ProjectDilemma
       }
 
     }
-    public void HideRadialMenuSequence()
+
+
+    // we call this from UnityEvent to close the radial menu with Esc
+    public void HideRadialMenu()
     {
       // hide the radial menu only if it is shown
       if (inSelection)
       {
-        StopAllCoroutines();
-        hidingRadialMenuSequence.rootCoroutine = hidingRadialMenuSequence.RunSequence(this);
-        StartCoroutine(hidingRadialMenuSequence.rootCoroutine);
-        inSelection = false;
+        HideRadialMenuSequence();
       }
+    }
+    public void HideRadialMenuSequence()
+    {
+      StopAllCoroutines();
+      hidingRadialMenuSequence.rootCoroutine = hidingRadialMenuSequence.RunSequence(this);
+      StartCoroutine(hidingRadialMenuSequence.rootCoroutine);
+      inSelection = false;
+    }
+
+    public void OnItemEquipped(ItemData item)
+    {
+      if (onlyOneItemPerInventory)
+      {
+        UnequipPreviousitem();
+      }
+      // equippedItem = item;
     }
 
 
@@ -336,7 +351,7 @@ namespace GuruLaghima.ProjectDilemma
     // List<InventoryItemDefinition> addedItemTypes = new List<InventoryItemDefinition>();
     private void PopulateUI()
     {
-      MyDebug.Log("Updating Inventory UI");
+      // MyDebug.Log("Updating Inventory UI");
       if (itemTag == "")
       {
         itemTag = itemType.ToString();
@@ -348,27 +363,27 @@ namespace GuruLaghima.ProjectDilemma
       switch (itemType)
       {
         case InventoryData.ItemType.emotes:
-          MyDebug.Log("Updating Emotes");
+          // MyDebug.Log("Updating Emotes");
           PopulateUIForItemType(itemTag, InventoryData.Instance.emotes);
           break;
         case InventoryData.ItemType.throwables:
-          MyDebug.Log("Updating Throwables");
+          // MyDebug.Log("Updating Throwables");
           PopulateUIForItemType(itemTag, InventoryData.Instance.throwables);
           break;
         case InventoryData.ItemType.cosmetics:
-          MyDebug.Log("Updating Clothes");
+          // MyDebug.Log("Updating Clothes");
           PopulateUIForItemType(itemTag, InventoryData.Instance.clothes);
           break;
         case InventoryData.ItemType.perks:
-          MyDebug.Log("Updating perks");
+          // MyDebug.Log("Updating perks");
           PopulateUIForItemType(itemTag, InventoryData.Instance.activePerks);
           break;
         case InventoryData.ItemType.abilities:
-          MyDebug.Log("Updating abilities");
+          // MyDebug.Log("Updating abilities");
           PopulateUIForItemType(itemTag, InventoryData.Instance.abilities);
           break;
         case InventoryData.ItemType.relics:
-          MyDebug.Log("Updating relics");
+          // MyDebug.Log("Updating relics");
           PopulateUIForItemType(itemTag, InventoryData.Instance.relics);
           break;
         default:
@@ -379,21 +394,32 @@ namespace GuruLaghima.ProjectDilemma
 
     void PopulateUIForItemType(string itemType, IEnumerable<ItemData> itemList)
     {
-      MyDebug.Log("itemList for item type " + itemType, " has " + itemList.Count() + " items");
-      foreach (ItemData inventoryItemType in itemList)
+      // MyDebug.Log("itemList for item type " + itemType, " has " + itemList.Count() + " items");
+
+      /* foreach (ItemData inventoryItemType in itemList)
       {
         MyDebug.Log("inventoryItemType ", inventoryItemType.Key);
         MyDebug.Log("itemType ", itemType);
         MyDebug.Log("has tag " + itemType, inventoryItemType.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)));
-      }
+      } */
+
       foreach (ItemData inventoryItemType in itemList.Where((obj) => { return itemType == "" ? true : obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
       {
-        if (usedForRecycler)
-          if (inventoryItemType.AmountOwned < 2)
-            continue;
-        if (usedInUpgrader)
+
+        /*         if (usedForRecycler) 
+                  if (inventoryItemType.AmountOwned < 2) // ! deprecated (duplicates-only recycling)
+                    continue; */
+        if (usedInCombiner)
+        {
+
           if (inventoryItemType.AmountOwned < inventoryItemType.amountNeededTorUpgrade)
             continue;
+          // if this piece of clothing is part of an outfit don't show it in the combiner view
+          if (((RigData)inventoryItemType).partOfOutfit)
+          {
+            continue;
+          }
+        }
         if (showUnequipedOnly && inventoryItemType.Equipped)
           continue;
         if (showEquipedOnly && !inventoryItemType.Equipped)
@@ -407,9 +433,47 @@ namespace GuruLaghima.ProjectDilemma
         newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
         newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
         newItem.SetItemData(inventoryItemType);
-        newItem.Equip(inventoryItemType.Equipped);
-        newItem.usesRadialMenu = false;
-        if (itemType == "emotes" || itemType == "throwables") newItem.usesRadialMenu = true; else newItem.usesRadialMenu = false;
+        if (newItem.quantityTextField)
+          newItem.quantityTextField.text = inventoryItemType.AmountOwned.ToString();
+        if (newItem.rarityGraphic)
+          newItem.rarityGraphic.color = MiscelaneousSettings.Instance.GetRarityColor(inventoryItemType.Rarity);
+        if (!usedForRecycler && !usedInCombiner)
+          newItem.Equip(inventoryItemType.Equipped);
+        // if emotes and throwables use raidal menu for equipping
+        if (itemType == "emotes" || itemType == "throwables")
+          newItem.usesRadialMenu = true;
+        else
+          newItem.usesRadialMenu = false;
+        // hide quantity for emotes and perks
+        if (itemType == "emotes" || itemType == "perks")
+          if (newItem.quantityTextFieldParent)
+            newItem.quantityTextFieldParent.SetActive(false);
+        // if this view uses radial menu for equipping
+        if (radialMenuData)
+        {
+          // if this item is meant for a radial menu
+          if (newItem.usesRadialMenu)
+          {
+            // and if it is equipped
+            if (newItem.whoDis.Equipped)
+            {
+              //  then find a place for it on the radial menu if not already in it (but should be, since it's equipped) 
+              if (!radialMenuData.orderedItems.Contains(newItem.whoDis))
+              {
+                // find the first free spot
+                for (int i = 0; i < radialMenuData.orderedItems.Count; i++)
+                {
+                  if (radialMenuData.orderedItems[i] == null)
+                  {
+                    radialMenuData.orderedItems[i] = newItem.whoDis;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+
         newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
         if (inventoryItemType.NewlyAdded)
         {
@@ -433,11 +497,12 @@ namespace GuruLaghima.ProjectDilemma
           newItem.usedInRecycler = true;
           newItem.recyclerView = this.recyclerView;
         }
-        // if this view is used for the recycler feature then this item should have the information to which object to send data about itself
-        if (usedInUpgrader)
+        // if this view is used for the combiner feature then this item should have the information to which object to send data about itself
+        if (usedInCombiner)
         {
-          newItem.usedForUpgrader = true;
-          newItem.upgraderView = this.upgraderView;
+          // MyDebug.Log("item used in combiner in", this.name);
+          newItem.usedForCombiner = true;
+          newItem.combinerView = this.combinerView;
         }
         if (usedByRelics)
         {
@@ -447,14 +512,18 @@ namespace GuruLaghima.ProjectDilemma
 
         if (newItem.GetComponentInChildren<ClothingPlaceholder>())
           newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
-        inventoryItems.Add(newItem);
 
+        // equip needs to be after loading of clothing data for the item
+        if (!usedForRecycler && !usedInCombiner)
+          newItem.Equip(inventoryItemType.Equipped);
+
+        inventoryItems.Add(newItem);
       }
     }
 
     private void ClearUI()
     {
-      MyDebug.Log("Clearing UI for", this.name);
+      // MyDebug.Log("Clearing UI for", this.name);
       foreach (InventoryItemHUDViewOverride child in inventoryItems)
       {
         Destroy(child.gameObject);

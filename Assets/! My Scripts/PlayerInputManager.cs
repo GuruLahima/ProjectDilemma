@@ -20,6 +20,7 @@ namespace Workbench.ProjectDilemma
     [System.Serializable]
     public class InputWrapper
     {
+      public string ActionName;
       public enum Mode : byte { OnPress, Hold, OnRelease, StateSwitch }
       [InputName]
       public string InputHotkey;
@@ -86,6 +87,16 @@ namespace Workbench.ProjectDilemma
       ProcessOverrideInputs();
       if (InputEnabled)
         ProcessInput();
+    }
+
+    public void ExecuteInputAction(string name)
+    {
+      InputWrapper input = Inputs.Find((input) =>
+      {
+        return input.ActionName == name;
+      });
+      if (input != null)
+        input.InputAction?.Invoke();
     }
 
     private void ProcessOverrideInputs()
@@ -282,7 +293,7 @@ namespace Workbench.ProjectDilemma
       emoteActivator.Emote();
     }
 
-    public void MagnifyingGlass()
+    public void AbilityActivate()
     {
       abilityActivator.Use();
     }
@@ -291,9 +302,10 @@ namespace Workbench.ProjectDilemma
     {
       perkActivator.ShowPerk();
     }
-    
+
     public void PerkHide()
     {
+
       perkActivator.HidePerk();
     }
 
@@ -301,6 +313,11 @@ namespace Workbench.ProjectDilemma
     public void PerkActivate()
     {
       perkActivator.ActivatePerk();
+    }
+
+    public void SetHeld(bool state)
+    {
+      IsHeld = state;
     }
 
     public void InChatVoice()
@@ -317,6 +334,11 @@ namespace Workbench.ProjectDilemma
       {
         inputConditions.Remove(ICKeys.USING_COMPUTER);
       }
+    }
+    
+    public void ActivateQuestState(string stateName)
+    {
+      GameMechanic.Instance.localPlayerSpot.questActivator.ActivateQuestState(stateName);
     }
 
     public void SetCameraControl(bool value)

@@ -66,7 +66,8 @@ namespace GuruLaghima.ProjectDilemma
     /// </summary>
     private void Start()
     {
-
+      // ! load all data for all items into their corresponding scriptable objects
+      // LoadAllData();
     }
 
     /// <summary>
@@ -157,17 +158,10 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public methods
 
-    [ContextMenu("Create Item")]
-
-    public void CreateItem()
-    {
-      AddItem("cosmetic_bearMask");
-    }
-
     /// <summary>
     /// Adds a single item to the main inventory.
     /// </summary>
-    public void AddItem(string itemDefinitionKey)
+    public InventoryItem AddItem(string itemDefinitionKey)
     {
       try
       {
@@ -176,11 +170,12 @@ namespace GuruLaghima.ProjectDilemma
         MyDebug.Log("UpgraderView:: creating item", itemDefinition.displayName);
         InventoryItem tempRef = GameFoundationSdk.inventory.CreateItem(itemDefinition);
         MyDebug.Log("UpgraderView:: created item", tempRef.definition.key);
-
+        return tempRef;
       }
       catch (Exception exception)
       {
         OnGameFoundationException(exception);
+        return null;
       }
     }
 

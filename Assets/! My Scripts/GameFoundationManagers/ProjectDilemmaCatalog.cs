@@ -669,6 +669,36 @@ public class ProjectDilemmaCatalog
                 public const string newlyAdded = "newlyAdded";
             }
         }
+        public class relic_egyptRelic
+        {
+            public const string key = "relic_egyptRelic";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
+        public class relic_motelRelic2
+        {
+            public const string key = "relic_motelRelic2";
+            public class StaticProperties
+            {
+                public const string description = "description";
+                public const string ingame_ScriptableObject = "ingame_ScriptableObject";
+                public const string inventory_icon = "inventory_icon";
+            }
+            public class Properties
+            {
+                public const string equipped = "equipped";
+                public const string newlyAdded = "newlyAdded";
+            }
+        }
     }
     public class Currencies
     {
@@ -995,6 +1025,14 @@ public class ProjectDilemmaCatalog
         public class upgrader_unlock_level
         {
             public const string key = "upgrader_unlock_level";
+            public class StaticProperties
+            {
+                public const string unlock_level = "unlock_level";
+            }
+        }
+        public class combiner_unlock_level
+        {
+            public const string key = "combiner_unlock_level";
             public class StaticProperties
             {
                 public const string unlock_level = "unlock_level";

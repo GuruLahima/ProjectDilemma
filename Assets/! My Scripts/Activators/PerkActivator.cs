@@ -17,8 +17,26 @@ namespace Workbench.ProjectDilemma
 
     #region events
 
+    public UnityEvent ChoosingPerk;
     public UnityEvent PerkChosen;
 
+    #endregion
+
+    #region Public Property
+    public bool PerkActivated
+    {
+      get
+      {
+        return perkActivated;
+      }
+    }
+    public bool PerkCompleted
+    {
+      get
+      {
+        return bonusAdded;
+      }
+    }
     #endregion
 
     #region Public Fields
@@ -64,6 +82,7 @@ namespace Workbench.ProjectDilemma
         HidePerk();
         return;
       }
+      ChoosingPerk?.Invoke();
       MyDebug.Log("Show perks window");
       ActiveState = true;
       CursorManager.SetLockMode(CursorLockMode.Confined);
@@ -72,6 +91,7 @@ namespace Workbench.ProjectDilemma
       showChooseScreenFeedbacks.ResetFeedbacks();
       showChooseScreenFeedbacks.Direction = MMFeedbacks.Directions.TopToBottom;
       showChooseScreenFeedbacks.PlayFeedbacks();
+
     }
     public void HidePerk()
     {
@@ -121,7 +141,7 @@ namespace Workbench.ProjectDilemma
       #region LOCAL STUFF
       perkActivated = true;
       MyDebug.Log("Perks window perk activated");
-      activeQuest = Instantiate(ownedPerk.objective, perkCanvasSlot ?? transform);
+      activeQuest = Instantiate(ownedPerk.objective, perkCanvasSlot);
       GameEvents.OnPerkActivated?.Invoke(ownedPerk);
 
       // show info about perk in the upper left corner
@@ -169,9 +189,9 @@ namespace Workbench.ProjectDilemma
       bonusAdded = true;
 
       BonusModifiersWrapper[] mod = ownedPerk.GetBonusModifiers(condition);
-      foreach (BonusModifiersWrapper pm in mod)
+      foreach (BonusModifiersWrapper bmw in mod)
       {
-        BonusModifierManager.Instance.AddModifier(pm);
+        BonusModifierManager.Instance.AddModifier(bmw);
       }
     }
     #endregion

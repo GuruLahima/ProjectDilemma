@@ -14,6 +14,7 @@ namespace Workbench.ProjectDilemma
     private void Awake()
     {
       Instance = this;
+      ResetClothing();
       SetActiveCharacterCustomization(_defaultCharacterCustomization);
     }
     #endregion
@@ -40,6 +41,9 @@ namespace Workbench.ProjectDilemma
     #region Exposed Private Fields
     [CustomTooltip("The CharacterCustomization that becomes active upon start")]
     [SerializeField] CharacterCustomization _defaultCharacterCustomization;
+    [SerializeField] private ClothingData currentClothingData;
+    [SerializeField] private ClothingData defaultClothingData;
+    [SerializeField] private ClothingData previewClothingData;
     #endregion
 
     #region Private Fields
@@ -49,6 +53,7 @@ namespace Workbench.ProjectDilemma
     #region Public Methods
     public void SetActiveCharacterCustomization(CharacterCustomization cc)
     {
+      MyDebug.Log("AddCLothing::SetActiveCharacterCustomization called");//
       if (ActiveCharacterCustomization)
       {
         ActiveCharacterCustomization.enabled = false;
@@ -59,6 +64,19 @@ namespace Workbench.ProjectDilemma
         ActiveCharacterCustomization.ReInitialize();
       }
     }
+
+
+    #endregion
+
+    #region private methods
+
+    public void ResetClothing()
+    {
+      currentClothingData.SaveClothes(currentClothingData.defaultClothing.Clothes);
+      defaultClothingData.SaveClothes(currentClothingData.defaultClothing.Clothes);
+      previewClothingData.SaveClothes(currentClothingData.defaultClothing.Clothes);
+    }
+
     #endregion
   }
 }

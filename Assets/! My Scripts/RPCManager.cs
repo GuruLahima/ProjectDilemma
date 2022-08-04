@@ -39,20 +39,20 @@ namespace Workbench.ProjectDilemma
     {
       var player = PhotonView.Find(viewID);
       EmoteData emote = MasterData.Instance.allEmotes[emoteIndex];
-      player.GetComponent<PlayerSpot>().playerEmote.SYNC_Animation(emote);
+      player.GetComponent<PlayerSpot>().emoteActivator.SYNC_Animation(emote);
     }
 
     [PunRPC]
     void RPC_PerkActivated(int viewID)
     {
       var player = PhotonView.Find(viewID);
-      player.GetComponent<PlayerSpot>().operatePerk.SYNC_ActivatePerk();
+      player.GetComponent<PlayerSpot>().perkActivator.SYNC_ActivatePerk();
     }
     [PunRPC]
-    void RPC_MagnifyingGlassActivated(int viewID)
+    void RPC_AbilityActivated(int viewID)
     {
       var player = PhotonView.Find(viewID);
-      player.GetComponent<PlayerSpot>().magnifyingGlass.SYNC_MagnifyingGlass();
+      player.GetComponent<PlayerSpot>().abilityActivator.SYNC_AbilityActivation();
     }
 
     [PunRPC]
@@ -71,6 +71,17 @@ namespace Workbench.ProjectDilemma
         playerSpot.playerLoaded = true;
       }
       GameMechanic.Instance.CheckPlayersLoaded();
+    }
+    [PunRPC]
+    void RPC_SyncExtraTimeVote(int viewID)
+    {
+      PhotonView player = PhotonView.Find(viewID);
+      PlayerSpot playerSpot = player.GetComponent<PlayerSpot>();
+      if (playerSpot)
+      {
+        playerSpot.playerVotedExtraTime = true;
+      }
+      GameMechanic.Instance.CheckPlayersVotedExtraTime();
     }
 
     [PunRPC]

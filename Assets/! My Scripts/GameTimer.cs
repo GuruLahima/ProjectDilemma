@@ -29,13 +29,19 @@ namespace Workbench.ProjectDilemma
     private float incTimer;
     private float decTimer;
     private string timerString;
-
+    Coroutine timerCoroutine;
     // Start is called before the first frame update
     public void StartTimer(float time)
     {
       if (Timer == null)
         Destroy(this);
-      StartCoroutine(UpdateTimer(time));
+      timerCoroutine = StartCoroutine(UpdateTimer(time));
+    }
+
+    public void ResetTimer(float time)
+    {
+      StopCoroutine(timerCoroutine);
+      StartTimer(time);
     }
 
     private IEnumerator UpdateTimer(float time)

@@ -38,7 +38,8 @@ namespace Workbench.ProjectDilemma
   {
     public BonusModifierData ModifierKey;
     public UpgradeData UpgradeableBy;
-
+    public string Description;
+    //---------------------------
     public float ModifierValueFloat;
     public bool ModifierValueBool;
     public string ModifierValueString;

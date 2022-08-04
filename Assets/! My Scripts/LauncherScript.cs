@@ -73,6 +73,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] CanvasGroup menuv2UI;
     [SerializeField] MMFeedbacks hideMenuFeedbacks;
     [SerializeField] MMFeedbacks showMenuFeedbacks;
+    [SerializeField] GameObject tutorialWindow;
 
     [HorizontalLine]
 
@@ -151,7 +152,7 @@ namespace Workbench.ProjectDilemma
     [Foldout("Visual Feedback Events")]
     public UnityEvent OnDisconnectedEvent;
     private Player otherPlayer;
-    private static int lastScenario;
+    private static int lastScenario = -1;
     #endregion
 
 
@@ -184,7 +185,10 @@ namespace Workbench.ProjectDilemma
       roomOptions.CustomRoomPropertiesForLobby = new string[] { Keys.MAP_PROP_KEY };
 
       _inputField.onValueChanged.AddListener(delegate (string m) { SetPlayerName(m); }); // for some reason dropdowns override their default behaviour if given listener via code
-      quickMatchButton.onClick.AddListener(delegate () { QuickMatch(); }); // for some reason dropdowns override their default behaviour if given listener via code
+      /*       quickMatchButton.onClick.AddListener(delegate ()
+            {
+              QuickMatch();
+            }); // for some reason dropdowns override their default behaviour if given listener via code */
     }
     public override void OnEnable()
     {
@@ -207,6 +211,7 @@ namespace Workbench.ProjectDilemma
 
     private void Start()
     {
+
       string defaultName = "";
 
       if (_inputField != null)
@@ -256,6 +261,16 @@ namespace Workbench.ProjectDilemma
       {
         garageButtonNotification.SetActive(false);
       }
+
+      // show tutorial on first play
+      bool firstTime = PlayerPrefs.GetString("first_time_play", "true") == "true" ? true : false;
+      if (firstTime)
+      {
+        ToggleMenu(false);
+        PlayerPrefs.SetString("first_time_play", "false");
+        tutorialWindow.SetActive(true);
+      }
+
 
     }
 
@@ -588,12 +603,20 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.LoadLevel(scenarioName);
     }
 
+    [ContextMenu("Test Func")]
+    public void TestFunc()
+    {
+      MyDebug.Log("lastScenario before", lastScenario);
+      lastScenario = lastScenario == -1 ? Random.Range(0, ScenariosManager.Instance.approvedScenariosNames.Count) : (((++lastScenario) % ScenariosManager.Instance.approvedScenariosNames.Count));
+      MyDebug.Log("lastScenario after", lastScenario);
+    }
     private string RotateScenarios()
     {
       if (loadDebugScenario)
         return debugScenario;
 
-      lastScenario = lastScenario == 1 ? 0 : 1;
+      lastScenario = lastScenario == -1 ? Random.Range(0, ScenariosManager.Instance.approvedScenariosNames.Count) : (((++lastScenario) % ScenariosManager.Instance.approvedScenariosNames.Count));
+      MyDebug.Log("lastScenario", lastScenario);
       string chosenScenario = "";
 
       if (ScenariosManager.Instance.approvedScenariosNames.Count > 0)

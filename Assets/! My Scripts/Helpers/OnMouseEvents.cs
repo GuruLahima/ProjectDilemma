@@ -16,6 +16,7 @@ namespace GuruLaghima
     public UnityEvent _OnMouseEnter;
 
     [SerializeField] CinemachineBrain cineBrain;
+    [SerializeField] bool blockedByUI = true;
 
     private void Awake()
     {
@@ -25,7 +26,7 @@ namespace GuruLaghima
     public void OnMouseEnter()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         // Debug.Log("There is UI in front of game object");
         return;
@@ -42,7 +43,7 @@ namespace GuruLaghima
     public void OnMouseOver()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         // Debug.Log("There is UI in front of game object");
         return;
@@ -58,7 +59,7 @@ namespace GuruLaghima
     public void OnMouseDown()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         Debug.Log("There is UI in front of game object");
         return;
@@ -74,7 +75,7 @@ namespace GuruLaghima
     public void OnMouseDrag()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         // Debug.Log("There is UI in front of game object");
         return;
@@ -90,7 +91,7 @@ namespace GuruLaghima
     public void OnMouseUp()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         // Debug.Log("There is UI in front of game object");
         return;
@@ -106,7 +107,7 @@ namespace GuruLaghima
     public void OnMouseExit()
     {
       // Check if the mouse was clicked over a UI element
-      if (EventSystem.current.IsPointerOverGameObject())
+      if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
         // Debug.Log("There is UI in front of game object");
         return;

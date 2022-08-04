@@ -15,10 +15,10 @@ namespace Workbench.ProjectDilemma
       MyDebug.Log("AddCLothing::AddToCharacter called for", this.Clothing.SkinPrefab.name);
       if (CharacterCustomizationManager.Instance)
       {
-        MyDebug.Log("AddCLothing:: CharacterCustomizationManager.Instance present");
+        // MyDebug.Log("AddCLothing:: CharacterCustomizationManager.Instance present");
         if (CharacterCustomizationManager.Instance.ActiveCharacterCustomization)
         {
-          MyDebug.Log("AddCLothing:: ActiveCharacterCustomization present");
+          // MyDebug.Log("AddCLothing:: ActiveCharacterCustomization present");
           CharacterCustomizationManager.Instance.ActiveCharacterCustomization.AddClothing(this.Clothing);
         }
       }

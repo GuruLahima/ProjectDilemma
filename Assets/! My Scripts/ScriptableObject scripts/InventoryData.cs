@@ -83,13 +83,18 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
         itm.SetMutableProperty(Keys.ITEMPROPERTY_EQUIPPED, equip);
       }
       item.Equipped = equip;
+      // notify any possible inventory views using this item
+      item.inventoriesUsingThisItem.ForEach((view) =>
+      {
+        view.OnItemEquipped(item);
+      });
     }
 
   }
 
   public void RemoveFromNewlyAdded(ItemData item)
   {
-    MyDebug.Log("RemoveFromNewlyAdded ", item.Key);
+    // MyDebug.Log("RemoveFromNewlyAdded ", item.Key);
     if (allTypes.Contains(item.inventoryitemDefinition))
     {
       ItemList allItemsOfThisType = GameFoundationSdk.inventory.CreateList();
@@ -163,8 +168,8 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       // dont add another entry in the allItems list
       return;
     }
-    MyDebug.Log("Populating item data for ", item.definition.displayName);
-    MyDebug.Log("UpgraderView:: item.GetMutableProperty(equipped)", (bool)item.GetMutableProperty("equipped"));
+    // MyDebug.Log("Populating item data for ", item.definition.displayName);
+    // MyDebug.Log("UpgraderView:: item.GetMutableProperty(equipped)", (bool)item.GetMutableProperty("equipped"));
 
 
     allTypes.Add(item.definition);
@@ -178,7 +183,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
         tmpData.Equipped = (bool)item.GetMutableProperty("equipped");
       if (item.HasMutableProperty("newlyAdded"))
         tmpData.NewlyAdded = (bool)item.GetMutableProperty("newlyAdded");
-      MyDebug.Log(item.definition.displayName + " has mutable property::", item.HasMutableProperty("equipped") + (item.HasMutableProperty("equipped") ? " with value of " + (bool)item.GetMutableProperty("equipped") : ""));
+      // MyDebug.Log(item.definition.displayName + " has mutable property::", item.HasMutableProperty("equipped") + (item.HasMutableProperty("equipped") ? " with value of " + (bool)item.GetMutableProperty("equipped") : ""));
     }
     allItems.Add(tmpData);
   }

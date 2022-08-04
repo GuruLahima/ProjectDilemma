@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 namespace Workbench.ProjectDilemma
 {
-  public enum ClothingType : byte { Chest, Leggings, Boots, Mask, Gloves }
+  public enum ClothingType : byte { Chest, Leggings, Boots, Mask, Gloves, Skin }
   /// <summary>
   /// CharacterCustomization is only used locally, it saves the character on a scriptable object that is later loaded in the game 
   /// </summary>

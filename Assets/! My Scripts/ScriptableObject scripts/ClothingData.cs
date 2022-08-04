@@ -21,6 +21,10 @@ public class ClothingData : ScriptableObject
     }
   }
 
+  #if UNITY_EDITOR
+  
+  #endif
+
   public bool IsPreviewClothing;
   public ClothingData currentClothing;
 

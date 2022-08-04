@@ -13,6 +13,7 @@ using NaughtyAttributes;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using Michsky.UI.ModernUIPack;
 
 namespace GuruLaghima.ProjectDilemma
 {
@@ -23,7 +24,6 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public fields
 
-
     #endregion
 
     #region UI references
@@ -32,6 +32,7 @@ namespace GuruLaghima.ProjectDilemma
     [SerializeField] GameObject slotTextObj;
     [SerializeField] Button recycleButton;
     [SerializeField] TextMeshProUGUI recycleRewardAmountText;
+    [SerializeField] SliderManager quantitySlider;
 
     #endregion
 
@@ -49,6 +50,7 @@ namespace GuruLaghima.ProjectDilemma
 
     #region private fields
     private InventoryItemHUDViewOverride selectedItem;
+    private static int amountToRecycle;
 
 
     #endregion
@@ -68,7 +70,15 @@ namespace GuruLaghima.ProjectDilemma
     #endregion
 
     #region public methods
+    public void UpdateAmount(float value)
+    {
+      amountToRecycle = (int)Mathf.Round(value * 1.0f);
+      if (recycleRewardAmountText)
+        if (selectedItem)
+          if (selectedItem.whoDis)
+            recycleRewardAmountText.text = "You get \n" + selectedItem.whoDis.recyclingRewardAmount * amountToRecycle + " dilemma points";
 
+    }
     public void AssignSelectedItemToSlot()
     {
       //disable text in the slot
@@ -78,28 +88,32 @@ namespace GuruLaghima.ProjectDilemma
       // enable recycling button (should turn from grey to colored)
       this.recycleButton.interactable = true;
       this.recycleButton.GetComponent<CanvasGroup>().alpha = 1;
+      // set up the quantity chooser
+      quantitySlider.mainSlider.minValue = 0;
+      // quantitySlider.mainSlider.maxValue = selectedItem.whoDis.AmountOwned - 1; // ! deprecated (duplicates-only recycling)
+      quantitySlider.mainSlider.maxValue = selectedItem.whoDis.AmountOwned;
+      quantitySlider.mainSlider.value = quantitySlider.mainSlider.maxValue;
+      amountToRecycle = (int)Mathf.Round(quantitySlider.mainSlider.value * 1.0f);
       // calculate currency exchange rate
-      recycleRewardAmountText.text = "You get \n" + selectedItem.whoDis.recyclingRewardAmount * selectedItem.whoDis.AmountOwned + " dilemma points";
+      recycleRewardAmountText.text = "You get \n" + selectedItem.whoDis.recyclingRewardAmount * amountToRecycle + " dilemma points";
     }
 
     public void Recycle()
     {
       // receive the reward (duplicates count x currency reward per item)
       Currency m_CoinDefinition = GameFoundationSdk.catalog.Find<Currency>(ProjectDilemmaCatalog.Currencies.currency_dilemmaPoints.key);
-      GameFoundationSdk.wallet.Add(m_CoinDefinition, (long)(this.selectedItem.whoDis.recyclingRewardAmount * this.selectedItem.whoDis.AmountOwned));
+      GameFoundationSdk.wallet.Add(m_CoinDefinition, (long)(this.selectedItem.whoDis.recyclingRewardAmount * (amountToRecycle)));
 
       MyDebug.Log("New amount", GameFoundationSdk.wallet.Get(m_CoinDefinition));
 
       // discard duplicates
       ItemList duplicates = GameFoundationSdk.inventory.CreateList();
       int someInt = GameFoundationSdk.inventory.FindItems(this.selectedItem.whoDis.inventoryitemDefinition, duplicates, true);
-      if (duplicates.Count > 1)
+      // if (duplicates.Count > 1) // ! deprecated (duplicates-only recycling)
+      int limit = amountToRecycle;
+      for (int i = 0; i < limit; i++)
       {
-        int limit = duplicates.Count;
-        for (int i = 0; i < limit - 1; i++)
-        {
-          GameFoundationSdk.inventory.Delete(duplicates[0]);
-        }
+        GameFoundationSdk.inventory.Delete(duplicates[0]);
       }
 
       // reset fields
