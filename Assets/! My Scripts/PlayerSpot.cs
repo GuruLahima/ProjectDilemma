@@ -16,13 +16,15 @@ namespace Workbench.ProjectDilemma
   {
     #region public fields
     public int playerSpot;
-    public Camera deathCam;
-    public Camera surviveCam;
+    // public Camera deathCam;
+    // public Camera surviveCam;
+    public GameObject gameplayCamerasParent; // the container for the cinemachine virtual cams
     public GameObject suspenseCam;
-    public GameObject gameplayCamerasParent;
-    public GameObject playerCam;
+    public GameObject playerCam;// the active virtual cam
+    // we need a reference to this specific cam because it is the most important one and many things depend on it, like throwables
+    public GameObject firstPersonPlayerCam;
+    public GameObject mainCam; // the cinemachine brain cam
     public OutlineEffect outlineComponent;
-    public SimpleCameraController mainCam;
     public GameObject nameplateCanvas;
     public TextMeshProUGUI nameplateText;
 
@@ -34,12 +36,13 @@ namespace Workbench.ProjectDilemma
     public GameObject endScenePlayerModelRight;
     [HorizontalLine(color: EColor.White)]
     public GameObject votingMechanism;
-    public Collider killButton;
-    public Collider saveButton;
+    public Button killButton;
+    public Button saveButton;
     // public TextMeshProUGUI timer; // deprecated, using UI overlay now
     public GameObject decisionTextSave;
     public GameObject decisionTextBetray;
     public GameTimer gameTimer;
+    public GameTimer extraTimer;
     [HorizontalLine(color: EColor.White)]
     public GameObject deathBookForPlayerCam;
     public GameObject deathBookForEnemyCam;

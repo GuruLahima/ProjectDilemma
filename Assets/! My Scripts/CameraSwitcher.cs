@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
+using Cinemachine;
 
 namespace Workbench.ProjectDilemma
 {
   public class CameraSwitcher : MonoBehaviour
   {
     #region public fields
-    [HideInInspector] public Camera currentCamera;
+    [HideInInspector] public CinemachineVirtualCamera currentCamera;
 
     #endregion
 
@@ -20,7 +21,7 @@ namespace Workbench.ProjectDilemma
     [InputAxis]
     [SerializeField] string switchBackModifierInput;
 
-    [SerializeField] List<Camera> camerasStack;
+    [SerializeField] List<CinemachineVirtualCamera> camerasStack;
     [SerializeField] int currentCameraIndex = 0;
     #endregion
 
@@ -46,8 +47,11 @@ namespace Workbench.ProjectDilemma
     public void DisableGameplayCameras()
     {
 
-      foreach (Camera cam in camerasStack)
-        cam.gameObject.SetActive(false);
+      foreach (CinemachineVirtualCamera cam in camerasStack)
+      {
+        if (cam)
+          cam.gameObject.SetActive(false);
+      }
 
     }
     #endregion
@@ -58,6 +62,8 @@ namespace Workbench.ProjectDilemma
     {
       GameMechanic.GameStarted += SetCamera;
       // GameMechanic.VotingEnded += DisableGameplayCameras;
+
+      SetCamera();
 
 
       // register this script's code that needs to run at certain input with the input processor
@@ -79,7 +85,7 @@ namespace Workbench.ProjectDilemma
 
     void SetCamera()
     {
-      foreach (Camera cam in camerasStack)
+      foreach (CinemachineVirtualCamera cam in camerasStack)
         cam.gameObject.SetActive(false);
       if (currentCameraIndex >= 0 && currentCameraIndex < camerasStack.Count)
       {
@@ -91,7 +97,7 @@ namespace Workbench.ProjectDilemma
     void NextCamera()
     {
 
-      foreach (Camera cam in camerasStack)
+      foreach (CinemachineVirtualCamera cam in camerasStack)
         cam.gameObject.SetActive(false);
       if (currentCameraIndex < 0)
         currentCameraIndex = -1;
@@ -107,7 +113,7 @@ namespace Workbench.ProjectDilemma
     void PrevCam()
     {
 
-      foreach (Camera cam in camerasStack)
+      foreach (CinemachineVirtualCamera cam in camerasStack)
         cam.gameObject.SetActive(false);
       if (currentCameraIndex >= camerasStack.Count)
         currentCameraIndex = camerasStack.Count;

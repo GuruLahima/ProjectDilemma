@@ -24,7 +24,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] List<TimerEvent> OnTimerEvents = new List<TimerEvent>();
     private TimerEvent _lastTimerEvent;
 
-    [SerializeField] TextMeshProUGUI Timer;
+    [SerializeField] List<TextMeshProUGUI> TimerTexts = new List<TextMeshProUGUI>();
 
     private float incTimer;
     private float decTimer;
@@ -33,7 +33,7 @@ namespace Workbench.ProjectDilemma
     // Start is called before the first frame update
     public void StartTimer(float time)
     {
-      if (Timer == null)
+      if (TimerTexts.Count <= 0)
         Destroy(this);
       timerCoroutine = StartCoroutine(UpdateTimer(time));
     }
@@ -58,7 +58,7 @@ namespace Workbench.ProjectDilemma
         // gameTimer -= Time.deltaTime;
         FormatTimeForUI(decTimer);
         yield return null;
-        var timerEvent = OnTimerEvents.Find((x) => Mathf.Abs(decTimer - x.TriggerTime) <= 1); //1 is threshold for checking
+        var timerEvent = OnTimerEvents.Find((x) => Mathf.Abs(incTimer - x.TriggerTime) <= 1); //1 is threshold for checking
         if (timerEvent != null && timerEvent != _lastTimerEvent)
         {
           timerEvent.TriggerEvent?.Invoke();
@@ -74,7 +74,10 @@ namespace Workbench.ProjectDilemma
 
       timerString = string.Format("{0:00}:{1:00}", minutes, seconds);
 
-      Timer.text = timerString;
+      foreach (TextMeshProUGUI timer in TimerTexts)
+      {
+        timer.text = timerString;
+      }
     }
 
   }

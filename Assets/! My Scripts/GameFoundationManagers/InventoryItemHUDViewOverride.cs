@@ -21,6 +21,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public GameObject quantityTextFieldParent;
   public Image rarityGraphic;
   [SerializeField] TextMeshProUGUI title;
+  [SerializeField] TooltipTrigger tooltip; 
   [Header("References")]
   public ItemData whoDis;
   public InventoryView parentView;
@@ -29,6 +30,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public CombinerView combinerView;
   public RelicView relicView;
   public BookView bookView;
+  public ShelfView shelfView;
   #endregion
 
   #region public fields 
@@ -38,6 +40,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public bool usedForCombiner;
   public bool usedByRelics;
   public bool usedByBook;
+  public bool usedInShelf;
   #endregion
 
   #region exposed fields
@@ -65,6 +68,26 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public void SetItemTitle(string text)
   {
     title.text = text;
+    if (tooltip)
+    {
+      tooltip.title = text;
+    }
+  }
+
+  public void SetItemTooltip(string text)
+  {
+    if (tooltip)
+    {
+      tooltip.description = text;
+    }
+  }
+
+  public void SetItemIcon(Sprite sprite)
+  {
+    if (tooltip)
+    {
+      tooltip.icon = sprite;
+    }
   }
 
   public void HandleHover()
@@ -94,6 +117,11 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     if (usedByBook)
     {
       bookView.ItemSelected(this);
+      return;
+    }
+    if (usedInShelf)
+    {
+      shelfView.ItemSelected(this);
       return;
     }
     if (usedByRelics)

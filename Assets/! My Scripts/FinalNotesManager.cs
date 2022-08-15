@@ -56,8 +56,8 @@ namespace Workbench.ProjectDilemma
 
     public void HideNotes()
     {
-      CursorManager.SetLockMode(CursorLockMode.Locked);
-      CursorManager.SetVisibility(false);
+      // CursorManager.SetLockMode(CursorLockMode.Locked);
+      // CursorManager.SetVisibility(false);
       canvas.SetActive(false);
     }
 

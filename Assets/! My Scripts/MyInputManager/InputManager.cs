@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using GuruLaghima;
 
 public static class InputManager
 {
@@ -29,12 +30,12 @@ public static class InputManager
 #endif
         if (_inputAxisData)
         {
-          Debug.Log("File found in the directory " + _customInputManagerPath + ", successfuly initialized InputManager");
+          MyDebug.Log("File found in the directory " + _customInputManagerPath + ", successfuly initialized InputManager");
           return _inputAxisData;
         }
         else
         {
-          Debug.LogError("Missing file for InputAxisData, could NOT be found in the directory " + _customInputManagerPath);
+          MyDebug.Log("Missing file for InputAxisData, could NOT be found in the directory " + _customInputManagerPath, Color.red);
           return null;
         }
       }

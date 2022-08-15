@@ -67,6 +67,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] MMFeedbacks outOfThrowablesFeedbacks;
     [SerializeField] MMFeedbacks shootThrowableFeedbacks;
     [SerializeField] GameObject decal;
+    [SerializeField] DiamonMenuEntry menuEntry;
 
     #endregion
 
@@ -84,9 +85,17 @@ namespace Workbench.ProjectDilemma
     private void OnEnable()
     {
       InventoryManager.InventoryUpdated += Init;
-      mainCam = GetComponent<PlayerSpot>().playerCam.GetComponent<SimpleCameraController>();
+      GameMechanic.DiscussionEnded += OnDiscussionEnded;
+      mainCam = GetComponent<PlayerSpot>().firstPersonPlayerCam.GetComponent<SimpleCameraController>();
       newBaseThrowStrength = baseThrowStrength;
       Init();
+    }
+
+    private void OnDiscussionEnded()
+    {
+      // when discussion ends the aiming helper should hide (if it was on)
+      aimHelper.gameObject.SetActive(false);
+      canon.playerHasControlOverCamera = false;
     }
 
     private void OnDisable()
@@ -105,17 +114,8 @@ namespace Workbench.ProjectDilemma
     [ContextMenu("Init")]
     public override void Init()
     {
-      ownedProjectiles = InventoryData.Instance.throwables.Where((obj) => { return obj.Owned && obj.Equipped; }).ToList();
-      // generate the new items
-      // foreach (ProjectileData projData in ownedProjectiles)
-      // {
-      //   if (projData.Icon)
-      //   {
-      //     var ico = Instantiate(projData.Icon, radialMenu.transform);
-      //     ico.container = projData;
-      //     if (projData.ico) ico.image.sprite = projData.ico;
-      //   }
-      // }
+      // maybe we should have a reference to the 
+
     }
     public void Pick()
     {
@@ -130,17 +130,19 @@ namespace Workbench.ProjectDilemma
         radialMenu.RegenerateSnapPoints();
       }
       ActiveState = true;
-      radialMenu.Activate();
-      CursorManager.SetLockMode(CursorLockMode.Confined);
-      CursorManager.SetVisibility(false);
+
+      radialMenu.ActivateRadialMenu(Set);
+
+      // CursorManager.SetLockMode(CursorLockMode.Confined);
+      // CursorManager.SetVisibility(false);
     }
     public void Set()
     {
       MyDebug.Log("Set projectile");
       ActiveState = false;
       radialMenu.Deactivate();
-      CursorManager.SetLockMode(CursorLockMode.Locked);
-      CursorManager.SetVisibility(false);
+      // CursorManager.SetLockMode(CursorLockMode.Locked);
+      // CursorManager.SetVisibility(false);
       if (radialMenu.LastSelectedObject != null)
       {
         var container = radialMenu.LastSelectedObject.GetComponent<SelectionMenuContainer>();
@@ -152,13 +154,38 @@ namespace Workbench.ProjectDilemma
             selectedItemCounter.text = selectedProjectile.AmountOwned.ToString();
             selectedItemIcon.sprite = selectedProjectile.ico;
             // selectedItemHUD.SetActive(true);
+
+            // diamond menu icon change
+            // first swap the default icon with the previous icon to complete the illusion of rotation of the items (because that's how the MMfeedbacks are set up)
+            if (menuEntry.chosenItemIcon.sprite)
+              menuEntry.defaultIcon.sprite = menuEntry.chosenItemIcon.sprite;
+            menuEntry.chosenItemIcon.sprite = selectedProjectile.ico;
+            menuEntry.switchToChosenIconFeedbacks.PlayFeedbacks();
+            // Invoke("SwapDefaultIcon", 1.2f);
           }
         }
-        if (selectedProjectile)
-          selectedItemInteractablesIcon.sprite = selectedProjectile.ico;
       }
+
+
       ResetRotationOfCanon();
     }
+    // void SwapDefaultIcon()
+    // {
+    //   if (radialMenu.LastSelectedObject != null)
+    //   {
+    //     var container = radialMenu.LastSelectedObject.GetComponent<SelectionMenuContainer>();
+    //     if (container)
+    //     {
+    //       if (container.container is ProjectileData)
+    //       {
+    //         selectedProjectile = container.container as ProjectileData;
+    //         menuEntry.defaultIcon.sprite = selectedProjectile.ico;
+    //       }
+    //     }
+    //   }
+
+
+    // }
     private void DisableCameraControl()
     {
       mainCam.playerHasControlOverCamera = false;
@@ -179,7 +206,7 @@ namespace Workbench.ProjectDilemma
           position = GameMechanic.Instance.playerOneSpot.playerModel.transform.position;
 
       }
-      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<Camera>();
+      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
       currentPlayerCam.transform.DOLookAt(position, aimingCameraTransitionInterval, AxisConstraint.Y, Vector3.up);
       currentPlayerCam.DOFieldOfView(aimingCameraTransitionFieldOfView, aimingCameraTransitionInterval);
     }
@@ -189,10 +216,10 @@ namespace Workbench.ProjectDilemma
       MyDebug.Log("Control restored");
       mainCam.playerHasControlOverCamera = true;
       // lock mouse
-      CursorManager.SetLockMode(CursorLockMode.Locked);
+      // CursorManager.SetLockMode(CursorLockMode.Locked);
 
       // restore field of view
-      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<Camera>();
+      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
       currentPlayerCam.DOFieldOfView(originalFieldOfView, aimingCameraTransitionInterval);
     }
 
@@ -222,7 +249,7 @@ namespace Workbench.ProjectDilemma
         MyDebug.Log("we own the projectile");
 
         aiming = true;
-        Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<Camera>();
+        Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
         originalFieldOfView = currentPlayerCam.fieldOfView;
         raycastBlocker.SetActive(true);
 

@@ -5,6 +5,7 @@ using Photon.Pun;
 using GuruLaghima;
 using System.Linq;
 using UnityEngine.Events;
+using System;
 
 namespace Workbench.ProjectDilemma
 {
@@ -15,6 +16,7 @@ namespace Workbench.ProjectDilemma
     [SerializeField] private RadialChooseMenu radialMenu;
     [SerializeField] private UnityEvent AnimationStart;
     [SerializeField] private UnityEvent AnimationEnd;
+    [SerializeField] DiamonMenuEntry menuEntry;
     #endregion
 
     #region Private Fields
@@ -25,7 +27,7 @@ namespace Workbench.ProjectDilemma
     #region Public Methods
     public override void Init()
     {
-      ownedEmotes = InventoryData.Instance.emotes.Where((obj) => { return obj.Owned && obj.Equipped; }).ToList();
+      // ownedEmotes = InventoryData.Instance.emotes.Where((obj) => { return obj.Owned && obj.Equipped; }).ToList();
       // foreach (EmoteData emote in ownedEmotes)
       // {
       //   if (emote.Icon)
@@ -47,21 +49,24 @@ namespace Workbench.ProjectDilemma
         radialMenu.RegenerateSnapPoints();
       }
       ActiveState = true;
-      radialMenu.Activate();
-      CursorManager.SetLockMode(CursorLockMode.Confined);
-      CursorManager.SetVisibility(false);
+
+      radialMenu.ActivateRadialMenu(Emote);
+
+      // CursorManager.SetLockMode(CursorLockMode.Confined);
+      // CursorManager.SetVisibility(false);
     }
+
+
     public void Emote()
     {
       if (OnCooldown) return;
       //we are adding cooldown where the animation is played
       // this way we take the duration of the animation
 
-
       ActiveState = false;
       radialMenu.Deactivate();
-      CursorManager.SetLockMode(CursorLockMode.Locked);
-      CursorManager.SetVisibility(false);
+      // CursorManager.SetLockMode(CursorLockMode.Locked);
+      // CursorManager.SetVisibility(false);
 
       if (radialMenu.LastSelectedObject != null)
       {
@@ -83,6 +88,13 @@ namespace Workbench.ProjectDilemma
               SYNC_Animation(emoteSelected);
             }
             GameEvents.OnEmoteUsed?.Invoke(emoteSelected);
+
+            // diamond menu icon change
+            // first swap the default icon with the previous icon to complete the illusion of rotation of the items (because that's how the MMfeedbacks are set up)
+            if (menuEntry.chosenItemIcon.sprite)
+              menuEntry.defaultIcon.sprite = menuEntry.chosenItemIcon.sprite;
+            menuEntry.chosenItemIcon.sprite = emoteSelected.ico;
+            menuEntry.switchToChosenIconFeedbacks.PlayFeedbacks();
           }
         }
       }

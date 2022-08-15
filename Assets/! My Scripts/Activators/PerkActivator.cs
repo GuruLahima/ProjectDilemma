@@ -53,6 +53,8 @@ namespace Workbench.ProjectDilemma
     [SerializeField] ActivePerksChooser perkChooser;
     [NaughtyAttributes.HorizontalLine]
     [SerializeField] UpgradeData upgradePerkBonus;
+    [SerializeField] TooltipTrigger perkTooltip;
+    [SerializeField] DiamonMenuEntry menuEntry;
     #endregion
 
     #region Private Fields
@@ -71,6 +73,7 @@ namespace Workbench.ProjectDilemma
 
     public void ShowPerk()
     {
+      MyDebug.Log("Show perks window");
       if (perkActivated)
         return;
       if (showChooseScreenFeedbacks.IsPlaying)
@@ -79,20 +82,19 @@ namespace Workbench.ProjectDilemma
       }
       if (ActiveState)
       {
-        HidePerk();
+        // HidePerk();
         return;
       }
       ChoosingPerk?.Invoke();
-      MyDebug.Log("Show perks window");
+      MyDebug.Log("Showing perks window");
       ActiveState = true;
-      CursorManager.SetLockMode(CursorLockMode.Confined);
-      CursorManager.SetVisibility(true);
-      showChooseScreenFeedbacks.StopFeedbacks();
+/*       showChooseScreenFeedbacks.StopFeedbacks();
       showChooseScreenFeedbacks.ResetFeedbacks();
-      showChooseScreenFeedbacks.Direction = MMFeedbacks.Directions.TopToBottom;
+      showChooseScreenFeedbacks.Direction = MMFeedbacks.Directions.TopToBottom; */
       showChooseScreenFeedbacks.PlayFeedbacks();
 
     }
+
     public void HidePerk()
     {
       if (perkActivated)
@@ -105,8 +107,6 @@ namespace Workbench.ProjectDilemma
       MyDebug.Log("Hide perks window");
 
       ActiveState = false;
-      //CursorManager.SetLockMode(CursorLockMode.Locked);
-      //CursorManager.SetVisibility(false);
       try
       {
         hideChooseScreenFeedbacks.PlayFeedbacks();
@@ -120,10 +120,7 @@ namespace Workbench.ProjectDilemma
     public void DisablePerkWindow()
     {
       MyDebug.Log("Disable perks window");
-
-      CursorManager.SetLockMode(CursorLockMode.Locked);
-      CursorManager.SetVisibility(false);
-      Invoke("DisableScreen", 1.5f);
+      Invoke("DisableScreen", 1f);
     }
 
     void DisableScreen()
@@ -155,6 +152,19 @@ namespace Workbench.ProjectDilemma
         }
         perkBuffSlot.GetComponent<CanvasGroup>().alpha = 1;
       }
+
+      // perk showcase tooltip
+      perkTooltip.title = ownedPerk.inventoryitemDefinition.displayName;
+      string descriptionKey = ProjectDilemmaCatalog.Items.perk_doubleDown.StaticProperties.description;
+      perkTooltip.description = ownedPerk.inventoryitemDefinition.GetStaticProperty(descriptionKey);
+
+      // diamond menu icon change
+      // first swap the default icon with the previous icon to complete the illusion of rotation of the items (because that's how the MMfeedbacks are set up)
+      if (menuEntry.chosenItemIcon.sprite)
+        menuEntry.defaultIcon.sprite = menuEntry.chosenItemIcon.sprite;
+      menuEntry.chosenItemIcon.sprite = ownedPerk.ico;
+      menuEntry.switchToChosenIconFeedbacks.PlayFeedbacks();
+
       #endregion
 
       #region INTERNET STUFF
@@ -169,7 +179,7 @@ namespace Workbench.ProjectDilemma
       }
       #endregion
 
-      Debug.Log("Perk " + activeQuest + " has been activated");
+      MyDebug.Log("Perk " + activeQuest + " has been activated");
     }
 
     /// <summary>
@@ -178,7 +188,7 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     public void SYNC_ActivatePerk()
     {
-      Debug.Log("RPC TEST PERK ACTIVATION");
+      MyDebug.Log("RPC TEST PERK ACTIVATION");
     }
     public void AddPerkBonuses(ObjectiveCondition condition)
     {

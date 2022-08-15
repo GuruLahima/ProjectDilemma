@@ -23,6 +23,7 @@ public class ItemData : ScriptableObject
   }
   [HorizontalLine]
   public InventoryItemDefinition inventoryitemDefinition;
+  public string Name;
   public string Key;
   [HorizontalLine]
   public int AmountOwned = 0;

@@ -121,6 +121,15 @@ namespace Workbench.ProjectDilemma
     [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent DiscussionEndedUnityEvent;
 
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnExtraTimeVotesAvailable;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnExtraTimeVotesUnavailable;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent<float> OnExtraTimeAdded;
+
     [Foldout("End screen references")]
     public UnityEvent<string> On1StarsEarned;
     [Foldout("End screen references")]
@@ -143,10 +152,10 @@ namespace Workbench.ProjectDilemma
     [HorizontalLine(color: EColor.White)]
     [SerializeField] public PlayerSpot playerOneSpot;
     [SerializeField] public PlayerSpot playerTwoSpot;
-    [SerializeField] Collider voteExtraTimeButtonP1;
-    [SerializeField] Collider voteExtraTimeButtonP2;
     [SerializeField] float extraTimeAdded;
     [SerializeField] float extraTimeDiminishPerVote;
+    [SerializeField] int extraTimeMaxVotes;
+    [HideInInspector][SerializeField] int extraTimeVotes = 0;
     [HorizontalLine(color: EColor.White)]
     public UnityEvent OnEndOfCinematic;
 
@@ -453,16 +462,17 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.playerModel.SetActive(true);
       localPlayerSpot.outlineComponent.enabled = true;
       DestroyImmediate(otherPlayerSpot.outlineComponent);
-      localPlayerSpot.gameplayCamerasParent.SetActive(true);
-      localPlayerSpot.playerCam.SetActive(true);
-      localPlayerSpot.killButton.enabled = true;
-      localPlayerSpot.saveButton.enabled = true;
+      localPlayerSpot.gameplayCamerasParent.SetActive(true); // the container for the cinemachine virtual cams
+      localPlayerSpot.mainCam.gameObject.SetActive(true); // the cinemachine brain cam
+      localPlayerSpot.killButton.interactable = true;
+      localPlayerSpot.saveButton.interactable = true;
       // localPlayerSpot.projectileThrow.canon.playerHasControlOverCamera = true;
       localPlayerSpot.throwablesActivator.canon.GetComponent<PhotonView>().TransferOwnership(PhotonNetwork.LocalPlayer);
       PlayerInputManager.Instance.throwablesActivator = localPlayerSpot.throwablesActivator;
       PlayerInputManager.Instance.emoteActivator = localPlayerSpot.emoteActivator;
       PlayerInputManager.Instance.perkActivator = localPlayerSpot.perkActivator;
       PlayerInputManager.Instance.abilityActivator = localPlayerSpot.abilityActivator;
+      PlayerInputManager.Instance.questActivator = localPlayerSpot.questActivator;
       // we can maybe use SendMessage to call all of these together, but I will leave it be for now
       localPlayerSpot.throwablesActivator.Init();
       localPlayerSpot.emoteActivator.Init();
@@ -492,10 +502,10 @@ namespace Workbench.ProjectDilemma
         otherPlayerSpot.gameplayCamerasParent.SetActive(false);
         Destroy(otherPlayerSpot.gameplayCamerasParent);
       }
-      otherPlayerSpot.playerCam.SetActive(false);
-      otherPlayerSpot.playerCam.GetComponent<Camera>().cullingMask = otherPlayerSpot.playerCam.GetComponent<Camera>().cullingMask | (1 << LayerMask.NameToLayer("Masks"));
-      otherPlayerSpot.killButton.enabled = false;
-      otherPlayerSpot.saveButton.enabled = false;
+      otherPlayerSpot.mainCam.gameObject.SetActive(false);
+      otherPlayerSpot.mainCam.gameObject.GetComponent<Camera>().cullingMask = otherPlayerSpot.mainCam.gameObject.GetComponent<Camera>().cullingMask | (1 << LayerMask.NameToLayer("Masks"));
+      // otherPlayerSpot.killButton.interactable = false;
+      // otherPlayerSpot.saveButton.interactable = false;
       otherPlayerSpot.GetComponent<CameraSwitcher>().enabled = false;
       otherPlayerSpot.throwablesActivator.canon.playerHasControlOverCamera = false;
       if (!PhotonNetwork.IsConnected)
@@ -535,7 +545,7 @@ namespace Workbench.ProjectDilemma
 
     public void AnimateSplitScreen()
     {
-      playerSplitScreenAnim.cam = localPlayerSpot.GetComponent<PlayerSpot>().playerCam.GetComponent<Camera>();
+      // playerSplitScreenAnim.cam = localPlayerSpot.suspenseCam.GetComponent<Camera>();
       playerSplitScreenAnim.AnimateCameraWidth(1f, 0.5f, 0f, 0f, 0f, 0f, camSlideTypeForSuspense, camSlideDurationForSuspense);
       enemySplitScreenAnim.AnimateCameraWidth(0f, 0.5f, 1f, 0.5f, 0f, 0f, camSlideTypeForSuspense, camSlideDurationForSuspense);
     }
@@ -555,10 +565,10 @@ namespace Workbench.ProjectDilemma
     }
     public void SetupLocalPlayerCamForSplitScreen()
     {
+      MyDebug.Log("SetupLocalPlayerCamForSplitScreen");
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
       localPlayerSpot.suspenseCam.SetActive(true);
       localPlayerSpot.playerCam = localPlayerSpot.suspenseCam;
-      // localPlayerSpot.playerCam.GetComponent<Camera>().depth = 102;
       playerSplitScreenAnim.cam = localPlayerSpot.playerCam.GetComponent<Camera>();
     }
     public void ShowOtherPlayerDecisionAnim()
@@ -897,30 +907,17 @@ namespace Workbench.ProjectDilemma
       GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
 
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
-      int ourTotalXp = RewardCalculator.Instance.CalculateXPAfterOutcome();
-      ourTotalXp += 40; // testing purposes
+      int ourTotalXp = (int)GameFoundationSdk.wallet.Get(xpAsCurrency);
+      ourTotalXp += RewardCalculator.Instance.CalculateXPAfterOutcome();
+      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
 
-      int totalRequiredXp = 0; int ourLevel = 0; int lastLevelExperience = 0;
-      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count; i++)
-      {
-        totalRequiredXp += MiscelaneousSettings.Instance.levelsDistribution[i];
-        if (ourTotalXp >= totalRequiredXp)
-        {
-          lastLevelExperience = totalRequiredXp;
-          continue;
-        }
-        else
-        {
-          ourLevel = i;
-          break;
-        }
-      }
+      int ourLevel = ProgressData.Instance.GetLevel(ourTotalXp , out int experienceLeft);
+
       experienceSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[ourLevel];
       levelText.text = ourLevel.ToString();
-      experienceText.text = $"{ourTotalXp - lastLevelExperience}/{MiscelaneousSettings.Instance.levelsDistribution[ourLevel]}";
+      experienceText.text = $"{experienceLeft}/{MiscelaneousSettings.Instance.levelsDistribution[ourLevel]}";
       experienceCounter.newAmount = ourTotalXp;
-      levelBarCounter.newAmount = ourTotalXp - lastLevelExperience;
-      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
+      levelBarCounter.newAmount = experienceLeft;
 
       RewardCalculator.Instance.CalculateRewardsAfterOutcome();
       SyncDataToOtherPlayer();
@@ -1142,20 +1139,40 @@ namespace Workbench.ProjectDilemma
 
     public void AddExtraTimeDiscussion()
     {
-      if (extraTimeAdded <= 0)
+      if (extraTimeVotes >= extraTimeMaxVotes)
       {
         return;
       }
       discussionTimer += extraTimeAdded;
       extraTimeAdded -= extraTimeDiminishPerVote;
-      if (extraTimeAdded <= 0)
+      extraTimeVotes++;
+      CheckExtraTimeAvailability();
+      localPlayerSpot.gameTimer.ResetTimer(discussionTimer + localPlayerSpot.gameTimer.CurrentTime); //
+    }
+
+    /// <summary>
+    /// Increase or decrease max votes for extra time
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetExtraTimeMaxVotes(int value)
+    {
+      extraTimeMaxVotes += value;
+      CheckExtraTimeAvailability();
+    }
+
+    /// <summary>
+    /// Call this check everytime we modify max votes or current votes
+    /// </summary>
+    private void CheckExtraTimeAvailability()
+    {
+      if (extraTimeVotes < extraTimeMaxVotes)
       {
-        if (voteExtraTimeButtonP1)
-          voteExtraTimeButtonP1.enabled = false;
-        if (voteExtraTimeButtonP2)
-          voteExtraTimeButtonP2.enabled = false;
+        OnExtraTimeVotesAvailable?.Invoke();
       }
-      localPlayerSpot.gameTimer.ResetTimer(discussionTimer); //
+      else
+      {
+        OnExtraTimeVotesUnavailable?.Invoke();
+      }
     }
 
     public void SkipOutcomeSequence()
@@ -1594,6 +1611,8 @@ namespace Workbench.ProjectDilemma
       }
       // disable all other cameras
       otherPlayerSpot.playerCam.SetActive(false);
+      otherPlayerSpot.playerCam.SetActive(false);
+      otherPlayerSpot.suspenseCam.SetActive(false);
       localPlayerSpot.playerCam.SetActive(false);
       defaultDeathCamAnim.cam.gameObject.SetActive(false);
       localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();

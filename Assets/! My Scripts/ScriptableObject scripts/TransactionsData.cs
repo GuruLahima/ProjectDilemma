@@ -37,12 +37,20 @@ public class TransactionsData : SingletonScriptableObject<TransactionsData>
   /// </summary>
   public void LoadTransactionDataFromDataLayer()
   {
-
+    
+  }
+  /// <summary>
+  /// todo: this function should be called when a transaction is made 
+  /// </summary>
+  public void SaveTransactionDataToDataLayer()
+  {
+    
   }
 
   public void AddTransaction(string transactionKey)
   {
     recordedNonrepeatableTransactions.Add(transactionKey);
+    SaveTransactionDataToDataLayer();
   }
   #endregion
 

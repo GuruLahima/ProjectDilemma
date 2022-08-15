@@ -65,7 +65,7 @@ public class RigGenerator : MonoBehaviour
         string boneName = boneArray[idx].name;
         if (false == boneMap.TryGetValue(boneName, out boneArray[idx]))
         {
-          Debug.LogError("failed to get bone: " + boneName);
+          MyDebug.LogError("failed to get bone: " + boneName);
         }
       }
     }
@@ -148,7 +148,7 @@ public class RigGenerator : MonoBehaviour
   {
     if (!target)
     {
-      Debug.LogError("Invalid SkinnedMeshRenderer, target should not be null");
+      MyDebug.LogError("Invalid SkinnedMeshRenderer, target should not be null");
       return false;
     }
 
@@ -186,7 +186,7 @@ public class RigGenerator : MonoBehaviour
 
     if (!PrefabDestination.rig)
     {
-      Debug.LogError("Failed to generate RigData, proccess canceled");
+      MyDebug.LogError("Failed to generate RigData, proccess canceled");
       return false;
     }
 
@@ -222,7 +222,7 @@ public class RigGenerator : MonoBehaviour
     }
     else
     {
-      Debug.LogError("Failed to create asset with name " + PrefabDestination.name + " at location " + prefabPath);
+      MyDebug.LogError("Failed to create asset with name " + PrefabDestination.name + " at location " + prefabPath);
       return false;
     }
   }

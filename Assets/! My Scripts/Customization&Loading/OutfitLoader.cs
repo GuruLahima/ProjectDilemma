@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEditor;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
@@ -45,7 +46,7 @@ namespace Workbench.ProjectDilemma
       }
       else
       {
-        Debug.LogWarning("Trying to load outfit but photon is not connected");
+        MyDebug.Log("Trying to load outfit but photon is not connected", Color.yellow);
         // circumventing photon because we are not connected
         RPCManager.LoadOutfit(photonView.ViewID, rigIds);
       }

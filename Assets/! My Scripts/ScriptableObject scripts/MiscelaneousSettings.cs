@@ -24,16 +24,7 @@ public class MiscelaneousSettings : SingletonScriptableObject<MiscelaneousSettin
   [Header("Chat settings")]
   [CustomTooltip("The time the chat is blocked after a massage is sent in lobby and in-game chat")]
   public float spamProtectInterval = 3f;
-  [Header("Points distribution")]
-  public int pointsForWin = 50;
-  public int pointsForLoss = -50;
-  public int pointsForBothWon = 10;
-  public int pointsForBothLost = -50;
-  [Header("XP distribution")]
-  public int xpForWin;
-  public int xpForLoss;
-  public int xpForBothWon;
-  public int xpForBothLost;
+
   [CustomTooltip("Enter values for how much each level needs XP to be reached")]
   public List<int> levelsDistribution = new List<int>();
   [Header("Rank distribution")]

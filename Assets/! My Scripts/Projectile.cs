@@ -165,7 +165,7 @@ public class Projectile : MonoBehaviour
       GameEvents.OnTargetHit?.Invoke(target.TargetData);
     }
 
-    Debug.Log("we hit " + collision.gameObject.name);
+    MyDebug.Log("we hit " + collision.gameObject.name);
     // local fx on collision
     if (GameMechanic.Instance.localPlayerSpot.rigRoot.gameObject == collision.transform.gameObject)
     {

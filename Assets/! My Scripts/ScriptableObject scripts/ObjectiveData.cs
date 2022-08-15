@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Workbench.ProjectDilemma;
 
-[CreateAssetMenu(fileName = "New ObjectiveData", menuName = "Workbench/ScriptableObjects/ObjectiveData", order = 3)]
+[CreateAssetMenu(fileName = "New ObjectiveData", menuName = "Workbench/ScriptableObjects/ObjectiveData/ObjectiveData", order = 3)]
 public class ObjectiveData : ItemData
 {
   #region Public Fields

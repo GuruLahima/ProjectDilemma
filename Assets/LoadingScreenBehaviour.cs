@@ -9,4 +9,12 @@ public class LoadingScreenBehaviour : MonoBehaviour
   {
     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
   }
+
+  private void Update()
+  {
+    if (Input.GetKeyDown("escape"))
+    {
+      LoadMenu();
+    }
+  }
 }

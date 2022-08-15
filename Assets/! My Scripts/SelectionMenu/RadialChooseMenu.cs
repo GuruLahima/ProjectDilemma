@@ -1,3 +1,4 @@
+using GuruLaghima;
 using NaughtyAttributes;
 using System;
 using System.Collections;
@@ -55,6 +56,7 @@ public class RadialChooseMenu : MonoBehaviour
       _lastSelected = value;
     }
   }
+  public bool isActivated;
   #endregion
 
   #region Exposed Private Fields
@@ -68,6 +70,7 @@ public class RadialChooseMenu : MonoBehaviour
   private List<Vector2> _objectSnapPoints = new List<Vector2>();
   private List<RectTransform> _objectPositions = new List<RectTransform>();
   private Transform _lastSelected;
+  private IEnumerator radialMenuCoroutine;
 
   private Vector2 FakeCursorPosition
   {
@@ -102,8 +105,26 @@ public class RadialChooseMenu : MonoBehaviour
   #endregion
 
   #region Public Methods
+  public void ActivateRadialMenu(Action actionToPlayAtEnd)
+  {
+    if (!isActivated)
+    {
+      if (radialMenuCoroutine != null)
+      {
+        StopCoroutine(radialMenuCoroutine);
+      }
+      radialMenuCoroutine = ShowRadialMenu(this, actionToPlayAtEnd);
+      StartCoroutine(radialMenuCoroutine);
+    }
+    else
+    {
+      MyDebug.Log("Radial Menu already shown");
+    }
+  }
+
   public void Activate()
   {
+    isActivated = true;
     if (transform.childCount > SnapPoints.Count)
     {
       LastSelectedObject = null;
@@ -127,14 +148,14 @@ public class RadialChooseMenu : MonoBehaviour
   }
   public void Deactivate()
   {
+    isActivated = false;
     raycastBlocker.SetActive(false);
     OnSelectionDeactivated?.Invoke();
-
   }
 
   public void RegenerateSnapPoints()
   {
-    Debug.Log("RegeneratingSnapPoints");
+    MyDebug.Log("RegeneratingSnapPoints");
     GenerateSnapPoints();
   }
 
@@ -184,6 +205,26 @@ public class RadialChooseMenu : MonoBehaviour
         SnapPoints.Add(_objectSnapPoints[i], _objectPositions[i]);
       }
     }
+  }
+
+
+  private IEnumerator ShowRadialMenu(RadialChooseMenu radialMenu, Action actionOnSelection)
+  {
+    radialMenu.isActivated = true;
+    while (radialMenu.isActivated)
+    {
+      radialMenu.Activate();
+
+      if (Input.GetMouseButtonDown(0))
+      {
+        radialMenu.isActivated = false;
+      }
+
+      yield return null;
+    }
+
+    // on closing of radial menu play the emote
+    actionOnSelection?.Invoke();
   }
 
   #endregion

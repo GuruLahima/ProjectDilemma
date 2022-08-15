@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GuruLaghima;
 using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
@@ -143,7 +144,7 @@ public class RadialChooseMenuTools : MonoBehaviour
         }
         else
         {
-          Debug.Log("impossible scenario");
+          MyDebug.Log("impossible scenario");
           distance = ZoomPositionOffset;
         }
         var dir = (oldSelection.position - transform.position).normalized;
@@ -342,7 +343,14 @@ public class RadialChooseMenuTools : MonoBehaviour
       {
         if (container.container != null)
         {
-          desc = container.container.name;
+          if (container.container is ItemData @ItemData)
+          {
+            desc = @ItemData.Name;
+          }
+          else
+          {
+            desc = container.container.name;
+          }
         }
         else
         {

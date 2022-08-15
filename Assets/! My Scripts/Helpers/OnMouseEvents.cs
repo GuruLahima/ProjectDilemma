@@ -23,6 +23,10 @@ namespace GuruLaghima
       // cineBrain = Camera.main.GetComponent<CinemachineBrain>();
     }
 
+    private void Start() {
+      
+    }
+
     public void OnMouseEnter()
     {
       // Check if the mouse was clicked over a UI element
@@ -61,7 +65,7 @@ namespace GuruLaghima
       // Check if the mouse was clicked over a UI element
       if (blockedByUI && EventSystem.current.IsPointerOverGameObject())
       {
-        Debug.Log("There is UI in front of game object");
+        MyDebug.Log("There is UI in front of game object");
         return;
       }
       // check distance of main cam to object

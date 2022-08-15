@@ -6,9 +6,11 @@ using UnityEngine.UI;
 using TMPro;
 using GuruLaghima;
 using Workbench.ProjectDilemma;
+using UnityEngine.EventSystems;
 
 public class ActivePerksChooser : MonoBehaviour
 {
+  [SerializeField] RadialMenuData perksData;
   [SerializeField] ItemData card_1_Data;
   [SerializeField] ItemData card_2_Data;
   [SerializeField] ItemData card_3_Data;
@@ -31,34 +33,34 @@ public class ActivePerksChooser : MonoBehaviour
   // Start is called before the first frame update
   public void Init()
   {
-    // fetch data about perks
-    List<InventoryItemDefinition> allPerkDefinitions = new List<InventoryItemDefinition>();
-    int count = GameFoundationSdk.catalog.FindItems(GameFoundationSdk.tags.Find("perks"), allPerkDefinitions);
-    MyDebug.Log("Perks Count", count);
 
-    foreach (InventoryItemDefinition item in allPerkDefinitions)
+    // fetch perk data from a scriptable object
+    if (perksData)
     {
-      if (!card_1_Data)
-        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
+      foreach (PerkData item in perksData.orderedItems)
+      {
+        if (item)
         {
-          card_1_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
-          MyDebug.Log("Equipped", item.key);
-          continue;
+          if (!card_1_Data)
+          {
+            card_1_Data = item;
+            MyDebug.Log("Equipped perk ", item.Name);
+            continue;
+          }
+          if (!card_2_Data)
+          {
+            card_2_Data = item;
+            MyDebug.Log("Equipped perk ", item.Name);
+            continue;
+          }
+          if (!card_3_Data)
+          {
+            card_3_Data = item;
+            MyDebug.Log("Equipped perk ", item.Name);
+            break;
+          }
         }
-      if (!card_2_Data)
-        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
-        {
-          card_2_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
-          MyDebug.Log("Equipped", item.key);
-          continue;
-        }
-      if (!card_3_Data)
-        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
-        {
-          card_3_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
-          MyDebug.Log("Equipped", item.key);
-          break;
-        }
+      }
     }
 
     PopulatePerkCardFromData(card_1_Image, card_1_Desc, card_1_Title, card_1_Button, card_1_Data);
@@ -69,16 +71,24 @@ public class ActivePerksChooser : MonoBehaviour
 
   void PopulatePerkCardFromData(Image cardIcon, TextMeshProUGUI cardDesc, TextMeshProUGUI cardTitle, Button cardButton, ItemData cardData)
   {
-    cardIcon.sprite = cardData.ico;
-    cardDesc.text = (string)cardData.inventoryitemDefinition.GetStaticProperty("description");
-    cardTitle.text = (string)cardData.inventoryitemDefinition.displayName;
-    cardButton.onClick.AddListener(() =>
+    if (cardData)
     {
-      playerPerkFeature.ownedPerk = (PerkData)cardData;
-      playerPerkFeature.DisablePerkWindow();
-      playerPerkFeature.HidePerk();
-      playerPerkFeature.ActivatePerk();
-    });
+      cardIcon.sprite = cardData.ico;
+      cardDesc.text = (string)cardData.inventoryitemDefinition.GetStaticProperty("description");
+      cardTitle.text = (string)cardData.inventoryitemDefinition.displayName;
+      cardButton.GetComponent<EventTrigger>().enabled = true;
+      cardButton.onClick.AddListener(() =>
+      {
+        playerPerkFeature.ownedPerk = (PerkData)cardData;
+        playerPerkFeature.DisablePerkWindow();
+        playerPerkFeature.HidePerk();
+        playerPerkFeature.ActivatePerk();
+      });
+    }
+    else
+    {
+      cardButton.GetComponent<EventTrigger>().enabled = false;
+    }
   }
 
 }

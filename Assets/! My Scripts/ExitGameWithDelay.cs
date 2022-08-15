@@ -1,3 +1,4 @@
+using GuruLaghima;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Workbench.ProjectDilemma
 
         void Exit()
         {
-            Debug.Log("QUIT!");
+            MyDebug.Log("QUIT!");
             Application.Quit();
         }
     }

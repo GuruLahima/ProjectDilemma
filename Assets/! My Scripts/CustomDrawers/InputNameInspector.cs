@@ -1,3 +1,4 @@
+using GuruLaghima;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -22,7 +23,7 @@ public class InputNameInspector : PropertyDrawer
     }
     else
     {
-      Debug.LogError("Property " + property.name + " is not of a matching type!");
+      MyDebug.LogError("Property " + property.name + " is not of a matching type!");
     }
   }
 }

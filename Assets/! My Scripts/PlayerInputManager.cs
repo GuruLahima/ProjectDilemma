@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GuruLaghima;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -99,6 +100,19 @@ namespace Workbench.ProjectDilemma
         input.InputAction?.Invoke();
     }
 
+    public void ExecuteInputActionButAlsoProcessTheInput(string name)
+    {
+      InputWrapper input = Inputs.Find((input) =>
+      {
+        return input.ActionName == name;
+      });
+      if (input != null)
+      {
+        CircumventedProcessInput(input);
+        // input.InputAction?.Invoke();
+      }
+    }
+
     private void ProcessOverrideInputs()
     {
       foreach (InputWrapper _input in OverrideInputs)
@@ -176,6 +190,83 @@ namespace Workbench.ProjectDilemma
             break;
         }
       }
+    }
+
+    private void CircumventedProcessInput(InputWrapper _input)
+    {
+      switch (_input.InputMode)
+      {
+        case InputWrapper.Mode.OnPress:
+          // if ((!IsHeld || _input.PersistentInput))
+          {
+            _input.InputAction?.Invoke();
+          }
+          break;
+        case InputWrapper.Mode.Hold:
+          if ((!IsHeld || _input.IsActivated == true || _input.PersistentInput))
+          {
+            _input.InputAction?.Invoke();
+            _input.IsActivated = true;
+            if (_input.TriggersHeld)
+            {
+              IsHeld = true;
+            }
+          }
+          else if (_input.IsActivated == true)
+          {
+            _input.IsActivated = false;
+            if (_input.TriggersHeld)
+            {
+              IsHeld = false;
+            }
+          }
+          break;
+        case InputWrapper.Mode.OnRelease:
+          if ((!IsHeld || _input.PersistentInput))
+          {
+            _input.InputAction?.Invoke();
+          }
+          break;
+        case InputWrapper.Mode.StateSwitch:
+          // we initiate the state
+          if ((!IsHeld || _input.IsActivated == true || _input.PersistentInput)) // special condition
+          {
+            // switch the state (true => false) / (false, null => true)
+            if (_input.IsActivated == true)
+            {
+              _input.IsActivated = false;
+
+            }
+            else
+            {
+              _input.IsActivated = true;
+
+            }
+          }
+          // init depending on the current state
+          if (_input.IsActivated == true)
+          {
+            _input.InputAction?.Invoke();
+            if (_input.TriggersHeld)
+            {
+              IsHeld = true;
+            }
+          }
+          // we only ever want this to execute once, then we set the state => null
+          else if (_input.IsActivated == false)
+          {
+            _input.ReverseInputAction?.Invoke();
+            _input.IsActivated = null;
+            if (_input.TriggersHeld)
+            {
+              IsHeld = false;
+            }
+          }
+          break;
+        default:
+          break;
+      }
+
     }
 
     private void ProcessInput()
@@ -263,6 +354,7 @@ namespace Workbench.ProjectDilemma
     [HideInInspector] public EmoteActivator emoteActivator;
     [HideInInspector] public PerkActivator perkActivator;
     [HideInInspector] public AbilityActivator abilityActivator;
+    [HideInInspector] public QuestActivator questActivator;
     public void ProjectileAim()
     {
       throwablesActivator.Aim();
@@ -305,7 +397,6 @@ namespace Workbench.ProjectDilemma
 
     public void PerkHide()
     {
-
       perkActivator.HidePerk();
     }
 
@@ -313,6 +404,11 @@ namespace Workbench.ProjectDilemma
     public void PerkActivate()
     {
       perkActivator.ActivatePerk();
+    }
+
+    public void RerollSnatchQuest()
+    {
+      questActivator.RerollSnatchQuest();
     }
 
     public void SetHeld(bool state)
@@ -335,7 +431,7 @@ namespace Workbench.ProjectDilemma
         inputConditions.Remove(ICKeys.USING_COMPUTER);
       }
     }
-    
+
     public void ActivateQuestState(string stateName)
     {
       GameMechanic.Instance.localPlayerSpot.questActivator.ActivateQuestState(stateName);
@@ -343,25 +439,12 @@ namespace Workbench.ProjectDilemma
 
     public void SetCameraControl(bool value)
     {
-      if (GameMechanic.Instance.localPlayerSpot.mainCam)
+      if (GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam)
       {
-        GameMechanic.Instance.localPlayerSpot.mainCam.playerHasControlOverCamera = value;
+        GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam.GetComponent<SimpleCameraController>().playerHasControlOverCamera = value;
       }
     }
 
-    public void ToggleCursor()
-    {
-      if (Cursor.lockState == CursorLockMode.Locked)
-      {
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = true;
-      }
-      else
-      {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-      }
-    }
     #endregion
 
     #region Private Methods

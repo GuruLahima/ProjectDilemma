@@ -186,7 +186,7 @@ namespace Workbench.ProjectDilemma
       this.chatClient.ConnectUsingSettings(this.chatAppSettings);
 
       this.ChannelToggleToInstantiate.gameObject.SetActive(false);
-      Debug.Log("Connecting as: " + this.UserName);
+      MyDebug.Log("Connecting as: " + this.UserName);
 
       this.ConnectingLabel.SetActive(true);
     }
@@ -483,7 +483,7 @@ namespace Workbench.ProjectDilemma
         }
         else
         {
-          Debug.Log("The command '" + tokens[0] + "' is invalid.");
+          MyDebug.Log("The command '" + tokens[0] + "' is invalid.");
         }
       }
       else
@@ -508,15 +508,15 @@ namespace Workbench.ProjectDilemma
     {
       if (level == ExitGames.Client.Photon.DebugLevel.ERROR)
       {
-        Debug.LogError(message);
+        MyDebug.LogError(message);
       }
       else if (level == ExitGames.Client.Photon.DebugLevel.WARNING)
       {
-        Debug.LogWarning(message);
+        MyDebug.LogWarning(message);
       }
       else
       {
-        Debug.Log(message);
+        MyDebug.Log(message);
       }
     }
 
@@ -585,7 +585,7 @@ namespace Workbench.ProjectDilemma
         }
       }
 
-      Debug.Log("OnSubscribed: " + string.Join(", ", channels));
+      MyDebug.Log("OnSubscribed: " + string.Join(", ", channels));
 
       /*
           // select first subscribed channel in alphabetical order
@@ -621,7 +621,7 @@ namespace Workbench.ProjectDilemma
     {
       if (this.channelToggles.ContainsKey(channelName))
       {
-        Debug.Log("Skipping creation for an existing channel toggle.");
+        MyDebug.Log("Skipping creation for an existing channel toggle.");
         return;
       }
 
@@ -658,7 +658,7 @@ namespace Workbench.ProjectDilemma
 
           this.channelToggles.Remove(channelName);
 
-          Debug.Log("Unsubscribed from channel '" + channelName + "'.");
+          MyDebug.Log("Unsubscribed from channel '" + channelName + "'.");
 
           // Showing another channel if the active channel is the one we unsubscribed from before
           if (channelName == this.selectedChannelName && this.channelToggles.Count > 0)
@@ -673,7 +673,7 @@ namespace Workbench.ProjectDilemma
         }
         else
         {
-          Debug.Log("Can't unsubscribe from channel '" + channelName + "' because you are currently not subscribed to it.");
+          MyDebug.Log("Can't unsubscribe from channel '" + channelName + "' because you are currently not subscribed to it.");
         }
       }
     }
@@ -696,7 +696,7 @@ namespace Workbench.ProjectDilemma
       byte[] msgBytes = message as byte[];
       if (msgBytes != null)
       {
-        Debug.Log("Message with byte[].Length: " + msgBytes.Length);
+        MyDebug.Log("Message with byte[].Length: " + msgBytes.Length);
       }
       if (this.selectedChannelName.Equals(channelName))
       {
@@ -715,7 +715,7 @@ namespace Workbench.ProjectDilemma
     public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
     {
 
-      Debug.LogWarning("status: " + string.Format("{0} is {1}. Msg:{2}", user, status, message));
+      MyDebug.LogWarning("status: " + string.Format("{0} is {1}. Msg:{2}", user, status, message));
 
       if (this.friendListItemLUT.ContainsKey(user))
       {
@@ -757,7 +757,7 @@ namespace Workbench.ProjectDilemma
       bool found = this.chatClient.TryGetChannel(this.selectedChannelName, out channel);
       if (!found)
       {
-        Debug.Log("AddMessageToSelectedChannel failed to find channel: " + this.selectedChannelName);
+        MyDebug.Log("AddMessageToSelectedChannel failed to find channel: " + this.selectedChannelName);
         return;
       }
 
@@ -782,7 +782,7 @@ namespace Workbench.ProjectDilemma
       bool found = this.chatClient.TryGetChannel(channelName, out channel);
       if (!found)
       {
-        Debug.Log("ShowChannel failed to find channel: " + channelName);
+        MyDebug.Log("ShowChannel failed to find channel: " + channelName);
         return;
       }
 
@@ -795,7 +795,7 @@ namespace Workbench.ProjectDilemma
       // CurrentChannelText.text = ColoredNames(CurrentChannelText.text);
       // CurrentChannelText.text = ParseSpecialKeywords(CurrentChannelText.text);
 
-      Debug.Log("ShowChannel: " + this.selectedChannelName);
+      MyDebug.Log("ShowChannel: " + this.selectedChannelName);
 
       foreach (KeyValuePair<string, Toggle> pair in this.channelToggles)
       {

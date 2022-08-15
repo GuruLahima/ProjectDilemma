@@ -76,12 +76,15 @@ namespace GuruLaghima.ProjectDilemma
     [SerializeField] bool usedForRecycler;
     [SerializeField] bool usedInCombiner;
     [SerializeField] bool usedByRelics;
+    [SerializeField] bool usedInShelf;
     [ShowIf("usedForRecycler")]
     [SerializeField] RecyclerView recyclerView;
     [ShowIf("usedInCombiner")]
     [SerializeField] CombinerView combinerView;
     [ShowIf("usedByRelics")]
     [SerializeField] RelicView relicView;
+    [ShowIf("usedInShelf")]
+    [SerializeField] ShelfView shelfView;
     [HideIf("showEquipedOnly")]
     [SerializeField] bool showUnequipedOnly;
     [HideIf("showUnequipedOnly")]
@@ -432,6 +435,8 @@ namespace GuruLaghima.ProjectDilemma
         newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
         newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
         newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
+        newItem.SetItemTooltip((string)inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.description));
+        newItem.SetItemIcon(inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.inventory_icon).AsAsset<Sprite>());
         newItem.SetItemData(inventoryItemType);
         if (newItem.quantityTextField)
           newItem.quantityTextField.text = inventoryItemType.AmountOwned.ToString();
@@ -508,6 +513,11 @@ namespace GuruLaghima.ProjectDilemma
         {
           newItem.usedByRelics = true;
           newItem.relicView = this.relicView;
+        }
+        if (usedInShelf)
+        {
+          newItem.usedInShelf = true;
+          newItem.shelfView = this.shelfView;
         }
 
         if (newItem.GetComponentInChildren<ClothingPlaceholder>())

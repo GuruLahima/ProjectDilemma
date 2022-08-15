@@ -23,7 +23,7 @@ namespace GuruLaghima
 
       if (args.Length < 2)
       {
-        Debug.Log("<color=red>Bad data for item</color>");
+        MyDebug.Log("<color=red>Bad data for item</color>");
         return false;
       }
       else

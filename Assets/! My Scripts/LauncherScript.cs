@@ -401,6 +401,9 @@ namespace Workbench.ProjectDilemma
       fpsController.SetActive(true);
       fpsControllerCam.SetActive(true);
 
+      // allow outlines to be shown when in FP view
+      cakeslice.Outline.eraseRendererGlobal = false;
+
       ToggleMenu(false);
     }
     public void SwitchToMenuView()
@@ -410,6 +413,10 @@ namespace Workbench.ProjectDilemma
       // turn off first person controller
       fpsController.SetActive(false);
       fpsControllerCam.SetActive(false);
+
+      // prevent outlines from being shown when in menu
+      cakeslice.Outline.eraseRendererGlobal = false;
+
       ToggleMenu(true);
 
     }
