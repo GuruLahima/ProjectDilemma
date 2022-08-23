@@ -602,4 +602,20 @@ namespace GuruLaghima
 
   }
 
+  [Serializable]
+  public class InvokableAction
+  {
+    public string name;
+    public UnityEvent action;
+    public void Execute()
+    {
+      action?.Invoke();
+    }
+
+    /*     [System.Serializable]
+        public class MyIntEvent : UnityEvent<int>
+        {
+        } */
+  }
+
 }

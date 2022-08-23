@@ -12,7 +12,7 @@ namespace Workbench.ProjectDilemma
     public RigData Clothing;
     public void AddToCharacter()
     {
-      MyDebug.Log("AddCLothing::AddToCharacter called for", this.Clothing.SkinPrefab.name);
+      // MyDebug.Log("AddCLothing::AddToCharacter called for", this.Clothing.SkinPrefab.name);
       if (CharacterCustomizationManager.Instance)
       {
         // MyDebug.Log("AddCLothing:: CharacterCustomizationManager.Instance present");

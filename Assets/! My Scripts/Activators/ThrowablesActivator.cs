@@ -12,7 +12,7 @@ using System;
 using MoreMountains.Feedbacks;
 using GuruLaghima;
 using DG.Tweening;
-
+using Cinemachine;
 
 namespace Workbench.ProjectDilemma
 {
@@ -101,6 +101,7 @@ namespace Workbench.ProjectDilemma
     private void OnDisable()
     {
       InventoryManager.InventoryUpdated -= Init;
+      GameMechanic.DiscussionEnded -= OnDiscussionEnded;
     }
 
     private void Update()
@@ -133,16 +134,12 @@ namespace Workbench.ProjectDilemma
 
       radialMenu.ActivateRadialMenu(Set);
 
-      // CursorManager.SetLockMode(CursorLockMode.Confined);
-      // CursorManager.SetVisibility(false);
     }
     public void Set()
     {
       MyDebug.Log("Set projectile");
       ActiveState = false;
       radialMenu.Deactivate();
-      // CursorManager.SetLockMode(CursorLockMode.Locked);
-      // CursorManager.SetVisibility(false);
       if (radialMenu.LastSelectedObject != null)
       {
         var container = radialMenu.LastSelectedObject.GetComponent<SelectionMenuContainer>();
@@ -161,66 +158,11 @@ namespace Workbench.ProjectDilemma
               menuEntry.defaultIcon.sprite = menuEntry.chosenItemIcon.sprite;
             menuEntry.chosenItemIcon.sprite = selectedProjectile.ico;
             menuEntry.switchToChosenIconFeedbacks.PlayFeedbacks();
-            // Invoke("SwapDefaultIcon", 1.2f);
           }
         }
       }
 
-
       ResetRotationOfCanon();
-    }
-    // void SwapDefaultIcon()
-    // {
-    //   if (radialMenu.LastSelectedObject != null)
-    //   {
-    //     var container = radialMenu.LastSelectedObject.GetComponent<SelectionMenuContainer>();
-    //     if (container)
-    //     {
-    //       if (container.container is ProjectileData)
-    //       {
-    //         selectedProjectile = container.container as ProjectileData;
-    //         menuEntry.defaultIcon.sprite = selectedProjectile.ico;
-    //       }
-    //     }
-    //   }
-
-
-    // }
-    private void DisableCameraControl()
-    {
-      mainCam.playerHasControlOverCamera = false;
-      // unlock mouse
-      CursorManager.SetLockMode(CursorLockMode.Confined);
-
-      // also force camera to look straight ahead. maybe increase field of view too for extra effect
-      Vector3 position;
-      if (PhotonNetwork.IsConnected)
-      {
-        position = GameMechanic.Instance.otherPlayerSpot.character.transform.position;
-      }
-      else
-      {
-        if (this.GetComponent<PlayerSpot>() == GameMechanic.Instance.playerOneSpot)
-          position = GameMechanic.Instance.playerTwoSpot.playerModel.transform.position;
-        else
-          position = GameMechanic.Instance.playerOneSpot.playerModel.transform.position;
-
-      }
-      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
-      currentPlayerCam.transform.DOLookAt(position, aimingCameraTransitionInterval, AxisConstraint.Y, Vector3.up);
-      currentPlayerCam.DOFieldOfView(aimingCameraTransitionFieldOfView, aimingCameraTransitionInterval);
-    }
-
-    private void RestoreCameraControl()
-    {
-      MyDebug.Log("Control restored");
-      mainCam.playerHasControlOverCamera = true;
-      // lock mouse
-      // CursorManager.SetLockMode(CursorLockMode.Locked);
-
-      // restore field of view
-      Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
-      currentPlayerCam.DOFieldOfView(originalFieldOfView, aimingCameraTransitionInterval);
     }
 
     IEnumerator FacePositionSmoothly(Vector3 position, float v)
@@ -249,21 +191,38 @@ namespace Workbench.ProjectDilemma
         MyDebug.Log("we own the projectile");
 
         aiming = true;
-        Camera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>();
-        originalFieldOfView = currentPlayerCam.fieldOfView;
+
+        // switch to first person camera for aiming
+        GameMechanic.Instance.localPlayerSpot.playerCam = GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam;
+        GameMechanic.Instance.localPlayerSpot.GetComponent<CameraSwitcher>().SwitchToCamByReference(
+          GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<CinemachineVirtualCamera>());
+
+        // prevent switching while aiming
+        GameMechanic.Instance.localPlayerSpot.GetComponent<CameraSwitcher>().canSwitch = false;
+
+        // remember the original field of view because we will be animating it
+        CinemachineVirtualCamera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<CinemachineVirtualCamera>();
+        originalFieldOfView = currentPlayerCam.m_Lens.FieldOfView;
+
+        // prevent any accidental clicks on the UI
         raycastBlocker.SetActive(true);
 
         DisableCameraControl();
-        canon.playerHasControlOverCamera = true;
+        AnimateFieldOfViewAndRotationOfCamera();
 
+
+        // initialize throwables canon and give control to the player
+        canon.Init();
+        canon.playerHasControlOverCamera = true;
         aimHelper.gameObject.SetActive(true);
 
         if (iconOutline)
         {
           iconOutline.effectColor = Color.red;
         }
-        // ActiveState = true;
       }
+
+      // aiming
       CalculateStrengthAndAngle();
       TrajectoryMotion.AIM(aimHelper, startingPoint, aimingAngle, baseThrowStrength, resolutionRay, (int)resolutionLine, layerMask.value, null, null, decal);
 
@@ -281,17 +240,67 @@ namespace Workbench.ProjectDilemma
       baseThrowStrength = Mathf.Lerp(baseThrowStrength, newBaseThrowStrength, Time.deltaTime * strengthUpdateSpeed);
     }
 
+    private void DisableCameraControl()
+    {
+      mainCam.playerHasControlOverCamera = false;
+      // unlock mouse
+      CursorManager.SetLockMode(CursorLockMode.Locked);
+      CursorManager.SetVisibility(false);
+    }
+
+    void AnimateFieldOfViewAndRotationOfCamera()
+    {
+      // also force camera to look straight ahead. maybe increase field of view too for extra effect
+      Vector3 position;
+      if (PhotonNetwork.IsConnected)
+      {
+        position = GameMechanic.Instance.otherPlayerSpot.character.transform.position;
+      }
+      else
+      {
+        if (this.GetComponent<PlayerSpot>() == GameMechanic.Instance.playerOneSpot)
+          position = GameMechanic.Instance.playerTwoSpot.playerModel.transform.position;
+        else
+          position = GameMechanic.Instance.playerOneSpot.playerModel.transform.position;
+
+      }
+      CinemachineVirtualCamera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<CinemachineVirtualCamera>();
+      if (currentPlayerCam)
+      {
+        currentPlayerCam.transform.DOLookAt(position, aimingCameraTransitionInterval, AxisConstraint.Y, Vector3.up);
+        DOTween.To(() => currentPlayerCam.m_Lens.FieldOfView, x => currentPlayerCam.m_Lens.FieldOfView = x, aimingCameraTransitionFieldOfView, aimingCameraTransitionInterval);
+      }
+    }
+
+    private void RestoreCameraControl()
+    {
+      MyDebug.Log("Control restored");
+      mainCam.playerHasControlOverCamera = true;
+      // lock mouse
+      CursorManager.SetLockMode(CursorLockMode.Confined);
+      CursorManager.SetVisibility(true);
+
+
+      // restore field of view
+      CinemachineVirtualCamera currentPlayerCam = GameMechanic.Instance.localPlayerSpot.playerCam.GetComponent<CinemachineVirtualCamera>();
+      if (currentPlayerCam)
+        DOTween.To(() => currentPlayerCam.m_Lens.FieldOfView, x => currentPlayerCam.m_Lens.FieldOfView = x, originalFieldOfView, aimingCameraTransitionInterval);
+
+    }
+
     public void Throw()
     {
       MyDebug.Log("Throw projectile");
       aiming = false;
       raycastBlocker.SetActive(false);
 
+      // allow switching while aiming
+      GameMechanic.Instance.localPlayerSpot.GetComponent<CameraSwitcher>().canSwitch = true;
+
       if (OnCooldown) return;
       if (!selectedProjectile) return;
       if (!(selectedProjectile.AmountOwned > 0)) return;
 
-      // ActiveState = false;
       if (selectedProjectile && selectedProjectile.AmountOwned > 0)
       {
         // expend an item

@@ -96,7 +96,11 @@ public class PointsCounter : MonoBehaviour
         BankMoney = softCurrency.quantity;
         if (mainPointsCounterGainFeedback)
         {
-          mainPointsCounterGainFeedback.PlayFeedbacks();
+          try
+          {
+            mainPointsCounterGainFeedback.PlayFeedbacks();
+          }
+          catch { }
         }
       }
       else if (softCurrency.quantity < prev_bankMoney)
@@ -106,7 +110,11 @@ public class PointsCounter : MonoBehaviour
         BankMoney = softCurrency.quantity;
         if (mainPointsCounterLoseFeedback)
         {
-          mainPointsCounterLoseFeedback.PlayFeedbacks();
+          try
+          {
+            mainPointsCounterLoseFeedback.PlayFeedbacks();
+          }
+          catch { }
         }
       }
     }

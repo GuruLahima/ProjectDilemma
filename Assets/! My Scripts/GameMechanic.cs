@@ -35,6 +35,7 @@ namespace Workbench.ProjectDilemma
   //
   public class GameMechanic : MonoBehaviourPunCallbacks, ISequenceExecutor
   {
+    public float discussionTime;
     IEnumerator currentCoroutine;
 
     public IEnumerator SequenceCoroutine(List<ControllableSequence.EventWithDuration> eventSequence, string name)
@@ -128,7 +129,7 @@ namespace Workbench.ProjectDilemma
     public UnityEvent OnExtraTimeVotesUnavailable;
 
     [BoxGroup("Visual Feedback Events - Choices")]
-    public UnityEvent<float> OnExtraTimeAdded;
+    public UnityEvent OnExtraTimeAdded;
 
     [Foldout("End screen references")]
     public UnityEvent<string> On1StarsEarned;
@@ -190,6 +191,8 @@ namespace Workbench.ProjectDilemma
     [SerializeField] float fadeOutToDeathSequenceInterval;
 
     [HorizontalLine(color: EColor.White)]
+    [Foldout("Camera transition settings")]
+    [SerializeField] GameObject postScreenCam;
     [Foldout("Camera transition settings")]
     [SerializeField] SplitScreenAnim playerSplitScreenAnim;
     [Foldout("Camera transition settings")]
@@ -269,10 +272,6 @@ namespace Workbench.ProjectDilemma
     [Foldout("End screen references")]
     [SerializeField] TMP_InputField postcardTextField;
     [Foldout("End screen references")]
-    [SerializeField] private RewardDisplayPlaceholder placeholderPrefab;
-    [Foldout("End screen references")]
-    [SerializeField] private Transform rewardsDisplayContent;
-    [Foldout("End screen references")]
     [SerializeField] private TextMeshProUGUI experienceBonusesText;
     [Foldout("End screen references")]
     [SerializeField] private TextMeshProUGUI coinsBonusesText;
@@ -282,6 +281,8 @@ namespace Workbench.ProjectDilemma
     [SerializeField] private string questCompletedMessageStar;
     [Foldout("End screen references")]
     [SerializeField] private string perkCompletedMessageStar;
+    [Foldout("End screen references")]
+    [SerializeField] private TextMeshProUGUI extraVotesCounter;
 
 
     #endregion
@@ -367,7 +368,6 @@ namespace Workbench.ProjectDilemma
     private Animator activeDeathBookAnimator;
     int decisionsMade;
     private bool inOutcomeSequence;
-    private List<RewardDisplayPlaceholder> listOfRewardPlaceholders = new List<RewardDisplayPlaceholder>();
     private float discussionTimer; // i extracted this timer because we are modifying it outside the function
     #endregion
 
@@ -482,7 +482,7 @@ namespace Workbench.ProjectDilemma
       localPlayerSpot.relicActivator.Init();
       localPlayerSpot.extrasActivator.Init();
       localPlayerSpot.abilityActivator.Init();
-      localPlayerSpot.outfitLoader.Init();
+      // localPlayerSpot.outfitLoader.Init(); // ? can the onwership transfer be screwing this call?  
       // populate list of owned death sequences
       localPlayerSpot.PopulateDeathBook(ScenarioManager.instance.thisScenario, DeathSequencesManager.Instance.universalDeathSequences);
       // assign current points to end screen counters
@@ -512,7 +512,6 @@ namespace Workbench.ProjectDilemma
       {
         otherPlayerSpot.outfitLoader.Init();
       }
-
 
       // assign current points to end screen counters
       if (ScenarioManager.instance.otherPlayer != null && ScenarioManager.instance.otherPlayer.CustomProperties.ContainsKey(Keys.PLAYER_SOFT_CURRENCY_POINTS))
@@ -855,6 +854,7 @@ namespace Workbench.ProjectDilemma
 
     public void ShowPostcardForWinner()
     {
+      MyDebug.Log("ShowPostcardForWinner");
       if (votingOutcome == Outcome.Won)
       {
         postcardObj.SetActive(true);
@@ -894,6 +894,7 @@ namespace Workbench.ProjectDilemma
     // referenced in inspector
     public void PrepareForEndScreen()
     {
+      MyDebug.Log("PrepareForEndScreen");
       ActivateProperModelForEndScreen();
 
       int ourTotalPoints = RewardCalculator.Instance.CalculatePointsAfterOutcome();
@@ -911,7 +912,7 @@ namespace Workbench.ProjectDilemma
       ourTotalXp += RewardCalculator.Instance.CalculateXPAfterOutcome();
       GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
 
-      int ourLevel = ProgressData.Instance.GetLevel(ourTotalXp , out int experienceLeft);
+      int ourLevel = ProgressData.Instance.GetLevel(ourTotalXp, out int experienceLeft);
 
       experienceSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[ourLevel];
       levelText.text = ourLevel.ToString();
@@ -922,33 +923,6 @@ namespace Workbench.ProjectDilemma
       RewardCalculator.Instance.CalculateRewardsAfterOutcome();
       SyncDataToOtherPlayer();
 
-    }
-    public void ClaimReward(RewardDisplayPlaceholder placeholder)
-    {
-      placeholder.rewardData.NewlyAdded = false;
-      placeholder.gameObject.SetActive(false);
-      if (listOfRewardPlaceholders.Contains(placeholder))
-      {
-        listOfRewardPlaceholders.Remove(placeholder);
-      }
-      if (listOfRewardPlaceholders.Count > 0)
-      {
-        listOfRewardPlaceholders[0].gameObject.SetActive(true);
-      }
-      else
-      {
-        OnAllRewardsClaimed?.Invoke();
-      }
-    }
-    public void ClaimRewardAll()
-    {
-      foreach (RewardDisplayPlaceholder placeholder in listOfRewardPlaceholders)
-      {
-        placeholder.rewardData.NewlyAdded = false;
-        placeholder.gameObject.SetActive(false);
-      }
-      listOfRewardPlaceholders.Clear();
-      OnAllRewardsClaimed?.Invoke();
     }
 
     public void LevelBar()
@@ -1068,8 +1042,9 @@ namespace Workbench.ProjectDilemma
     }
     public void OnPlayerDisconnect()
     {
+      MyDebug.Log("OnPlayerDisconnect");
       votingOutcome = Outcome.Won;
-      PrepareForEndScreen();
+      // PrepareForEndScreen();
 
 
       // stop game sequence
@@ -1146,7 +1121,10 @@ namespace Workbench.ProjectDilemma
       discussionTimer += extraTimeAdded;
       extraTimeAdded -= extraTimeDiminishPerVote;
       extraTimeVotes++;
+      if (extraVotesCounter)
+        extraVotesCounter.text = (extraTimeMaxVotes - extraTimeVotes).ToString();
       CheckExtraTimeAvailability();
+      OnExtraTimeAdded?.Invoke();
       localPlayerSpot.gameTimer.ResetTimer(discussionTimer + localPlayerSpot.gameTimer.CurrentTime); //
     }
 
@@ -1154,9 +1132,11 @@ namespace Workbench.ProjectDilemma
     /// Increase or decrease max votes for extra time
     /// </summary>
     /// <param name="value"></param>
-    public void SetExtraTimeMaxVotes(int value)
+    public void AddExtraTimeMaxVotes(int value)
     {
       extraTimeMaxVotes += value;
+      if (extraVotesCounter)
+        extraVotesCounter.text = (extraTimeMaxVotes - extraTimeVotes).ToString();
       CheckExtraTimeAvailability();
     }
 
@@ -1194,7 +1174,7 @@ namespace Workbench.ProjectDilemma
     }
     public void DiscussionPhaseInvoker(float duration)
     {
-      currentCoroutine = DiscussionPhaseCoroutine(duration);
+      currentCoroutine = DiscussionPhaseCoroutine(discussionTime);
     }
     public void DeathChoiceCoroutineWrapper(float interval)
     {
@@ -1291,6 +1271,8 @@ namespace Workbench.ProjectDilemma
       oneVotedCondition.boolWrapper.Value = false;
       oneBetrayedOneSaved.boolWrapper.Value = false;
       localPlayerWonCondition.boolWrapper.Value = false;
+      if (extraVotesCounter)
+        extraVotesCounter.text = (extraTimeMaxVotes - extraTimeVotes).ToString();
     }
 
     private void Update()
@@ -1361,8 +1343,26 @@ namespace Workbench.ProjectDilemma
       if (!madeChoice)
         OnRanOutOfTime?.Invoke();
 
+      /*       try
+            {
+              DiscussionEnded?.Invoke();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            try
+            {
+              DiscussionEndedUnityEvent?.Invoke();
+            }
+            catch (Exception ex)
+            {
+
+            } */
       DiscussionEnded?.Invoke();
       DiscussionEndedUnityEvent?.Invoke();
+
+
     }
     IEnumerator DeathChoiceCoroutine(float chooseDuration)
     {
@@ -1506,11 +1506,14 @@ namespace Workbench.ProjectDilemma
         yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
       }
       // disable all other cameras
-      otherPlayerSpot.playerCam.SetActive(false);
-      localPlayerSpot.playerCam.SetActive(false);
-      defaultDeathCamAnim.cam.gameObject.SetActive(false);
-      localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      /*       if (otherPlayerSpot.playerCam)
+              otherPlayerSpot.playerCam.SetActive(false);
+            if (localPlayerSpot.playerCam)
+              localPlayerSpot.playerCam.SetActive(false);
+            defaultDeathCamAnim.cam.gameObject.SetActive(false);
+            localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+            otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras(); */
+      DisableAllCameras();
 
       // play random Both Lost death (the choice should already have been made when the voting ended)
       if (outcomeSequence != null)
@@ -1541,11 +1544,12 @@ namespace Workbench.ProjectDilemma
       transitionToSalvationSequenceScreen.GetComponent<Animator>().SetTrigger("FadeOut");
       yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
       // disable all other cameras
-      otherPlayerSpot.playerCam.SetActive(false);
-      localPlayerSpot.playerCam.SetActive(false);
-      defaultDeathCamAnim.cam.enabled = false;
-      localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      /*       otherPlayerSpot.playerCam.SetActive(false);
+            localPlayerSpot.playerCam.SetActive(false);
+            defaultDeathCamAnim.cam.enabled = false;
+            localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+            otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras(); */
+      DisableAllCameras();
       // play victory
       if (outcomeSequence)
       {
@@ -1575,11 +1579,12 @@ namespace Workbench.ProjectDilemma
         yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
       }
       // disable all other cameras
-      otherPlayerSpot.playerCam.SetActive(false);
-      localPlayerSpot.playerCam.SetActive(false);
-      defaultDeathCamAnim.cam.gameObject.SetActive(false);
-      localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      /*       otherPlayerSpot.playerCam.SetActive(false);
+            localPlayerSpot.playerCam.SetActive(false);
+            defaultDeathCamAnim.cam.gameObject.SetActive(false);
+            localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+            otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras(); */
+      DisableAllCameras();
       // play chosen death scene (by other player, or a random default one)
       if (outcomeSequence != null)
       {
@@ -1610,13 +1615,7 @@ namespace Workbench.ProjectDilemma
         yield return new WaitForSeconds(fadeOutToDeathSequenceInterval);
       }
       // disable all other cameras
-      otherPlayerSpot.playerCam.SetActive(false);
-      otherPlayerSpot.playerCam.SetActive(false);
-      otherPlayerSpot.suspenseCam.SetActive(false);
-      localPlayerSpot.playerCam.SetActive(false);
-      defaultDeathCamAnim.cam.gameObject.SetActive(false);
-      localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
-      otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      DisableAllCameras();
       // play chosen death scene (or a random default one if the other player didnt vote)
       if (outcomeSequence != null)
       {
@@ -1630,8 +1629,10 @@ namespace Workbench.ProjectDilemma
         _deathSequence.ActivateOutcome((DeathSequence.OutcomeSequence)localPlayerSpot.playerSpot);
       }
     }
+
     IEnumerator StarRewardsCoroutine()
     {
+      MyDebug.Log("StarRewardsCoroutine");
       int stars = 0;
       if (votingOutcome == Outcome.BothWon || votingOutcome == Outcome.Won)
       {
@@ -1658,30 +1659,16 @@ namespace Workbench.ProjectDilemma
     }
     IEnumerator ClaimRewardsCoroutine()
     {
-      int rewardsObtained = 0;
-      foreach (RewardData reward in MasterData.Instance.allRewards)
+      if (RewardDisplayManager.Instance)
       {
-        if (reward.NewlyAdded)
-        {
-          for (int i = 0; i < reward.AllClaimRewards.Count; i++)
-          {
-            rewardsObtained++;
-            var placeholder = Instantiate(placeholderPrefab, rewardsDisplayContent);
-            placeholder.rewardData = reward;
-            placeholder.Set(reward.AllClaimRewards[i].ClaimRewardText, reward.AllClaimRewards[i].ClaimRewardIcon);
-            listOfRewardPlaceholders.Add(placeholder);
-            if (rewardsObtained > 1)
-            {
-              placeholder.gameObject.SetActive(false);
-            }
-          }
-        }
+        RewardDisplayManager.Instance.CreateRewards();
+        yield return new WaitForSeconds(0.3f);
+        yield return new WaitUntil(() => RewardDisplayManager.Instance.listOfRewardPlaceholders.Count <= 0);
       }
-      if (listOfRewardPlaceholders.Count <= 0)
+      else
       {
-        OnAllRewardsClaimed?.Invoke();
+        yield return null;
       }
-      yield return new WaitUntil(() => listOfRewardPlaceholders.Count <= 0);
     }
     IEnumerator CoinsRewardsCoroutine()
     {
@@ -1704,6 +1691,8 @@ namespace Workbench.ProjectDilemma
     }
     IEnumerator ExperienceRewardsCoroutine()
     {
+      MyDebug.Log("ExperienceRewardsCoroutine");
+
       experienceCounter.Duration = rewardActivationSpeed + RewardDisplayManager.Instance.ExperienceRewards.Count * rewardActivationSpeed - Mathf.Epsilon;
       experienceCounter.Value = experienceCounter.newAmount;
       int i = 0;
@@ -1724,6 +1713,39 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region private methods
+
+    public void DisableAllCameras()
+    {
+      MyDebug.Log("DisableAllCameras");
+
+      // disable all other cameras
+      if (otherPlayerSpot.playerCam)
+        otherPlayerSpot.playerCam.SetActive(false);
+      if (otherPlayerSpot.suspenseCam)
+        otherPlayerSpot.suspenseCam.SetActive(false);
+      if (otherPlayerSpot.playerCam)
+        localPlayerSpot.playerCam.SetActive(false);
+      if (defaultDeathCamAnim.cam)
+        defaultDeathCamAnim.cam.gameObject.SetActive(false);
+      if (localPlayerSpot.GetComponent<CameraSwitcher>())
+        localPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      if (otherPlayerSpot.GetComponent<CameraSwitcher>())
+        otherPlayerSpot.GetComponent<CameraSwitcher>().DisableGameplayCameras();
+      // //before the death prefab is spawned we must disable all other active cameras.
+      // // I don't care much for this particular implementation. should be better
+      // foreach (Camera cam in Camera.allCameras)
+      // {
+      //   cam.enabled = false;
+      // }
+    }
+
+    // public void ShowPostscreenCam()
+    // {
+    //   MyDebug.Log("ShowPostscreenCam");
+    //   postScreenCam.SetActive(true);
+    //   postScreenCam.GetComponent<Camera>().enabled = true;
+    // }
+
     void ActivateStarEvents(int star, string message)
     {
       switch (star)
@@ -2023,7 +2045,7 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region DEBUG
-    [Button("Other player make choice")]
+    [Button("Other player makes choice")]
     void DebugOtherPlayerChoice()
     {
       //theirChoice = theirChoice;
@@ -2032,6 +2054,11 @@ namespace Workbench.ProjectDilemma
       //otherPlayerSpot.OnMyChoiceMade?.Invoke();
       //localPlayerSpot.OnTheirChoiceMade?.Invoke();
       GameEvents.OnOtherPlayerVoted?.Invoke(theirChoice);
+    }
+    [Button("Other player leaves")]
+    void DebugOtherPlayerLeaves()
+    {
+      OnPlayerDisconnect();
     }
     #endregion
   }

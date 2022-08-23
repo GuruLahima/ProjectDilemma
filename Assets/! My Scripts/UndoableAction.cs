@@ -2,9 +2,9 @@ using UnityEngine.Events;
 
 public class UndoableAction
 {
-  public UnityEvent action;
+  public UnityEvent theReverseAction;
   public void Execute()
   {
-    action?.Invoke();
+    theReverseAction?.Invoke();
   }
 }

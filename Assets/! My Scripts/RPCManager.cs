@@ -102,6 +102,11 @@ namespace Workbench.ProjectDilemma
       }
       GameMechanic.Instance.ActivateEndScreenCountersOtherPlayer(_points, _rank, _xp);
     }
+    [PunRPC]
+    void RPC_AddTimeExtends(int amount)
+    {
+      GameMechanic.Instance.AddExtraTimeMaxVotes(amount);
+    }
     #endregion
 
     #region public static methods

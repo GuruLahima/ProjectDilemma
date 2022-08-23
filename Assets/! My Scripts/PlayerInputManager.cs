@@ -15,6 +15,7 @@ namespace Workbench.ProjectDilemma
     {
       Instance = this;
     }
+
     #endregion
 
     #region User Input
@@ -81,6 +82,8 @@ namespace Workbench.ProjectDilemma
     private void OnDisable()
     {
       GameMechanic.DiscussionEnded -= OnDiscussionEnded;
+      Instance = null;
+
     }
 
     private void Update()

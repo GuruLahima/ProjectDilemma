@@ -8,12 +8,15 @@ using System;
 using GuruLaghima;
 using static Workbench.ProjectDilemma.GameMechanic;
 using Workbench.ProjectDilemma;
+using UnityEngine.UI;
 
 public class TransactionItemViewOverride : TransactionItemView
 {
 
   [SerializeField] UnityEvent OnTransactionDisabled; // *should probably rename it to OnTransactionPurchased
   [SerializeField] TooltipTrigger tooltip;
+  public Button itemButton;
+  public GameObject selectionBox;
 
   private void Start()
   {
@@ -75,13 +78,17 @@ public class TransactionItemViewOverride : TransactionItemView
   {
     if (tooltip != null)
     {
-      ItemData item = transaction.payout.GetExchange(0).tradableDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ItemData>();
-      if (item)
+      if (transaction != null)
       {
-        tooltip.icon = item.ico;
-        tooltip.title = item.inventoryitemDefinition.displayName;
-        tooltip.description = (string)item.inventoryitemDefinition.GetStaticProperty("description") + 
-          "\n" + (string)item.inventoryitemDefinition.GetStaticProperty("note_description");
+
+        ItemData item = transaction.payout.GetExchange(0).tradableDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ItemData>();
+        if (item)
+        {
+          tooltip.icon = item.ico;
+          tooltip.title = item.inventoryitemDefinition.displayName;
+          tooltip.description = (string)item.inventoryitemDefinition.GetStaticProperty("description") +
+            "\n" + (string)item.inventoryitemDefinition.GetStaticProperty("note_description");
+        }
       }
     }
   }
@@ -99,6 +106,9 @@ public class TransactionItemViewOverride : TransactionItemView
   public void Equip()
   {
     MyDebug.Log("Trying out store item");
+
+    // unequip other items
+
 
     // if this is a clothing item add it to character 
     if (GetComponentInChildren<ClothingPlaceholder>().Clothing)

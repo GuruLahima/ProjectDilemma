@@ -21,6 +21,11 @@ namespace GuruLaghima.ProjectDilemma
 
     #region public fields
 
+    public bool hasMaxLimitOnEquippedItems;
+    [ShowIf("hasMaxLimitOnEquippedItems")]
+    public int maxLimitOnEquippedItems;
+    [ReadOnly]
+    public List<ItemData> equippedItems = new List<ItemData>();
 
     public bool onlyOneItemPerInventory;
     public bool mustHaveOneEquippedAtAllTimes;
@@ -74,15 +79,15 @@ namespace GuruLaghima.ProjectDilemma
 
     #region exposed fields
     [SerializeField] bool usedForRecycler;
-    [SerializeField] bool usedInCombiner;
-    [SerializeField] bool usedByRelics;
-    [SerializeField] bool usedInShelf;
     [ShowIf("usedForRecycler")]
     [SerializeField] RecyclerView recyclerView;
+    [SerializeField] bool usedInCombiner;
     [ShowIf("usedInCombiner")]
     [SerializeField] CombinerView combinerView;
+    [SerializeField] bool usedByRelics;
     [ShowIf("usedByRelics")]
     [SerializeField] RelicView relicView;
+    [SerializeField] bool usedInShelf;
     [ShowIf("usedInShelf")]
     [SerializeField] ShelfView shelfView;
     [HideIf("showEquipedOnly")]
@@ -90,6 +95,7 @@ namespace GuruLaghima.ProjectDilemma
     [HideIf("showUnequipedOnly")]
     [SerializeField] bool showEquipedOnly;
     [SerializeField] bool ownedOnly;
+
 
     #endregion
 
@@ -103,6 +109,7 @@ namespace GuruLaghima.ProjectDilemma
     #region private fields
 
     List<InventoryItemHUDViewOverride> inventoryItems = new List<InventoryItemHUDViewOverride>();
+
 
     #endregion
 
@@ -142,6 +149,20 @@ namespace GuruLaghima.ProjectDilemma
           lastSelected.GetComponent<SelectionMenuContainer>().image.sprite = ((ItemData)lastSelected.GetComponent<SelectionMenuContainer>().container).ico;
         else
           lastSelected.GetComponent<SelectionMenuContainer>().image.sprite = lastSelected.GetComponent<SelectionMenuContainer>().defaultIcon;
+      }
+    }
+
+    public void EquipItem(InventoryItemHUDViewOverride inventoryItemHUDViewOverride, bool equip)
+    {
+      if (equip)
+      {
+        if (!hasMaxLimitOnEquippedItems || (equippedItems.Count < maxLimitOnEquippedItems))
+          if (!equippedItems.Contains(inventoryItemHUDViewOverride.whoDis))
+            equippedItems.Add(inventoryItemHUDViewOverride.whoDis);
+      }
+      else
+      {
+        equippedItems.Remove(inventoryItemHUDViewOverride.whoDis);
       }
     }
 
@@ -349,6 +370,17 @@ namespace GuruLaghima.ProjectDilemma
       ClearUI();
 
       PopulateUI();
+
+      SortUI();
+    }
+
+    private void SortUI()
+    {
+      foreach (InventoryItemHUDViewOverride item in inventoryItems)
+      {
+        if (item.whoDis.isDefaultItem)
+          item.transform.SetSiblingIndex(0);
+      }
     }
 
     // List<InventoryItemDefinition> addedItemTypes = new List<InventoryItemDefinition>();
@@ -359,39 +391,44 @@ namespace GuruLaghima.ProjectDilemma
       {
         itemTag = itemType.ToString();
       }
-      List<ItemData> tempList = new List<ItemData>();
+      // ? i don't know why I did this with the clothes
+      // List<ItemData> tempList = new List<ItemData>();
+      // List<InventoryItemDefinition> allClothesDefinitions = new List<InventoryItemDefinition>();
+      // GameFoundationSdk.catalog.FindItems<InventoryItemDefinition>(GameFoundationSdk.tags.Find(Keys.CLOTHES_TAG), allClothesDefinitions);
+
       // Loop through every type of item within the inventory and display its name and quantity.
-      List<InventoryItemDefinition> allClothesDefinitions = new List<InventoryItemDefinition>();
-      GameFoundationSdk.catalog.FindItems<InventoryItemDefinition>(GameFoundationSdk.tags.Find(Keys.CLOTHES_TAG), allClothesDefinitions);
+      IEnumerable<ItemData> tmpitemList;
       switch (itemType)
       {
         case InventoryData.ItemType.emotes:
           // MyDebug.Log("Updating Emotes");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.emotes);
+          tmpitemList = InventoryData.Instance.emotes;
           break;
         case InventoryData.ItemType.throwables:
           // MyDebug.Log("Updating Throwables");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.throwables);
+          tmpitemList = InventoryData.Instance.throwables;
           break;
         case InventoryData.ItemType.cosmetics:
           // MyDebug.Log("Updating Clothes");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.clothes);
+          tmpitemList = InventoryData.Instance.clothes;
           break;
         case InventoryData.ItemType.perks:
           // MyDebug.Log("Updating perks");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.activePerks);
+          tmpitemList = InventoryData.Instance.activePerks;
           break;
         case InventoryData.ItemType.abilities:
           // MyDebug.Log("Updating abilities");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.abilities);
+          tmpitemList = InventoryData.Instance.abilities;
           break;
         case InventoryData.ItemType.relics:
           // MyDebug.Log("Updating relics");
-          PopulateUIForItemType(itemTag, InventoryData.Instance.relics);
+          tmpitemList = InventoryData.Instance.relics;
           break;
         default:
+          tmpitemList = new List<ItemData>();
           break;
       }
+      PopulateUIForItemType(itemTag, tmpitemList);
 
     }
 
@@ -405,6 +442,8 @@ namespace GuruLaghima.ProjectDilemma
         MyDebug.Log("itemType ", itemType);
         MyDebug.Log("has tag " + itemType, inventoryItemType.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)));
       } */
+      // we populate this list every time we fetch info about data
+      equippedItems.Clear();
 
       foreach (ItemData inventoryItemType in itemList.Where((obj) => { return itemType == "" ? true : obj.inventoryitemDefinition.HasTag(GameFoundationSdk.tags.Find(itemType)); }))
       {
@@ -414,7 +453,10 @@ namespace GuruLaghima.ProjectDilemma
                     continue; */
         if (usedInCombiner)
         {
-
+          // if this item is a skin don't include it in the combiner view
+          if (((RigData)inventoryItemType).type == ClothingType.Skin)
+            continue;
+          // if we don't have enough of this item to combine it don'y show it // ? I don't know about this check
           if (inventoryItemType.AmountOwned < inventoryItemType.amountNeededTorUpgrade)
             continue;
           // if this piece of clothing is part of an outfit don't show it in the combiner view
@@ -422,6 +464,19 @@ namespace GuruLaghima.ProjectDilemma
           {
             continue;
           }
+
+          // if this is a default clothing don't show it as an option for combining
+          if (!inventoryItemType.ShowInCombiner)
+            continue;
+        }
+        if (usedForRecycler)
+        {
+          // if this item is a skin don't include it in the combiner view
+          if (((RigData)inventoryItemType).type == ClothingType.Skin)
+            continue;
+          // if this is a default clothing don't show it as an option for recycling
+          if (!inventoryItemType.ShowInRecycler)
+            continue;
         }
         if (showUnequipedOnly && inventoryItemType.Equipped)
           continue;
@@ -442,8 +497,8 @@ namespace GuruLaghima.ProjectDilemma
           newItem.quantityTextField.text = inventoryItemType.AmountOwned.ToString();
         if (newItem.rarityGraphic)
           newItem.rarityGraphic.color = MiscelaneousSettings.Instance.GetRarityColor(inventoryItemType.Rarity);
-        if (!usedForRecycler && !usedInCombiner)
-          newItem.Equip(inventoryItemType.Equipped);
+        // if (!usedForRecycler && !usedInCombiner)
+        //   newItem.Equip(inventoryItemType.Equipped);
         // if emotes and throwables use raidal menu for equipping
         if (itemType == "emotes" || itemType == "throwables")
           newItem.usesRadialMenu = true;
@@ -525,7 +580,10 @@ namespace GuruLaghima.ProjectDilemma
 
         // equip needs to be after loading of clothing data for the item
         if (!usedForRecycler && !usedInCombiner)
-          newItem.Equip(inventoryItemType.Equipped);
+        {
+          if (!hasMaxLimitOnEquippedItems || (equippedItems.Count < maxLimitOnEquippedItems))
+            newItem.Equip(inventoryItemType.Equipped);
+        }
 
         inventoryItems.Add(newItem);
       }

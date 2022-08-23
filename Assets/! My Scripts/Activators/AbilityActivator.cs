@@ -10,19 +10,34 @@ namespace Workbench.ProjectDilemma
   public class AbilityActivator : BaseActivatorComponent
   {
     #region Exposed Private Fields
-
+    [SerializeField] private UnityEngine.UI.Image abilitiesIcon;
+    [SerializeField] private TooltipTrigger tooltip;
     #endregion
 
     #region Private Fields
     private AbilityData equipedAbility;
 
     private AbilityBase _equipedAbilityBase;
+
+    private bool abiliyUsed = false;
     #endregion
 
     #region Public Methods
     public override void Init()
     {
       equipedAbility = InventoryData.Instance.abilities.Find((obj) => { return obj.Owned && obj.Equipped; });
+      if (equipedAbility)
+      {
+        if (abilitiesIcon)
+        {
+          abilitiesIcon.sprite = equipedAbility.ico;
+        }
+        if (tooltip)
+        {
+          tooltip.title = equipedAbility.inventoryitemDefinition.displayName;        
+          tooltip.description = (string)equipedAbility.inventoryitemDefinition.GetStaticProperty("description");
+        }
+      }
     }
     /// <summary>
     /// Since this will require things such as getting player's last x games CHOICE and the OUTCOME of the game
@@ -32,9 +47,11 @@ namespace Workbench.ProjectDilemma
     {
       if (OnCooldown) return;
 
+      if (abiliyUsed) return;
 
       if (equipedAbility)
       {
+        abiliyUsed = true;
         AddCooldown();
         ActiveState = true;
         _equipedAbilityBase = Instantiate(equipedAbility.Ability);

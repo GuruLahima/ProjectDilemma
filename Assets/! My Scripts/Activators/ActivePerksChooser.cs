@@ -33,34 +33,34 @@ public class ActivePerksChooser : MonoBehaviour
   // Start is called before the first frame update
   public void Init()
   {
+    // fetch data about perks
+    List<InventoryItemDefinition> allPerkDefinitions = new List<InventoryItemDefinition>();
+    int count = GameFoundationSdk.catalog.FindItems(GameFoundationSdk.tags.Find("perks"), allPerkDefinitions);
+    MyDebug.Log("Perks Count", count);
 
-    // fetch perk data from a scriptable object
-    if (perksData)
+    foreach (InventoryItemDefinition item in allPerkDefinitions)
     {
-      foreach (PerkData item in perksData.orderedItems)
-      {
-        if (item)
+      if (!card_1_Data)
+        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
         {
-          if (!card_1_Data)
-          {
-            card_1_Data = item;
-            MyDebug.Log("Equipped perk ", item.Name);
-            continue;
-          }
-          if (!card_2_Data)
-          {
-            card_2_Data = item;
-            MyDebug.Log("Equipped perk ", item.Name);
-            continue;
-          }
-          if (!card_3_Data)
-          {
-            card_3_Data = item;
-            MyDebug.Log("Equipped perk ", item.Name);
-            break;
-          }
+          card_1_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
+          MyDebug.Log("Equipped", item.key);
+          continue;
         }
-      }
+      if (!card_2_Data)
+        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
+        {
+          card_2_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
+          MyDebug.Log("Equipped", item.key);
+          continue;
+        }
+      if (!card_3_Data)
+        if (item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>().Equipped)
+        {
+          card_3_Data = item.GetStaticProperty("ingame_ScriptableObject").AsAsset<ItemData>();
+          MyDebug.Log("Equipped", item.key);
+          break;
+        }
     }
 
     PopulatePerkCardFromData(card_1_Image, card_1_Desc, card_1_Title, card_1_Button, card_1_Data);

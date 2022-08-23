@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
 using Cinemachine;
+using GuruLaghima;
 
 namespace Workbench.ProjectDilemma
 {
@@ -11,6 +12,7 @@ namespace Workbench.ProjectDilemma
   {
     #region public fields
     [HideInInspector] public CinemachineVirtualCamera currentCamera;
+    public bool canSwitch = true;
 
     #endregion
 
@@ -34,8 +36,8 @@ namespace Workbench.ProjectDilemma
 
     public void SwitchCamera()
     {
-      if (CanSwitch())
-        if (Input.GetButtonDown(switchInput))
+      if (Input.GetButtonDown(switchInput))
+        if (CanSwitch())
         {
           if (Input.GetButton(switchBackModifierInput))
             PrevCam();
@@ -91,6 +93,34 @@ namespace Workbench.ProjectDilemma
       {
         currentCamera = camerasStack[currentCameraIndex];
         currentCamera.gameObject.SetActive(true);
+        if (GameMechanic.Instance.localPlayerSpot)
+          GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+      }
+    }
+    public void SwitchToCamByIndex(int index)
+    {
+      foreach (CinemachineVirtualCamera cam in camerasStack)
+        cam.gameObject.SetActive(false);
+      if (index >= 0 && index < camerasStack.Count)
+      {
+        currentCamera = camerasStack[index];
+        currentCameraIndex = index;
+        currentCamera.gameObject.SetActive(true);
+        if (GameMechanic.Instance.localPlayerSpot)
+          GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+      }
+    }
+    public void SwitchToCamByReference(CinemachineVirtualCamera newCam)
+    {
+      foreach (CinemachineVirtualCamera cam in camerasStack)
+        cam.gameObject.SetActive(false);
+      if (camerasStack.Contains(newCam))
+      {
+        currentCameraIndex = camerasStack.IndexOf(newCam);
+        currentCamera = newCam;
+        currentCamera.gameObject.SetActive(true);
+        if (GameMechanic.Instance.localPlayerSpot)
+          GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
       }
     }
 
@@ -107,6 +137,9 @@ namespace Workbench.ProjectDilemma
       {
         currentCamera = camerasStack[++currentCameraIndex];
         currentCamera.gameObject.SetActive(true);
+        if (GameMechanic.Instance.localPlayerSpot)
+          GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+
       }
     }
 
@@ -123,6 +156,9 @@ namespace Workbench.ProjectDilemma
       {
         currentCamera = camerasStack[--currentCameraIndex];
         currentCamera.gameObject.SetActive(true);
+        if (GameMechanic.Instance.localPlayerSpot)
+          GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+
       }
     }
 
@@ -130,8 +166,9 @@ namespace Workbench.ProjectDilemma
     {
       bool result = true;
 
-      result = GameMechanic.Instance.canChoose && !ChatGui.isInChatMode;
+      result = GameMechanic.Instance.canChoose && !ChatGui.isInChatMode && canSwitch;
 
+      MyDebug.Log("CanSwitch", result);
       return result;
     }
     #endregion

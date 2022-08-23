@@ -21,6 +21,7 @@ public class SimpleCameraController : MonoBehaviour
   #endregion
 
   #region private fields
+  [SerializeField] Vector2 initRot = Vector2.zero;
   float _yMin = 3;
   float _yMax = 3;
   float _xMin = 3;
@@ -31,11 +32,12 @@ public class SimpleCameraController : MonoBehaviour
 
   float sensitivityMod = 1;
   InGameSetting setting;
-  Vector2 rotation = Vector2.zero;
+  [SerializeField] Vector2 rotation = Vector2.zero;
   Vector2 origRotation;
 
   private void Start()
   {
+
     origRotation = transform.eulerAngles;
     rotation = origRotation;
     if (limitsInLocalSpace)
@@ -58,6 +60,9 @@ public class SimpleCameraController : MonoBehaviour
       {
         return obj.settingKey == mouseSensitivitySetting.settingKey;
       });
+
+    // Init();
+
   }
 
   void Update()
@@ -66,6 +71,13 @@ public class SimpleCameraController : MonoBehaviour
     if (playerHasControlOverCamera)
       MoveCamera();
 
+  }
+
+
+  public void Init()
+  {
+    rotation.x = initRot.x;
+    rotation.y = initRot.y;
   }
 
   void MoveCamera()

@@ -100,6 +100,8 @@ namespace GuruLaghima.ProjectDilemma
 
     public void Recycle()
     {
+      MyDebug.Log("Recycling ", selectedItem.whoDis.name);
+
       // receive the reward (duplicates count x currency reward per item)
       Currency m_CoinDefinition = GameFoundationSdk.catalog.Find<Currency>(ProjectDilemmaCatalog.Currencies.currency_dilemmaPoints.key);
       GameFoundationSdk.wallet.Add(m_CoinDefinition, (long)(this.selectedItem.whoDis.recyclingRewardAmount * (amountToRecycle)));

@@ -9,6 +9,15 @@ namespace Workbench.ProjectDilemma
   [CreateAssetMenu(fileName = "ProgressData", menuName = "Workbench/ScriptableObjects/ProgressData", order = 11)]
   public class ProgressData : SingletonScriptableObject<ProgressData>
   {
+    private void OnEnable()
+    {
+      //initialization
+      foreach (LevelRewards reward in RewardsPerLevel)
+      {
+        reward.IsClaimed = false;
+      }
+    }
+
     [NaughtyAttributes.HorizontalLine]
     public float[] ExperienceRequiredPerLevel;
     public List<LevelRewards> RewardsPerLevel = new List<LevelRewards>();

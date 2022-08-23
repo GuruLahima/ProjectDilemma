@@ -21,7 +21,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   public GameObject quantityTextFieldParent;
   public Image rarityGraphic;
   [SerializeField] TextMeshProUGUI title;
-  [SerializeField] TooltipTrigger tooltip; 
+  [SerializeField] TooltipTrigger tooltip;
   [Header("References")]
   public ItemData whoDis;
   public InventoryView parentView;
@@ -152,6 +152,13 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     //     if (parentView.equippedItem.whoDis == whoDis)
     //       return;
 
+    // don't equip if the inventory already has maximum equipped items
+    if (equip)
+      if (parentView.hasMaxLimitOnEquippedItems && (parentView.equippedItems.Count >= parentView.maxLimitOnEquippedItems))
+        return;
+    parentView.EquipItem(this, equip);
+
+
     // if this is a clothing item add it to character 
     if (GetComponentInChildren<ClothingPlaceholder>())
     {
@@ -177,6 +184,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
       // record this item as the last equipped item
       parentView.equippedItem = this;
     }
+
 
     if (equip)
     {

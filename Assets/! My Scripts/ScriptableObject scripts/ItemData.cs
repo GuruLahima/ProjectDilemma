@@ -36,6 +36,11 @@ public class ItemData : ScriptableObject
   public bool NewlyAddedInBook = true;
   // for handling shop population, if item should not show up
   public bool ShowInShop = true;
+  // can we combine this item with something else
+  public bool ShowInCombiner = true;
+  // can we recycle this item
+  public bool ShowInRecycler = true;
+  public bool isDefaultItem = false;
   [HorizontalLine]
   public ItemRarity Rarity;
   // how much does this item give when recycled
@@ -67,4 +72,4 @@ public class ItemData : ScriptableObject
   public RewardData RewardData;
 }
 
-public enum ItemRarity : byte { Common = 0, Rare = 1, Epic = 2, Legendary = 3, Unique = 4}
+public enum ItemRarity : byte { Common = 0, Rare = 1, Epic = 2, Legendary = 3, Unique = 4 }
