@@ -64,8 +64,8 @@ namespace Workbench.ProjectDilemma
     public Transform rigRoot;
     public int[] clothesId;
 
-    [HideInInspector] public bool playerLoaded;
-    [HideInInspector] public bool playerVotedExtraTime;
+    [ReadOnly] public bool playerLoaded;
+    [ReadOnly] public bool requestedExtraTime;
 
 #if UNITY_EDITOR
     [Foldout("Visual Feedback Events")]

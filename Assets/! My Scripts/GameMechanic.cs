@@ -129,6 +129,18 @@ namespace Workbench.ProjectDilemma
     public UnityEvent OnExtraTimeVotesUnavailable;
 
     [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnExtraTimeRequestCooldown;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnLocalRequestedExtraTime;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnOtherRequestedExtraTime;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
+    public UnityEvent OnExtraTimeRequestFailed;
+
+    [BoxGroup("Visual Feedback Events - Choices")]
     public UnityEvent OnExtraTimeAdded;
 
     [Foldout("End screen references")]
@@ -153,6 +165,8 @@ namespace Workbench.ProjectDilemma
     [HorizontalLine(color: EColor.White)]
     [SerializeField] public PlayerSpot playerOneSpot;
     [SerializeField] public PlayerSpot playerTwoSpot;
+    [SerializeField] float extraTimeRequestCooldown;
+    [SerializeField] float extraTimeRequestDuration;
     [SerializeField] float extraTimeAdded;
     [SerializeField] float extraTimeDiminishPerVote;
     [SerializeField] int extraTimeMaxVotes;
@@ -318,6 +332,7 @@ namespace Workbench.ProjectDilemma
 
     #region private fields
     IEnumerator gameTimerCoroutine;
+    IEnumerator extraTimeRequestCoroutine;
     [Foldout("Debug")]
     [Dropdown("intValues")]
     [SerializeField] int debugPlayerSpot;
@@ -1059,19 +1074,37 @@ namespace Workbench.ProjectDilemma
       StartCoroutine(postGameSequence.rootCoroutine);
     }
 
-    public void VoteExtraTime()
+    public void RequestExtraTime(bool state)
     {
       if (PhotonNetwork.IsConnected)
       {
-        RPCManager.Instance.photonView.RPC("RPC_SyncExtraTimeVote", RpcTarget.AllViaServer, localPlayerSpot.GetComponent<PhotonView>().ViewID);
+        RPCManager.Instance.photonView.RPC("RPC_SyncExtraTimeVote", RpcTarget.AllViaServer, localPlayerSpot.GetComponent<PhotonView>().ViewID, state);
       }
       else
       {
-        localPlayerSpot.playerVotedExtraTime = true;
-        otherPlayerSpot.playerVotedExtraTime = true;
+        localPlayerSpot.requestedExtraTime = state;
+        //otherPlayerSpot.requestedExtraTime = true;
+        if (!state)
+        {
+          DeclineExtraTime();
+        }
         GameMechanic.Instance.CheckPlayersVotedExtraTime();
       }
+      if (state)
+      {
+        StartCoroutine(ExtraTimeRequestCooldown());
+      }
+    }
 
+    public void DeclineExtraTime()
+    {
+      if (extraTimeRequestCoroutine != null)
+      {
+        StopCoroutine(extraTimeRequestCoroutine);
+      }
+      localPlayerSpot.requestedExtraTime = false;
+      otherPlayerSpot.requestedExtraTime = false;
+      OnExtraTimeRequestFailed?.Invoke();
     }
 
     // normaly we call this function via RPC twice, it fails the first time when only one of the player is loaded
@@ -1096,14 +1129,36 @@ namespace Workbench.ProjectDilemma
     {
       if (localPlayerSpot && otherPlayerSpot)
       {
-        if (localPlayerSpot.playerVotedExtraTime && otherPlayerSpot.playerVotedExtraTime)
+        if (localPlayerSpot.requestedExtraTime && otherPlayerSpot.requestedExtraTime)
         {
           //reset values for the next vote
-          localPlayerSpot.playerVotedExtraTime = false;
-          otherPlayerSpot.playerVotedExtraTime = false;
+          localPlayerSpot.requestedExtraTime = false;
+          otherPlayerSpot.requestedExtraTime = false;
           MyDebug.Log("Both players voted for extra time", Color.green);
           AddExtraTimeDiscussion();
           GameEvents.OnVotedExtraTime?.Invoke();
+        }
+        else if (otherPlayerSpot.requestedExtraTime)
+        {
+          MyDebug.Log("Other player voted for extra time", Color.green);
+          OnOtherRequestedExtraTime?.Invoke();
+          if (extraTimeRequestCoroutine != null)
+          {
+            StopCoroutine(extraTimeRequestCoroutine);
+          }
+          extraTimeRequestCoroutine = ExtraTimeRequestInProgress();
+          StartCoroutine(extraTimeRequestCoroutine);
+        }
+        else if (localPlayerSpot.requestedExtraTime)
+        {
+          MyDebug.Log("Local player voted for extra time", Color.green);
+          OnLocalRequestedExtraTime?.Invoke();
+          if (extraTimeRequestCoroutine != null)
+          {
+            StopCoroutine(extraTimeRequestCoroutine);
+          }
+          extraTimeRequestCoroutine = ExtraTimeRequestInProgress();
+          StartCoroutine(extraTimeRequestCoroutine);
         }
         else
         {
@@ -1710,6 +1765,20 @@ namespace Workbench.ProjectDilemma
       }
       yield return new WaitForSeconds(2f);
     }
+    IEnumerator ExtraTimeRequestInProgress()
+    {
+      yield return new WaitForSeconds(extraTimeRequestDuration);
+      // after the time has expired we reset both to false
+      localPlayerSpot.requestedExtraTime = false;
+      otherPlayerSpot.requestedExtraTime = false;
+      OnExtraTimeRequestFailed?.Invoke();
+    }
+    IEnumerator ExtraTimeRequestCooldown()
+    {
+      OnExtraTimeRequestCooldown?.Invoke();
+      yield return new WaitForSeconds(extraTimeRequestCooldown);
+      CheckExtraTimeAvailability();
+    }
     #endregion
 
     #region private methods
@@ -2054,6 +2123,12 @@ namespace Workbench.ProjectDilemma
       //otherPlayerSpot.OnMyChoiceMade?.Invoke();
       //localPlayerSpot.OnTheirChoiceMade?.Invoke();
       GameEvents.OnOtherPlayerVoted?.Invoke(theirChoice);
+    }
+    [Button("Other player requests extra time")]
+    void DebugOtherPlayerRequestsExtraTime()
+    {
+      otherPlayerSpot.requestedExtraTime = true;
+      GameMechanic.Instance.CheckPlayersVotedExtraTime();
     }
     [Button("Other player leaves")]
     void DebugOtherPlayerLeaves()

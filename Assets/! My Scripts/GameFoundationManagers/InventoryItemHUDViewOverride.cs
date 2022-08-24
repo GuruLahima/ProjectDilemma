@@ -239,7 +239,8 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
 
       // notify parentView that this item was checked out so it can decide if the other icons in the hierarchy should be disabled too
       // parentView.NewItems--;
-      notificationHandler.NewItems--;
+      if (notificationHandler)
+        notificationHandler.NewItems--;
     }
   }
   #endregion

@@ -6,7 +6,7 @@ using static GuruLaghima.ControllableSequence;
 namespace GuruLaghima.ProjectDilemma
 {
 
-  public class BackButtonBehaviour : SingletonBase<BackButtonBehaviour>
+  public class BackButtonBehaviour : MonoBehaviour
   {
     #region public fields
 

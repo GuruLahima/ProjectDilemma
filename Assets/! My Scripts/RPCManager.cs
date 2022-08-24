@@ -73,13 +73,17 @@ namespace Workbench.ProjectDilemma
       GameMechanic.Instance.CheckPlayersLoaded();
     }
     [PunRPC]
-    void RPC_SyncExtraTimeVote(int viewID)
+    void RPC_SyncExtraTimeVote(int viewID, bool request)
     {
       PhotonView player = PhotonView.Find(viewID);
       PlayerSpot playerSpot = player.GetComponent<PlayerSpot>();
       if (playerSpot)
       {
-        playerSpot.playerVotedExtraTime = true;
+        playerSpot.requestedExtraTime = request;
+        if (!request)
+        {
+          GameMechanic.Instance.DeclineExtraTime();
+        }
       }
       GameMechanic.Instance.CheckPlayersVotedExtraTime();
     }
