@@ -17,12 +17,19 @@ public class TransactionItemViewOverride : TransactionItemView
   [SerializeField] TooltipTrigger tooltip;
   public Button itemButton;
   public GameObject selectionBox;
+  public bool unrepeatable = false;
+  public bool owned = false;
 
   private void Start()
   {
     Invoke("AssignClothingData", 1f);
     Invoke("UpdateVisualStatus", 1f);
     Invoke("AssignTooltip", 1f);
+  }
+
+  void NotifyStoreViewHelper()
+  {
+    SendMessageUpwards("DelayedStart", SendMessageOptions.RequireReceiver);
   }
 
   void UpdateVisualStatus()
@@ -47,6 +54,7 @@ public class TransactionItemViewOverride : TransactionItemView
       // if this transaction is not repeatable,
       if (!this.transaction.GetStaticProperty("repeatable"))
       {
+        unrepeatable = true;
         // and if it's only for one specific item (like an emote)
         int exchangesCount = this.transaction.payout.GetExchanges();
         if (exchangesCount == 1)
@@ -58,10 +66,15 @@ public class TransactionItemViewOverride : TransactionItemView
             // disable or enable the buy button
             OnTransactionDisabled?.Invoke();
 
+            owned = true;
+
           }
         }
 
       }
+
+      // notify Store parent 
+      NotifyStoreViewHelper();
     }
 
   }

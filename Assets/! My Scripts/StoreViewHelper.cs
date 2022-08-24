@@ -6,47 +6,110 @@ using UnityEngine.GameFoundation.Components;
 using UnityEngine.UI;
 using TMPro;
 using MoreMountains.Feedbacks;
+using UnityEngine.GameFoundation;
+using UnityEngine.Events;
 
 public class StoreViewHelper : MonoBehaviour
 {
   [SerializeField] Button purchaseButton;
   [SerializeField] TextMeshProUGUI purchaseButtonAmount;
   [SerializeField] TextMeshProUGUI purchaseButtonDescription;
-  [SerializeField] MMFeedbacks selectedItemFeedback;
-  [SerializeField] MMFeedbacks boughtItemFeedback;
+  [SerializeField] UnityEvent OnPurchasedUnrepeatableTransaction;
+  [SerializeField] UnityEvent OnSelectedUnrepeatableAndOwnedTransaction;
+  [SerializeField] UnityEvent OnSelectedTransaction;
+  [SerializeField] UnityEvent OnPurchasedTransaction;
 
   StoreView storeV;
+  private bool alreadyInitialized;
+
   // Start is called before the first frame update
   void Start()
   {
     storeV = GetComponent<StoreView>();
-    Invoke("DelayedStart", 2f);
+    // Invoke("DelayedStart", 2f);
   }
 
+  // I am calling this function via SendMessageUpwards from the TransactionItemViewOverride
   void DelayedStart()
   {
-    foreach (TransactionItemViewOverride item in storeV.itemContainer.GetComponentsInChildren<TransactionItemViewOverride>())
+    if (!alreadyInitialized)
     {
-      if (item.itemButton)
+      alreadyInitialized = true;
+      foreach (TransactionItemViewOverride item in storeV.itemContainer.GetComponentsInChildren<TransactionItemViewOverride>())
       {
-        item.itemButton.onClick.AddListener(() =>
+        if (item.itemButton)
         {
-          foreach (TransactionItemViewOverride it in storeV.itemContainer.GetComponentsInChildren<TransactionItemViewOverride>())
+          item.itemButton.onClick.AddListener(() =>
           {
-            it.selectionBox.SetActive(false);
-          }
-          item.selectionBox.SetActive(true);
-          selectedItemFeedback.PlayFeedbacks();
+            foreach (TransactionItemViewOverride it in storeV.itemContainer.GetComponentsInChildren<TransactionItemViewOverride>())
+            {
+              it.selectionBox.SetActive(false);
+            }
+            item.selectionBox.SetActive(true);
 
-          purchaseButtonAmount.text = item.purchaseButton.priceTextField.text;
-          purchaseButton.onClick.RemoveAllListeners();
-          purchaseButton.onClick.AddListener(() =>
-          {
-            boughtItemFeedback.PlayFeedbacks();
-            item.purchaseButton.Purchase();
+            // allow purchasing of this item only if it is not owned and not repeatable
+            if (!(item.owned && item.unrepeatable))
+            {
+
+              // also don't show the selection feedbacks of it is owned so as the user don't mistake it for a a sign that they can purchase it
+              OnSelectedTransaction?.Invoke();
+
+              purchaseButtonAmount.text = item.purchaseButton.priceTextField.text;
+              purchaseButton.onClick.RemoveAllListeners();
+              purchaseButton.onClick.AddListener(() =>
+              {
+                OnPurchasedTransaction?.Invoke();
+                item.purchaseButton.Purchase();
+              });
+            }
+            else
+            {
+              // if we select an owned item it should clear the purchase button 
+              purchaseButton.onClick.RemoveAllListeners();
+              // purchaseButtonAmount.text = "";
+              OnSelectedUnrepeatableAndOwnedTransaction?.Invoke();
+            }
+
           });
-        });
+        }
       }
     }
+
   }
+
+  public void OnTransactionSucceeded(BaseTransaction transact)
+  {
+    if (IsTransactionUnrepeatableAndOwned(transact))
+    {
+
+      purchaseButton.onClick.RemoveAllListeners();
+      // purchaseButtonAmount.text = "";
+
+      OnPurchasedUnrepeatableTransaction?.Invoke();
+    }
+
+  }
+
+  bool IsTransactionUnrepeatableAndOwned(BaseTransaction transact)
+  {
+    // if  we bought an one-time purhcase item (doesn't have quantity) then don't allow buying it again
+    if (!transact.GetStaticProperty("repeatable"))
+    {
+      // and if it's only for one specific item (like an emote)
+      int exchangesCount = transact.payout.GetExchanges();
+      if (exchangesCount == 1)
+      {
+        // and if we own that item
+        InventoryItemDefinition itemDef = (InventoryItemDefinition)transact.payout.GetExchange(0).tradableDefinition;
+        if (GameFoundationSdk.inventory.GetTotalQuantity(itemDef) > 0)
+        {
+
+          return true;
+
+        }
+      }
+    }
+    return false;
+  }
+
 }
