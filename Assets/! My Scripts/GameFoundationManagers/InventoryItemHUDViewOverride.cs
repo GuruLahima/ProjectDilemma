@@ -113,6 +113,7 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     if (usesRadialMenu)
     {
       ShowRadialMenu();
+      return;
     }
     if (usedByBook)
     {
