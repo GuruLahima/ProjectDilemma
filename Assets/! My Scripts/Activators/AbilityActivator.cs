@@ -15,7 +15,8 @@ namespace Workbench.ProjectDilemma
     #endregion
 
     #region Private Fields
-    private AbilityData equipedAbility;
+    [HideInInspector]
+    public AbilityData equipedAbility;
 
     private AbilityBase _equipedAbilityBase;
 

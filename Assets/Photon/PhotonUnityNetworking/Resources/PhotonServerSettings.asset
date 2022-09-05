@@ -52,6 +52,11 @@ MonoBehaviour:
   - RPC_AbilityActivated
   - RPC_SyncExtraTimeVote
   - RPC_AddTimeExtends
+  - RPC_LoadGameInfo
+  - RPC_RequestGameInfo
+  - RPC_ForceExtraTimeVote
+  - RPC_LoadPlayerInfo
+  - RPC_RequestPlayerInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

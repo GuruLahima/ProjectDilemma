@@ -96,6 +96,19 @@ namespace Workbench.ProjectDilemma
     public ControllableSequence gameSequence;
     public ControllableSequence postGameSequence;
 
+    public bool CanExtendTime
+    {
+      get
+      {
+        return _canExtendTime;
+      }
+      set
+      {
+        _canExtendTime = value;
+        CheckExtraTimeAvailability();
+      }
+    }
+    private bool _canExtendTime = true;
 
     [Header("Visual Feedback Events - Phases")]
 
@@ -168,7 +181,6 @@ namespace Workbench.ProjectDilemma
     [SerializeField] float extraTimeRequestCooldown;
     [SerializeField] float extraTimeRequestDuration;
     [SerializeField] float extraTimeAdded;
-    [SerializeField] float extraTimeDiminishPerVote;
     [SerializeField] int extraTimeMaxVotes;
     [HideInInspector][SerializeField] int extraTimeVotes = 0;
     [HorizontalLine(color: EColor.White)]
@@ -318,6 +330,14 @@ namespace Workbench.ProjectDilemma
     [Foldout("Debug")]
     public int otherPlayerPoints;
 
+    [HideInInspector]
+    public List<GameInfo> otherPlayerGames = new List<GameInfo>();
+    [HideInInspector]
+    public List<RelicData> otherPlayerRelics = new List<RelicData>();
+    [HideInInspector]
+    public List<PerkData> otherPlayerPerks = new List<PerkData>();
+    [HideInInspector]
+    public List<AbilityData> otherPlayerAbilities = new List<AbilityData>();
     #endregion
 
     #region photon events
@@ -332,7 +352,8 @@ namespace Workbench.ProjectDilemma
 
     #region private fields
     IEnumerator gameTimerCoroutine;
-    IEnumerator extraTimeRequestCoroutine;
+    Coroutine extraTimeRequestCoroutine;
+    Coroutine extraTimeCooldownCoroutine;
     [Foldout("Debug")]
     [Dropdown("intValues")]
     [SerializeField] int debugPlayerSpot;
@@ -539,7 +560,6 @@ namespace Workbench.ProjectDilemma
 
       //
       GameEvents.OnScenario?.Invoke(ScenarioManager.instance.thisScenario);
-
       if (PhotonNetwork.IsConnected)
       {
         RPCManager.Instance.photonView.RPC("RPC_SyncPlayerLoaded", RpcTarget.AllViaServer, localPlayerSpot.GetComponent<PhotonView>().ViewID);
@@ -938,6 +958,11 @@ namespace Workbench.ProjectDilemma
       RewardCalculator.Instance.CalculateRewardsAfterOutcome();
       SyncDataToOtherPlayer();
 
+      //add this game to latest games
+      if (PlayerData.Instance)
+      {
+        PlayerData.Instance.latestGames.Add(new GameInfo(votingOutcome, myChoice));
+      }
     }
 
     public void LevelBar()
@@ -1092,7 +1117,24 @@ namespace Workbench.ProjectDilemma
       }
       if (state)
       {
-        StartCoroutine(ExtraTimeRequestCooldown());
+        if (extraTimeCooldownCoroutine != null)
+        {
+          StopCoroutine(extraTimeCooldownCoroutine);
+        }
+        extraTimeCooldownCoroutine = StartCoroutine("ExtraTimeRequestCooldown");
+      }
+    }
+
+    public void ForceExtraTime(float time)
+    {
+      MyDebug.Log("Force adding extra time");
+      if (PhotonNetwork.IsConnected)
+      {
+        RPCManager.Instance.photonView.RPC("RPC_ForceExtraTimeVote", RpcTarget.AllViaServer, time);
+      }
+      else
+      {
+        AddExtraTimeDiscussion();
       }
     }
 
@@ -1118,6 +1160,8 @@ namespace Workbench.ProjectDilemma
           MyDebug.Log("Both players have successfuly loaded", Color.green);
           GameEvents.OnBothPlayerLoaded?.Invoke();
           GameMechanic.Instance.localPlayerSpot.outfitLoader.Init();
+          //
+          RPCManager.Instance.photonView.RPC("RPC_RequestPlayerInfo", otherPlayerSpot.GetComponent<PhotonView>().Owner);
         }
         else
         {
@@ -1136,7 +1180,6 @@ namespace Workbench.ProjectDilemma
           otherPlayerSpot.requestedExtraTime = false;
           MyDebug.Log("Both players voted for extra time", Color.green);
           AddExtraTimeDiscussion();
-          GameEvents.OnVotedExtraTime?.Invoke();
         }
         else if (otherPlayerSpot.requestedExtraTime)
         {
@@ -1146,8 +1189,7 @@ namespace Workbench.ProjectDilemma
           {
             StopCoroutine(extraTimeRequestCoroutine);
           }
-          extraTimeRequestCoroutine = ExtraTimeRequestInProgress();
-          StartCoroutine(extraTimeRequestCoroutine);
+          extraTimeRequestCoroutine = StartCoroutine("ExtraTimeRequestInProgress");
         }
         else if (localPlayerSpot.requestedExtraTime)
         {
@@ -1157,8 +1199,7 @@ namespace Workbench.ProjectDilemma
           {
             StopCoroutine(extraTimeRequestCoroutine);
           }
-          extraTimeRequestCoroutine = ExtraTimeRequestInProgress();
-          StartCoroutine(extraTimeRequestCoroutine);
+          extraTimeRequestCoroutine = StartCoroutine("ExtraTimeRequestInProgress");
         }
         else
         {
@@ -1174,12 +1215,28 @@ namespace Workbench.ProjectDilemma
         return;
       }
       discussionTimer += extraTimeAdded;
-      extraTimeAdded -= extraTimeDiminishPerVote;
       extraTimeVotes++;
       if (extraVotesCounter)
         extraVotesCounter.text = (extraTimeMaxVotes - extraTimeVotes).ToString();
       CheckExtraTimeAvailability();
       OnExtraTimeAdded?.Invoke();
+      GameEvents.OnVotedExtraTime?.Invoke();
+      localPlayerSpot.gameTimer.ResetTimer(discussionTimer + localPlayerSpot.gameTimer.CurrentTime); //
+    }
+
+    public void AddExtraTimeDiscussion(float time)
+    {
+      if (extraTimeVotes >= extraTimeMaxVotes)
+      {
+        return;
+      }
+      discussionTimer += time;
+      extraTimeVotes++;
+      if (extraVotesCounter)
+        extraVotesCounter.text = (extraTimeMaxVotes - extraTimeVotes).ToString();
+      CheckExtraTimeAvailability();
+      OnExtraTimeAdded?.Invoke();
+      GameEvents.OnVotedExtraTime?.Invoke();
       localPlayerSpot.gameTimer.ResetTimer(discussionTimer + localPlayerSpot.gameTimer.CurrentTime); //
     }
 
@@ -1200,7 +1257,7 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     private void CheckExtraTimeAvailability()
     {
-      if (extraTimeVotes < extraTimeMaxVotes)
+      if (extraTimeVotes < extraTimeMaxVotes && _canExtendTime)
       {
         OnExtraTimeVotesAvailable?.Invoke();
       }
@@ -1305,7 +1362,6 @@ namespace Workbench.ProjectDilemma
 
     private void Start()
     {
-
       // initialize game properly depending if its in debug mode or not
       if (ScenarioManager.instance.debugMode && !PhotonNetwork.IsConnected)
       {

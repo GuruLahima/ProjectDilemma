@@ -15,17 +15,20 @@ EditorBuildSettings:
     path: Assets/! My Scenes/ApprovedScenarios/Motel-Scene.unity
     guid: 567b948946e22e1459f54a46545687cd
   - enabled: 1
-    path: Assets/! My Scenes/Scenarios/Sewer.unity
+    path: Assets/! My Scenes/ApprovedScenarios/Sewer.unity
     guid: 225332d294ea7fe4886c10ffeb44a632
   - enabled: 1
-    path: Assets/! My Scenes/Scenarios/Pier.unity
+    path: Assets/! My Scenes/ApprovedScenarios/Pier.unity
     guid: 288be1726e27f0d4ca0d67bd8214023a
   - enabled: 1
-    path: Assets/! My Scenes/Scenarios/Cave.unity
+    path: Assets/! My Scenes/ApprovedScenarios/Cave.unity
     guid: 856994a21eaea484381366358f9dc945
   - enabled: 1
-    path: Assets/! My Scenes/Scenarios/Tomb.unity
+    path: Assets/! My Scenes/ApprovedScenarios/Tomb.unity
     guid: cf9119e41acef0b47a037342d56f38e1
+  - enabled: 1
+    path: Assets/! My Scenes/ApprovedScenarios/Cemetary.unity
+    guid: 8deef09df2d3b7b4ea2fb807e68b942b
   - enabled: 0
     path: Assets/Photon/PhotonVoice/Demos/DemoVoicePun/DemoVoicePun-Scene.unity
     guid: a3f3c3b3816924199acba595045624d2

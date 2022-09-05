@@ -6,6 +6,7 @@ using Workbench.ProjectDilemma;
 public class ObjectiveData : ItemData
 {
   #region Public Fields
+  [Header("Constant data - objectives")]
   public SelectionMenuContainer Icon;
   public List<BonusModifiersConditionWrapper> AllBonusModifiers = new List<BonusModifiersConditionWrapper>();
   public ObjectiveBase objective;

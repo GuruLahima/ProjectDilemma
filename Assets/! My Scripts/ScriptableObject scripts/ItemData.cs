@@ -4,6 +4,7 @@ using UnityEngine.GameFoundation;
 using Workbench.ProjectDilemma;
 using System.Collections.Generic;
 using GuruLaghima.ProjectDilemma;
+using GuruLaghima;
 
 [CreateAssetMenu(fileName = "New Item Data", menuName = "Workbench/ScriptableObjects/ItemData", order = 1)]
 public class ItemData : ScriptableObject
@@ -21,13 +22,9 @@ public class ItemData : ScriptableObject
       NewlyAddedInBook = true;
     }
   }
-  [HorizontalLine]
-  public InventoryItemDefinition inventoryitemDefinition;
-  public string Name;
-  public string Key;
-  [HorizontalLine]
-  public int AmountOwned = 0;
-  public bool Owned => AmountOwned > 0;
+
+
+  [Header("Mutable data")]
   [HorizontalLine]
   public bool Equipped = false;
   // for handling notifications (!) when new item is added
@@ -35,17 +32,25 @@ public class ItemData : ScriptableObject
   // for handling notifications (!) when new item is added
   public bool NewlyAddedInBook = true;
   // for handling shop population, if item should not show up
-  public bool ShowInShop = true;
-  // can we combine this item with something else
-  public bool ShowInCombiner = true;
-  // can we recycle this item
-  public bool ShowInRecycler = true;
-  public bool isDefaultItem = false;
+  public int AmountOwned = 0;
+  public bool Owned => AmountOwned > 0;
+  [Header("Constant data")]
   [HorizontalLine]
+  public string Name;
+  public string Key;
+  public InventoryItemDefinition inventoryitemDefinition;
   public ItemRarity Rarity;
-  // how much does this item give when recycled
+  [CustomTooltip("how much does this item give when recycled")]
   public float recyclingRewardAmount = 10f;
   public int amountNeededTorUpgrade;
+  [CustomTooltip("can we buy this item")]
+  public bool ShowInShop = true;
+  [CustomTooltip("can we combine this item with something else")]
+  public bool ShowInCombiner = true;
+  [CustomTooltip("can we recycle this item")]
+  public bool ShowInRecycler = true;
+  [CustomTooltip("Is this item one of the default items given to player from the very start (should be only one per category. e.g. one mask, one pants, one shoes etc)")]
+  public bool isDefaultItem = false;
 
   public List<InventoryView> inventoriesUsingThisItem = new List<InventoryView>();
 

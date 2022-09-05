@@ -6,6 +6,7 @@ using Workbench.ProjectDilemma;
 [CreateAssetMenu(fileName = "New EmoteData", menuName = "Workbench/ScriptableObjects/EmoteData", order = 2)]
 public class EmoteData : ItemData
 {
+  [Header("Constant data - emotes")]
   public bool Ownable;
   public string Parameter;
   public float ApproxDuration;

@@ -7,6 +7,8 @@ using Workbench.ProjectDilemma;
 public class AbilityData : ItemData
 {
   #region Public Fields
+  [Header("Constant data - ability")]
+
   public AbilityBase Ability;
   #endregion
 

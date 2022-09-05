@@ -6,6 +6,7 @@ using MoreMountains.Feedbacks;
 using GuruLaghima;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace Workbench.ProjectDilemma
 {
@@ -41,6 +42,8 @@ namespace Workbench.ProjectDilemma
 
     #region Public Fields
     public PerkData ownedPerk;
+    [HideInInspector]
+    public List<PerkData> equipedPerks = new List<PerkData>();
     #endregion
 
     #region Exposed Private Fields
@@ -52,7 +55,6 @@ namespace Workbench.ProjectDilemma
     [SerializeField] MMFeedbacks disableChooseScreenFeedbacks;
     [SerializeField] ActivePerksChooser perkChooser;
     [NaughtyAttributes.HorizontalLine]
-    [SerializeField] UpgradeData upgradePerkBonus;
     [SerializeField] TooltipTrigger perkTooltip;
     [SerializeField] DiamonMenuEntry menuEntry;
     #endregion
@@ -66,9 +68,10 @@ namespace Workbench.ProjectDilemma
     #region Public Methods
     public override void Init()
     {
+      // saving it here for syncing data //
+      equipedPerks = InventoryData.Instance.activePerks.Where((obj) => { return obj.Owned && obj.Equipped; }).ToList();
       perkChooser.playerPerkFeature = this;
       perkChooser.Init();
-
     }
 
     public void ShowPerk()

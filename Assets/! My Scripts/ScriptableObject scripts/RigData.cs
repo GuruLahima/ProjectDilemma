@@ -8,7 +8,7 @@ using Workbench.ProjectDilemma;
 public class RigData : ItemData
 {
   [HorizontalLine]
-  [Header("Clothing Info")]
+  [Header("Constant data - Clothing Info")]
   public List<string> BonesData = new List<string>();
   public RiggableSkin SkinPrefab;
   public ClothingType type;

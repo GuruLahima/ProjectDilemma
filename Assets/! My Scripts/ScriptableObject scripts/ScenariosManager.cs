@@ -40,7 +40,7 @@ namespace Workbench.ProjectDilemma
       }
     }
 
-    [Button]
+    [Button("1. Choose Folder With Approved Scenarios")]
     void ChooseFolderWithApprovedScenarios()
     {
       string path = EditorUtility.OpenFolderPanel("Choose approved scenes folder", "", "");
@@ -52,7 +52,7 @@ namespace Workbench.ProjectDilemma
     }
 
 
-    [Button("Load approved scenarios")]
+    [Button("2. Load approved scenarios")]
     void LoadApprovedScenarios()
     {
 
@@ -81,7 +81,7 @@ namespace Workbench.ProjectDilemma
       }
     }
 
-    [Button]
+    [Button("3. Add Scenarios To Build")]
     void AddScenariosToBuild()
     {
       // Find valid Scene paths and make a list of EditorBuildSettingsScene
