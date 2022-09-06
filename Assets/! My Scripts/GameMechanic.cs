@@ -1127,15 +1127,23 @@ namespace Workbench.ProjectDilemma
 
     public void ForceExtraTime(float time)
     {
-      MyDebug.Log("Force adding extra time");
-      if (PhotonNetwork.IsConnected)
+      if (extraTimeVotes < extraTimeMaxVotes)
       {
-        RPCManager.Instance.photonView.RPC("RPC_ForceExtraTimeVote", RpcTarget.AllViaServer, time);
+        MyDebug.Log("Force adding extra time");
+        if (PhotonNetwork.IsConnected)
+        {
+          RPCManager.Instance.photonView.RPC("RPC_ForceExtraTimeVote", RpcTarget.AllViaServer, time);
+        }
+        else
+        {
+          AddExtraTimeDiscussion();
+        }
       }
       else
       {
-        AddExtraTimeDiscussion();
+        MyDebug.Log("Not enough votes left to force add extra time");
       }
+
     }
 
     public void DeclineExtraTime()

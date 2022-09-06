@@ -93,15 +93,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.game-foundation": {
-      "version": "0.9.0-preview.3",
+      "version": "file:com.unity.game-foundation@0.9.0-preview.3",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.addressables": "1.16.16",
         "com.unity.analytics": "3.3.2",
         "com.unity.textmeshpro": "2.1.0"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.ide.rider": {
       "version": "2.0.7",
