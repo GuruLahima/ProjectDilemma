@@ -1030,7 +1030,7 @@ namespace UnityEngine.GameFoundation.Components
 #if UNITY_EDITOR
             else
             {
-                UpdateContentAtEditor();
+                // UpdateContentAtEditor();
             }
 #endif
         }
