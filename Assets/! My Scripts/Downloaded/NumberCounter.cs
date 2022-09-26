@@ -25,6 +25,7 @@ public class NumberCounter : MonoBehaviour
     }
   }
   private Coroutine CountingCoroutine;
+  [SerializeField] bool customFormatting = true;
 
   private void Awake()
   {
@@ -74,7 +75,14 @@ public class NumberCounter : MonoBehaviour
           previousValue = newValue;
         }
 
-        Text.SetText(previousValue.ToString(NumberFormat));
+        if (customFormatting)
+        {
+          Text.SetText($"{NumberFormating.Format((long)previousValue)}");
+        }
+        else
+        {
+          Text.SetText(previousValue.ToString(NumberFormat));
+        }
 
         yield return Wait;
       }
@@ -89,7 +97,14 @@ public class NumberCounter : MonoBehaviour
           previousValue = newValue;
         }
 
-        Text.SetText(previousValue.ToString(NumberFormat));
+        if (customFormatting)
+        {
+          Text.SetText($"{NumberFormating.Format((long)previousValue)}");
+        }
+        else
+        {
+          Text.SetText(previousValue.ToString(NumberFormat));
+        }
 
         yield return Wait;
       }

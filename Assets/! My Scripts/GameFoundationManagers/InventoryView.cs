@@ -38,26 +38,31 @@ namespace GuruLaghima.ProjectDilemma
     #endregion
 
     #region UI references
+    /// <summary>
+    ///     The Game Object with ScrollRect component where scrollable content resides.
+    /// </summary>
+    [SerializeField] ScrollRect m_ScrollRect;
     /// 
     [CustomTooltip("the parent to which we will attach inventory items")]
-    public Transform contentFrame;
+    [SerializeField] Transform contentFrame;
     /// 
     [CustomTooltip("the inventory item template")]
-    public Transform inventoryItemPrefab;
+    [SerializeField] Transform inventoryItemPrefab;
     /// 
     [CustomTooltip("the item type this inventory should render")]
-    public InventoryData.ItemType itemType;
-    public string itemTag;
+    [SerializeField] InventoryData.ItemType itemType;
+    [SerializeField] string itemTag;
     /// 
     [HorizontalLine]
     [CustomTooltip("the radial menu which pops up when we select an item")]
-    public RadialChooseMenu radialMenu;
-    public RadialMenuData radialMenuData;
+    [SerializeField] RadialChooseMenu radialMenu;
+    [SerializeField] RadialMenuData radialMenuData;
     [HorizontalLine]
     // 
     [CustomTooltip("the New Item notification for this inventory")]
-    public GameObject inventoryNotification;
-
+    [SerializeField] GameObject inventoryNotification;
+    [CustomTooltip("The script that handles when to show the new item notification")]
+    [SerializeField] NewItemsTracker newItemsTracker;
 
     public bool InSelection
     {
@@ -88,6 +93,9 @@ namespace GuruLaghima.ProjectDilemma
     [ShowIf("usedByRelics")]
     [SerializeField] RelicView relicView;
     [SerializeField] bool usedInShelf;
+    [ShowIf("usedInChest")]
+    [SerializeField] ChestView chestView;
+    [SerializeField] bool usedInChest;
     [ShowIf("usedInShelf")]
     [SerializeField] ShelfView shelfView;
     [HideIf("showEquipedOnly")]
@@ -95,6 +103,7 @@ namespace GuruLaghima.ProjectDilemma
     [HideIf("showUnequipedOnly")]
     [SerializeField] bool showEquipedOnly;
     [SerializeField] bool ownedOnly;
+    [SerializeField] bool showSeparated;
 
 
     #endregion
@@ -120,6 +129,10 @@ namespace GuruLaghima.ProjectDilemma
       if (radialMenuData)
         radialMenu.radialMenuData = this.radialMenuData;
 
+      if (!newItemsTracker)
+      {
+        newItemsTracker = this.GetComponent<NewItemsTracker>();
+      }
     }
 
     // public void ItemWasEquipped(ItemData item)
@@ -361,7 +374,25 @@ namespace GuruLaghima.ProjectDilemma
     #endregion
 
     #region private methods
+    IEnumerator UpdateScrollbarStatus()
+    {
+      yield return new WaitForEndOfFrame();
 
+      if (!(m_ScrollRect is null))
+      {
+        var scrollTransform = m_ScrollRect.GetComponent<RectTransform>();
+        var containerTransform = contentFrame.GetComponent<RectTransform>();
+
+        if (!(scrollTransform is null) && !(containerTransform is null))
+        {
+          var scrollRect = scrollTransform.rect;
+          var containerRect = containerTransform.rect;
+
+          m_ScrollRect.vertical = scrollRect.height < containerRect.height;
+          m_ScrollRect.horizontal = scrollRect.width < containerRect.width;
+        }
+      }
+    }
     /// <summary>
     /// This will fill out the main text box with information about the main inventory.
     /// </summary>
@@ -372,6 +403,8 @@ namespace GuruLaghima.ProjectDilemma
       PopulateUI();
 
       SortUI();
+
+      StartCoroutine(UpdateScrollbarStatus());
     }
 
     private void SortUI()
@@ -423,6 +456,10 @@ namespace GuruLaghima.ProjectDilemma
         case InventoryData.ItemType.relics:
           // MyDebug.Log("Updating relics");
           tmpitemList = InventoryData.Instance.relics;
+          break;
+        case InventoryData.ItemType.chests:
+          // MyDebug.Log("Updating chests");
+          tmpitemList = InventoryData.Instance.chests;
           break;
         default:
           tmpitemList = new List<ItemData>();
@@ -484,108 +521,134 @@ namespace GuruLaghima.ProjectDilemma
           continue;
         if (ownedOnly && !inventoryItemType.Owned)
           continue;
-        InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
-        newItem.parentView = this;
-        newItem.notificationHandler = this.GetComponent<NewItemsTracker>();
-        newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
-        newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
-        newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
-        newItem.SetItemTooltip((string)inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.description));
-        newItem.SetItemIcon(inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.inventory_icon).AsAsset<Sprite>());
-        newItem.SetItemData(inventoryItemType);
-        if (newItem.quantityTextField)
-          newItem.quantityTextField.text = inventoryItemType.AmountOwned.ToString();
-        if (newItem.rarityGraphic)
-          newItem.rarityGraphic.color = MiscelaneousSettings.Instance.GetRarityColor(inventoryItemType.Rarity);
-        // if (!usedForRecycler && !usedInCombiner)
-        //   newItem.Equip(inventoryItemType.Equipped);
-        // if emotes and throwables use raidal menu for equipping
-        if (itemType == "emotes" || itemType == "throwables")
-          newItem.usesRadialMenu = true;
-        else
-          newItem.usesRadialMenu = false;
-        // hide quantity for emotes and perks
-        if (itemType == "emotes" || itemType == "perks")
-          if (newItem.quantityTextFieldParent)
-            newItem.quantityTextFieldParent.SetActive(false);
-        // if this view uses radial menu for equipping
-        if (radialMenuData)
+
+        int k = 0;
+        do
         {
-          // if this item is meant for a radial menu
-          if (newItem.usesRadialMenu)
+          k++;
+          InventoryItemHUDViewOverride newItem = Instantiate(inventoryItemPrefab, contentFrame, false).GetComponent<InventoryItemHUDViewOverride>();
+          newItem.parentView = this;
+          newItem.notificationHandler = newItemsTracker;
+          newItem.SetItemDefinition(inventoryItemType.inventoryitemDefinition);
+          newItem.SetIconSpritePropertyKey(inventoryItem_HUDIconPropertyKey);
+          newItem.SetItemTitle(inventoryItemType.inventoryitemDefinition.displayName);
+          newItem.SetItemTooltip((string)inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.description));
+          newItem.SetItemIcon(inventoryItemType.inventoryitemDefinition.GetStaticProperty(ProjectDilemmaCatalog.Items.throwable_egg.StaticProperties.inventory_icon).AsAsset<Sprite>());
+          newItem.SetItemData(inventoryItemType);
+          if (newItem.quantityTextField)
+            newItem.quantityTextField.text = inventoryItemType.AmountOwned.ToString();
+          if (newItem.rarityGraphic)
+            newItem.rarityGraphic.color = MiscelaneousSettings.Instance.GetRarityColor(inventoryItemType.Rarity);
+          // if (!usedForRecycler && !usedInCombiner)
+          //   newItem.Equip(inventoryItemType.Equipped);
+          // if emotes and throwables use raidal menu for equipping
+          if (itemType == "emotes" || itemType == "throwables")
+            newItem.usesRadialMenu = true;
+          else
+            newItem.usesRadialMenu = false;
+          // hide quantity for emotes and perks
+          if (itemType == "emotes" || itemType == "perks")
+            if (newItem.quantityTextFieldParent)
+              newItem.quantityTextFieldParent.SetActive(false);
+          // if this view uses radial menu for equipping
+          if (radialMenuData)
           {
-            // and if it is equipped
-            if (newItem.whoDis.Equipped)
+            // if this item is meant for a radial menu
+            if (newItem.usesRadialMenu)
             {
-              //  then find a place for it on the radial menu if not already in it (but should be, since it's equipped) 
-              if (!radialMenuData.orderedItems.Contains(newItem.whoDis))
+              // and if it is equipped
+              if (newItem.whoDis.Equipped)
               {
-                // find the first free spot
-                for (int i = 0; i < radialMenuData.orderedItems.Count; i++)
+                //  then find a place for it on the radial menu if not already in it (but should be, since it's equipped) 
+                if (!radialMenuData.orderedItems.Contains(newItem.whoDis))
                 {
-                  if (radialMenuData.orderedItems[i] == null)
+                  // find the first free spot
+                  for (int i = 0; i < radialMenuData.orderedItems.Count; i++)
                   {
-                    radialMenuData.orderedItems[i] = newItem.whoDis;
-                    break;
+                    if (radialMenuData.orderedItems[i] == null)
+                    {
+                      radialMenuData.orderedItems[i] = newItem.whoDis;
+                      break;
+                    }
                   }
                 }
               }
             }
           }
-        }
+          if (newItem.notificationIcon)
+          {
+            newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
+            if (inventoryItemType.NewlyAdded)
+            {
+              if (newItem.notificationHandler)
+                newItem.notificationHandler.NewItems++;
+            }
+            else
+            {
+              if (newItem.notificationPopFeedback)
+              {
+                newItem.notificationPopFeedback.enabled = false;
+                Destroy(newItem.notificationPopFeedback);
+              }
+            }
+          }
 
-        newItem.notificationIcon.SetActive(inventoryItemType.NewlyAdded);
-        if (inventoryItemType.NewlyAdded)
-        {
-          // this.NewItems++;
-          if (newItem.notificationHandler)
-            newItem.notificationHandler.NewItems++;
-        }
-        else
-        {
-          newItem.notificationPopFeedback.enabled = false;
-          Destroy(newItem.notificationPopFeedback);
-        }
-        // show visually that this item has duplicates
-        if (inventoryItemType.AmountOwned > 1)
-        {
-          newItem.feedbacks.Find((obj) => obj.key == "Duplicates")?.element?.PlayFeedbacks();
-        }
-        // if this view is used for the recycler feature then this item should have the information to which object to send data about itself
-        if (usedForRecycler)
-        {
-          newItem.usedInRecycler = true;
-          newItem.recyclerView = this.recyclerView;
-        }
-        // if this view is used for the combiner feature then this item should have the information to which object to send data about itself
-        if (usedInCombiner)
-        {
-          // MyDebug.Log("item used in combiner in", this.name);
-          newItem.usedForCombiner = true;
-          newItem.combinerView = this.combinerView;
-        }
-        if (usedByRelics)
-        {
-          newItem.usedByRelics = true;
-          newItem.relicView = this.relicView;
-        }
-        if (usedInShelf)
-        {
-          newItem.usedInShelf = true;
-          newItem.shelfView = this.shelfView;
-        }
+          // show visually that this item has duplicates
+          if (inventoryItemType.AmountOwned > 1)
+          {
+            newItem.feedbacks.Find((obj) => obj.key == "Duplicates")?.element?.PlayFeedbacks();
+          }
+          // if this view is used for the recycler feature then this item should have the information to which object to send data about itself
+          if (usedForRecycler)
+          {
+            newItem.usedInRecycler = true;
+            newItem.recyclerView = this.recyclerView;
+          }
+          // if this view is used for the combiner feature then this item should have the information to which object to send data about itself
+          if (usedInCombiner)
+          {
+            // MyDebug.Log("item used in combiner in", this.name);
+            newItem.usedForCombiner = true;
+            newItem.combinerView = this.combinerView;
+          }
+          if (usedByRelics)
+          {
+            newItem.usedByRelics = true;
+            newItem.relicView = this.relicView;
+          }
+          if (usedInShelf)
+          {
+            newItem.usedInShelf = true;
+            newItem.shelfView = this.shelfView;
+          }
+          if (usedInChest)
+          {
+            newItem.usedInChest = true;
+            newItem.chestView = this.chestView;
+          }
+          // if this item is a skin don't show quantity
+          var myClothing = inventoryItemType as RigData;
+          if (myClothing != null)
+          {
+            // successfully cast
+            if (myClothing.type == ClothingType.Skin)
+            {
+              newItem.quantityTextFieldParent.SetActive(false);
+            }
+          }
 
-        if (newItem.GetComponentInChildren<ClothingPlaceholder>())
-          newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
+          if (newItem.GetComponentInChildren<ClothingPlaceholder>())
+            newItem.GetComponentInChildren<ClothingPlaceholder>().Clothing = LoadItemData(inventoryItemType.inventoryitemDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT), SetIconSprite, OnSpriteLoadFailed) as RigData;
 
-        // equip needs to be after loading of clothing data for the item
-        if (!usedForRecycler && !usedInCombiner)
-        {
-          if (!hasMaxLimitOnEquippedItems || (equippedItems.Count < maxLimitOnEquippedItems))
-            newItem.Equip(inventoryItemType.Equipped);
-        }
+          // equip needs to be after loading of clothing data for the item
+          if (!usedForRecycler && !usedInCombiner)
+          {
+            if (!hasMaxLimitOnEquippedItems || (equippedItems.Count < maxLimitOnEquippedItems))
+              newItem.Equip(inventoryItemType.Equipped);
+          }
 
-        inventoryItems.Add(newItem);
+          inventoryItems.Add(newItem);
+        } while (k < inventoryItemType.AmountOwned && showSeparated);
       }
     }
 

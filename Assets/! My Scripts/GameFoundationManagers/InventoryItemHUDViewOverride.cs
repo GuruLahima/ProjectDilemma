@@ -11,43 +11,52 @@ using MoreMountains.Feedbacks;
 using GuruLaghima;
 using Workbench.ProjectDilemma;
 using UnityEngine.UI;
+using NaughtyAttributes;
 
 public class InventoryItemHUDViewOverride : InventoryItemHudView
 {
   #region references
 
   [Header("UI stuff")]
+  [HorizontalLine]
   public GameObject notificationIcon;
   public GameObject quantityTextFieldParent;
   public Image rarityGraphic;
   [SerializeField] TextMeshProUGUI title;
   [SerializeField] TooltipTrigger tooltip;
+
   [Header("References")]
+  [HorizontalLine]
   public ItemData whoDis;
-  public InventoryView parentView;
-  public NewItemsTracker notificationHandler;
-  public RecyclerView recyclerView;
-  public CombinerView combinerView;
-  public RelicView relicView;
-  public BookView bookView;
-  public ShelfView shelfView;
+  [HideInInspector] public InventoryView parentView;
+  [HideInInspector] public NewItemsTracker notificationHandler;
+  [HideInInspector] public RecyclerView recyclerView;
+  [HideInInspector] public CombinerView combinerView;
+  [HideInInspector] public RelicView relicView;
+  [HideInInspector] public ChestView chestView;
+  [HideInInspector] public BookView bookView;
+  [HideInInspector] public ShelfView shelfView;
   #endregion
 
   #region public fields 
+  [HorizontalLine]
   public bool usesRadialMenu = false;
   public List<DictWrapper<MMFeedbacks>> feedbacks = new List<DictWrapper<MMFeedbacks>>();
   public bool usedInRecycler;
   public bool usedForCombiner;
   public bool usedByRelics;
+  public bool usedInChest;
   public bool usedByBook;
   public bool usedInShelf;
   #endregion
 
   #region exposed fields
 
+  [HorizontalLine]
   public MMFeedbacks notificationPopFeedback;
   #endregion
 
+  [Header("Events")]
   public UnityEvent OnEquipped;
   public UnityEvent OnUnequipped;
 
@@ -67,7 +76,10 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
   /// </param>
   public void SetItemTitle(string text)
   {
-    title.text = text;
+    if (title)
+    {
+      title.text = text;
+    }
     if (tooltip)
     {
       tooltip.title = text;
@@ -128,6 +140,10 @@ public class InventoryItemHUDViewOverride : InventoryItemHudView
     if (usedByRelics)
     {
       relicView.ItemSelected(this);
+    }
+    if (usedInChest)
+    {
+      chestView.ItemSelected(this);
     }
     else
     {

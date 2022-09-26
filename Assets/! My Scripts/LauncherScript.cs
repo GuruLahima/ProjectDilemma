@@ -49,8 +49,19 @@ namespace Workbench.ProjectDilemma
     [CustomTooltip("The input field for the nickname")]
     [SerializeField]
     TMP_InputField _inputField;
+    [CustomTooltip("The input field for entering a private match code")]
+    [SerializeField]
+    TMP_InputField joinPrivateGameCodeField;
+    [SerializeField]
+    [CustomTooltip("The input field that shows the generated private match code")]
+    TMP_Text createPrivateGameCodeField;
+    [SerializeField]
+    [CustomTooltip("The input field that shows the generated private match code")]
+    Button copyRoomCodeToClipboardButton;
     [SerializeField]
     TMP_Text idCardNickname;
+    [SerializeField]
+    TMP_Text idCardLevelLabel;
     [SerializeField]
     TMP_Text idCardXPLabel;
     [SerializeField]
@@ -132,6 +143,7 @@ namespace Workbench.ProjectDilemma
     string gameVersion = "1";
 
     RoomOptions roomOptions;
+    RoomOptions privateRoomOptions;
     AppSettings appSettings;
 
     List<GameObject> virtualCameras = new List<GameObject>();
@@ -183,6 +195,15 @@ namespace Workbench.ProjectDilemma
       roomOptions.PublishUserId = true;
       roomOptions.MaxPlayers = maxPlayersPerRoom; // should be exposed as option for master clients
       roomOptions.CustomRoomPropertiesForLobby = new string[] { Keys.MAP_PROP_KEY };
+
+      privateRoomOptions = new RoomOptions();
+      privateRoomOptions.IsVisible = false;
+      privateRoomOptions.PublishUserId = true;
+      privateRoomOptions.MaxPlayers = maxPlayersPerRoom; // should be exposed as option for master clients
+      privateRoomOptions.CustomRoomPropertiesForLobby = new string[] { Keys.MAP_PROP_KEY, Keys.PRIVATE_GAME };
+      Hashtable roomProps = new Hashtable();
+      roomProps.Add(Keys.PRIVATE_GAME, "yes");
+      privateRoomOptions.CustomRoomProperties = roomProps;
 
       _inputField.onValueChanged.AddListener(delegate (string m) { SetPlayerName(m); }); // for some reason dropdowns override their default behaviour if given listener via code
       /*       quickMatchButton.onClick.AddListener(delegate ()
@@ -262,19 +283,22 @@ namespace Workbench.ProjectDilemma
         garageButtonNotification.SetActive(false);
       }
 
+      // ! we are waiting on the tutorial to uncomment this
       // show tutorial on first play
-      bool firstTime = PlayerPrefs.GetString("first_time_play", "true") == "true" ? true : false;
-      if (firstTime)
-      {
-        ToggleMenu(false);
-        PlayerPrefs.SetString("first_time_play", "false");
-        tutorialWindow.SetActive(true);
-      }
+      // bool firstTime = PlayerPrefs.GetString("first_time_play", "true") == "true" ? true : false;
+      // if (firstTime)
+      // {
+      //   ToggleMenu(false);
+      //   PlayerPrefs.SetString("first_time_play", "false");
+      //   tutorialWindow.SetActive(true);
+      // }
 
 
     }
 
     bool muted;
+    private bool customGame;
+    private bool joiningCustomGame;
 
     private void Update()
     {
@@ -334,6 +358,43 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    public void CreateRoomWithUniqueCode()
+    {
+      customGame = true;
+      joiningCustomGame = false;
+
+      // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
+      if (PhotonNetwork.IsConnected)
+      {
+        // generate unique room code 
+        string code = GenerateNearlyUniqueCode();
+        createPrivateGameCodeField.text = code;
+        copyRoomCodeToClipboardButton.gameObject.SetActive(true);
+        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
+        PhotonNetwork.CreateRoom(code, privateRoomOptions);
+      }
+      else
+      {
+        ConnectToMaster();
+      }
+    }
+    public void JoinCustomGameWithCode()
+    {
+      customGame = true;
+      joiningCustomGame = true;
+      // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
+      if (PhotonNetwork.IsConnected)
+      {
+        // Hashtable expectedCustomRoomProperties = new Hashtable { { Keys.MAP_PROP_KEY, "in_queue" }, { Keys.PRIVATE_GAME, "yes" } };
+        string code = joinPrivateGameCodeField.text;
+        PhotonNetwork.JoinRoom(code);
+      }
+      else
+      {
+        ConnectToMaster();
+      }
+    }
+
     public void FateChosen()
     {
       PlayerPrefs.SetString(Keys.CARD_DECK_CHOSEN, "true");
@@ -375,6 +436,7 @@ namespace Workbench.ProjectDilemma
       // keep track of the will to join a room, because when we come back from the game we will get a callback that we are connected, so we need to know what to do then
       isConnecting = true;
 
+      customGame = false;
 
       // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
       if (PhotonNetwork.IsConnected)
@@ -421,10 +483,10 @@ namespace Workbench.ProjectDilemma
 
     }
 
-    public void ToggleMenu(bool on)
+    public void ToggleMenu(bool state)
     {
-      menuv2UI.interactable = on;
-      if (on)
+      menuv2UI.interactable = state;
+      if (state)
         showMenuFeedbacks.PlayFeedbacks();
       else
         hideMenuFeedbacks.PlayFeedbacks();
@@ -433,6 +495,16 @@ namespace Workbench.ProjectDilemma
     public void EnteredGarage()
     {
       PlayerPrefs.SetInt("has_entered_garage", 1);
+    }
+
+
+    public void CopyRoomCodeToClipboard()
+    {
+      UnityEngine.TextEditor te = new UnityEngine.TextEditor();
+      te.text = createPrivateGameCodeField.text;
+      te.SelectAll();
+      te.Copy();
+      // GUIUtility.systemCopyBuffer = createPrivateGameCodeField.text;
     }
 
     #endregion
@@ -448,14 +520,28 @@ namespace Workbench.ProjectDilemma
     /// </summary>
     public override void OnConnectedToMaster()
     {
-      LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
       MyDebug.Log("Connected to region: " + PhotonNetwork.CloudRegion);
-
-      JoinRandomRoom();
-
       // visual stuff
       OnConnectedEvent?.Invoke();
+      if (customGame)
+      {
+        if (joiningCustomGame)
+        {
+          JoinCustomGameWithCode();
+        }
+        else
+        {
+          CreateRoomWithUniqueCode();
+        }
+      }
+      else
+      {
+        LogFeedback("OnConnectedToMaster: Next -> try to Join Random Room");
+        JoinRandomRoom();
+      }
+
     }
+
 
     /// <summary>
     /// Called when a JoinRandom() call failed. The parameter provides ErrorCode and message.
@@ -499,9 +585,16 @@ namespace Workbench.ProjectDilemma
       {
         // mark this room as available to be joined
         Hashtable ht = new Hashtable {
-        { Keys.MAP_PROP_KEY, "in_queue"}
+        { Keys.MAP_PROP_KEY, "in_queue"},
          };
+
+
         PhotonNetwork.CurrentRoom.SetCustomProperties(ht);
+
+        // show the room name which we can use to find it
+        // createCustomGameCodeField.text = PhotonNetwork.CurrentRoom.Name;
+        createPrivateGameCodeField.text = PhotonNetwork.CurrentRoom.Name;
+
       }
     }
 
@@ -563,6 +656,8 @@ namespace Workbench.ProjectDilemma
       PhotonNetwork.LocalPlayer.SetCustomProperties(ResetCustomProperties(PhotonNetwork.LocalPlayer.CustomProperties));
 
       isConnecting = false;
+      copyRoomCodeToClipboardButton.gameObject.SetActive(false);
+
     }
 
     #endregion
@@ -693,6 +788,7 @@ namespace Workbench.ProjectDilemma
       // xp
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
       int xp = (int)GameFoundationSdk.wallet.Get(xpAsCurrency);
+      MyDebug.Log(xp);
       int accumulatedLevelThreshold = 0;
       int currentLevel = 0;
       int currentLevelThreshold = 0;
@@ -721,30 +817,35 @@ namespace Workbench.ProjectDilemma
       }
       // xp
       int xp = (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP));
-      int accumulatedLevelThreshold = 0;
-      int currentLevel = 0;
-      int currentLevelThreshold = 0;
-      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
-      {
-        currentLevelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
-        accumulatedLevelThreshold += currentLevelThreshold;
-        if (xp >= accumulatedLevelThreshold)
-        {
-          currentLevel = i;
-        }
-        else
-        {
-          break;
-        }
-      }
+      #region Old calculations
+      //int accumulatedLevelThreshold = 0;
+      //int currentLevel = 0;
+      //int currentLevelThreshold = 0;
+      //for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count - 1; i++)
+      //{
+      //  currentLevelThreshold = MiscelaneousSettings.Instance.levelsDistribution[i];
+      //  accumulatedLevelThreshold += currentLevelThreshold;
+      //  if (xp >= accumulatedLevelThreshold)
+      //  {
+      //    currentLevel = i;
+      //  }
+      //  else
+      //  {
+      //    break;
+      //  }
+      //}
+      #endregion
+      int currentLevel = ProgressData.Instance.GetLevel(xp, out int experienceLeft);
       if (idCardXPSlider)
       {
-        float currentXPPerc = ((float)(Mathf.Abs((accumulatedLevelThreshold - xp) - currentLevelThreshold)) / (float)currentLevelThreshold) * 100;
-        idCardXPSlider.maxValue = 100;
-        StartCoroutine(AnimateProgressBar(idCardXPSlider, 0f, currentXPPerc));
+        //float currentXPPerc = ((float)(Mathf.Abs((accumulatedLevelThreshold - xp) - currentLevelThreshold)) / (float)currentLevelThreshold) * 100;
+        idCardXPSlider.maxValue = ProgressData.Instance.ExperienceRequiredPerLevel[currentLevel];
+        StartCoroutine(AnimateProgressBar(idCardXPSlider, 0f, experienceLeft));
       }
+      if (idCardLevelLabel)
+        idCardLevelLabel.text = currentLevel.ToString();
       if (idCardXPLabel)
-        idCardXPLabel.text = "Level " + currentLevel;
+        idCardXPLabel.text = $"{experienceLeft}/{ProgressData.Instance.ExperienceRequiredPerLevel[currentLevel]}";
       // rank
       if (idCardRank)
         idCardRank.text = "Rank. " + (int)GameFoundationSdk.wallet.Get(GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP));
@@ -765,7 +866,10 @@ namespace Workbench.ProjectDilemma
 
     }
 
-
+    private string GenerateNearlyUniqueCode()
+    {
+      return Hash128.Compute(PhotonNetwork.LocalPlayer.UserId + "_" + System.DateTime.Now).ToString();
+    }
 
     #endregion
 

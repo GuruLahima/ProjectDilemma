@@ -137,8 +137,17 @@ namespace Workbench.ProjectDilemma
       {
         currentCamera = camerasStack[++currentCameraIndex];
         currentCamera.gameObject.SetActive(true);
+
         if (GameMechanic.Instance.localPlayerSpot)
+        {
           GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+
+          // make sure local player's mask is visible from any other camera except first person view
+          if (currentCamera.gameObject == GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam)
+            GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask & ~(1 << LayerMask.NameToLayer("Masks"));
+          else
+            GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask | (1 << LayerMask.NameToLayer("Masks"));
+        }
 
       }
     }
@@ -156,8 +165,18 @@ namespace Workbench.ProjectDilemma
       {
         currentCamera = camerasStack[--currentCameraIndex];
         currentCamera.gameObject.SetActive(true);
+
         if (GameMechanic.Instance.localPlayerSpot)
+        {
           GameMechanic.Instance.localPlayerSpot.playerCam = currentCamera.gameObject;
+
+
+          // make sure local player's mask is visible from any other camera except first person view
+          if (currentCamera.gameObject == GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam)
+            GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask & ~(1 << LayerMask.NameToLayer("Masks"));
+          else
+            GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask = GameMechanic.Instance.localPlayerSpot.mainCam.GetComponent<Camera>().cullingMask | (1 << LayerMask.NameToLayer("Masks"));
+        }
 
       }
     }

@@ -25,6 +25,8 @@ public class TransactionItemViewOverride : TransactionItemView
     Invoke("AssignClothingData", 1f);
     Invoke("UpdateVisualStatus", 1f);
     Invoke("AssignTooltip", 1f);
+
+
   }
 
   void NotifyStoreViewHelper()
@@ -76,7 +78,6 @@ public class TransactionItemViewOverride : TransactionItemView
       // notify Store parent 
       NotifyStoreViewHelper();
     }
-
   }
 
   void AssignClothingData()
@@ -97,13 +98,19 @@ public class TransactionItemViewOverride : TransactionItemView
         ItemData item = transaction.payout.GetExchange(0).tradableDefinition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ItemData>();
         if (item)
         {
-          tooltip.icon = item.ico;
-          tooltip.title = item.inventoryitemDefinition.displayName;
-          tooltip.description = (string)item.inventoryitemDefinition.GetStaticProperty("description") +
-            "\n" + (string)item.inventoryitemDefinition.GetStaticProperty("note_description");
+          if (item.inventoryitemDefinition != null)
+          {
+            tooltip.icon = item.ico;
+            tooltip.title = item.inventoryitemDefinition.displayName;
+            tooltip.description = (string)item.inventoryitemDefinition.GetStaticProperty("description") +
+              "\n" + (string)item.inventoryitemDefinition.GetStaticProperty("note_description");
+          }
+
         }
       }
     }
+    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, 0);
+
   }
 
   public void RecordTransaction()
@@ -137,6 +144,7 @@ public class TransactionItemViewOverride : TransactionItemView
     if (this.transaction.GetStaticProperty("repeatable"))
       return;
 
+    owned = true;
     OnTransactionDisabled?.Invoke();
   }
   public void UpdateNewlyAddedInfoForAllBoughtItems()

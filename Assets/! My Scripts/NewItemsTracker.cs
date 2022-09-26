@@ -53,4 +53,18 @@ public class NewItemsTracker : MonoBehaviour
 
     }
   }
+
+  public void AddItem()
+  {
+    NewItems++;
+  }
+  public void RemoveItem()
+  {
+    NewItems--;
+  }
+
+  public void ClearItems()
+  {
+    NewItems = 0;
+  }
 }

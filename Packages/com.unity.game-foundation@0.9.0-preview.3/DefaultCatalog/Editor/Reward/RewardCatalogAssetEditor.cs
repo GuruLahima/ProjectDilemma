@@ -79,7 +79,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         {
             BeginSidebarItem(reward, new Vector2(242f, 30f), new Vector2(5f, 7f));
 
-            DrawSidebarItemLabel(reward.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
+            DrawSidebarItemLabel(reward, reward.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
 
             EndSidebarItem();
         }

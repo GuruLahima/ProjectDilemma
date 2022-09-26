@@ -111,6 +111,13 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             }
         }
 
+        protected sealed override void DrawDetail(List<TagAsset> catalogItems)
+        {
+            // DrawGeneralDetail(catalogItems);
+
+            EditorGUILayout.Space();
+        }
+
         protected override void DrawSidebarUtils()
         {
             m_TagSearchFieldEditor.OnGUI();
@@ -120,7 +127,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         {
             BeginSidebarItem(tag, new Vector2(242f, 30f), new Vector2(5f, 7f));
 
-            DrawSidebarItemLabel(tag.key, 242, GameFoundationEditorStyles.boldTextStyle);
+            DrawSidebarItemLabel(tag, tag.key, 242, GameFoundationEditorStyles.boldTextStyle);
 
             EndSidebarItem();
         }

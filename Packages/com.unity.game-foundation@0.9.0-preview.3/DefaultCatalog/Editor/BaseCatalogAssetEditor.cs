@@ -161,6 +161,10 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                 {
                     SelectValidItem(0);
                 }
+
+                // reset selection
+                inventoryItemsSelectedFlags.Clear();
+                selectedItems.Clear();
             }
 
             EditorGUILayout.Space();
@@ -170,10 +174,11 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         {
             BeginSidebarItem(catalogItem, new Vector2(242f, 30f), new Vector2(5f, 7f));
 
-            DrawSidebarItemLabel(catalogItem.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
+            DrawSidebarItemLabel(catalogItem, catalogItem.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
 
             EndSidebarItem();
         }
+
 
         protected sealed override void DrawDetail(TCatalogItemAsset catalogItem)
         {
@@ -209,6 +214,48 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                     RefreshItems();
                 }
             }
+        }
+
+        
+        protected sealed override void DrawDetail(List<TCatalogItemAsset> catalogItems)
+        {
+            DrawGeneralDetail(catalogItems);
+
+            EditorGUILayout.Space();
+
+            foreach (TCatalogItemAsset catalogItem in catalogItems)
+            {
+              
+              // save off previous state of tags so we can detect changes
+              using (DCTools.Pools.tagList.Get(out var previousTags))
+              {
+                  catalogItem.GetTags(previousTags);
+
+                  m_TagPicker.DrawTagPicker(catalogItem);
+
+                  EditorGUILayout.Space();
+
+                  DrawTypeSpecificBlocks(catalogItem);
+
+                  EditorGUILayout.Space();
+
+                  EditorGUILayout.LabelField(PropertiesEditor.staticPropertiesLabel, GameFoundationEditorStyles.titleStyle);
+                  using (new EditorGUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
+                  {
+                      m_StaticPropertiesEditor.Draw();
+                  }
+
+                  // make sure this is the last to draw
+                  m_TagPicker.DrawTagPickerPopup(catalogItem);
+
+                  // if tags changed then refresh item, including tags so tag filter can be updated
+                  if (!previousTags.SequenceEqual(catalogItem.m_Tags))
+                  {
+                      RefreshItems();
+                  }
+              }
+            }
+
         }
 
         protected override void SelectItem(TCatalogItemAsset catalogItem)
@@ -270,6 +317,28 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                 }
 
                 DrawGeneralFields(catalogItem);
+            }
+        }
+        protected virtual void DrawGeneralDetail(List<TCatalogItemAsset> catalogItems)
+        {
+                  Debug.Log("catalogItems.Count = " + catalogItems.Count);
+            EditorGUILayout.LabelField("General", GameFoundationEditorStyles.titleStyle);
+
+            using (new GUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
+            {
+                foreach (TCatalogItemAsset catalogItem in catalogItems)
+                {
+                  Debug.Log(catalogItem.displayName.currentValue);
+                  string displayName = catalogItem.displayName;
+                  m_ReadableNameKeyEditor.DrawReadableNameKeyFields(ref catalogItem.m_Key, ref displayName);
+
+                  // if (catalogItem.displayName != displayName)
+                  // {
+                  //     catalogItem.Editor_SetDisplayName(displayName);
+                  // }
+
+                  // DrawGeneralFields(catalogItem);
+                }
             }
         }
     }

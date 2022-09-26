@@ -10,8 +10,12 @@ public class PointsCounter : MonoBehaviour
   [SerializeField] MMFeedbacks mainPointsCounterGainFeedback;
   [SerializeField] MMFeedbacks mainPointsCounterLoseFeedback;
   [SerializeField] NumberCounter counterUpdater;
+  [SerializeField] string currencyKey;
   private float _bankMoney;
   private float prev_bankMoney;
+
+  Currency softCurrency = null;
+
 
   public float BankMoney
   {
@@ -19,16 +23,22 @@ public class PointsCounter : MonoBehaviour
     {
       return _bankMoney;
     }
-    private set
+    set
     {
       _bankMoney = value;
       prev_bankMoney = _bankMoney;
-      // OnUpdated?.Invoke();
     }
   }
 
   #region monobehaviours
 
+  private void Start()
+  {
+    if (GameFoundationSdk.IsInitialized)
+    {
+      softCurrency = GameFoundationSdk.catalog.Find<Currency>(currencyKey);
+    }
+  }
 
   void OnDisable()
   {
@@ -39,8 +49,6 @@ public class PointsCounter : MonoBehaviour
   [ContextMenu("Test Func")]
   public void TestFunc()
   {
-    Currency softCurrency = null;
-    softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
     GameFoundationSdk.wallet.Add(softCurrency, 100);
     // PlayFeedbacks(softCurrency, 2000);
   }
@@ -50,9 +58,11 @@ public class PointsCounter : MonoBehaviour
 
   public void OnGameFoundationInitialized()
   {
+    softCurrency = GameFoundationSdk.catalog.Find<Currency>(currencyKey);
+
     GameFoundationSdk.wallet.balanceChanged += PlayFeedbacks;
 
-    LoadBankData();
+    // LoadBankData();
   }
 
 
@@ -73,7 +83,8 @@ public class PointsCounter : MonoBehaviour
     if (GameFoundationSdk.IsInitialized)
     {
       Currency softCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_SOFT);
-      PlayFeedbacks(softCurrency, GameFoundationSdk.wallet.Get(softCurrency));
+      // PlayFeedbacks(softCurrency, GameFoundationSdk.wallet.Get(softCurrency));
+      PlayFeedbacks(GameFoundationSdk.wallet.Get(softCurrency));
     }
   }
 
@@ -119,6 +130,49 @@ public class PointsCounter : MonoBehaviour
       }
     }
     BankMoney = softCurrency.quantity;
+
+  }
+  public void PlayFeedbacks(long value)
+  {
+    // MyDebug.Log("PointsCounter:: prev value", value);
+    // MyDebug.Log("PointsCounter:: softCurrency.quantity", softCurrency.quantity);
+    // MyDebug.Log("PointsCounter:: prev_bankMoney", prev_bankMoney);
+    // if new amount is bigger than previous amount play the gain feedback
+    if (softCurrency != null)
+    {
+
+
+      if (softCurrency.quantity > prev_bankMoney)
+      {
+
+        // maybe an animation of coins rapidly falling into the counter, embiggening it slightly with each coin
+        // MyDebug.Log("PointsCounter:: playing gain feedback ");
+        BankMoney = softCurrency.quantity;
+        if (mainPointsCounterGainFeedback)
+        {
+          try
+          {
+            mainPointsCounterGainFeedback.PlayFeedbacks();
+          }
+          catch { }
+        }
+      }
+      else if (softCurrency.quantity < prev_bankMoney)
+      {
+        // maybe an animation of coins rapidly falling out of the counter
+        // MyDebug.Log("PointsCounter:: playing lose feedback  ");
+        BankMoney = softCurrency.quantity;
+        if (mainPointsCounterLoseFeedback)
+        {
+          try
+          {
+            mainPointsCounterLoseFeedback.PlayFeedbacks();
+          }
+          catch { }
+        }
+      }
+      BankMoney = softCurrency.quantity;
+    }
 
   }
   #endregion

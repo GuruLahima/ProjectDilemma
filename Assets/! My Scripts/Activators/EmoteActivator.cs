@@ -50,6 +50,7 @@ namespace Workbench.ProjectDilemma
       }
       ActiveState = true;
 
+      PlayerInputManager.Instance.OnEnterRadialMenu();
       radialMenu.ActivateRadialMenu(Emote);
 
       // CursorManager.SetLockMode(CursorLockMode.Confined);
@@ -59,7 +60,9 @@ namespace Workbench.ProjectDilemma
 
     public void Emote()
     {
+      PlayerInputManager.Instance.OnExitRadialMenu();
       if (OnCooldown) return;
+
       //we are adding cooldown where the animation is played
       // this way we take the duration of the animation
 

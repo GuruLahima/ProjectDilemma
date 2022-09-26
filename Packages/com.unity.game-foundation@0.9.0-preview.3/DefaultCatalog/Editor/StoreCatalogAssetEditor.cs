@@ -23,7 +23,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         {
             BeginSidebarItem(store, new Vector2(242f, 30f), new Vector2(5f, 7f));
 
-            DrawSidebarItemLabel(store.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
+            DrawSidebarItemLabel(store, store.displayName, 242, GameFoundationEditorStyles.boldTextStyle);
 
             EndSidebarItem();
         }

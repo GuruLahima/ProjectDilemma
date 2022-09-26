@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GuruLaghima;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,13 +34,16 @@ namespace Workbench.ProjectDilemma
       public bool TriggersHeld;
       [HideInInspector]
       public bool? IsActivated;
+      public List<InputCondition> allowEvenWhenTheseConditionsAreTrue = new List<InputCondition>();
     }
 
     [NaughtyAttributes.InfoBox("Override Inputs ignores input conditions")]
     [SerializeField] private List<InputWrapper> OverrideInputs = new List<InputWrapper>();
     [SerializeField] private List<InputWrapper> Inputs = new List<InputWrapper>();
-    public List<string> inputConditions;
+    public List<InputCondition> inputConditions;
 
+    [HorizontalLine]
+    [Header("Events")]
     public UnityEvent OnButtonHeldOrActive;
     public UnityEvent OnButtonReleasedOrInactive;
     bool IsHeld
@@ -89,8 +93,8 @@ namespace Workbench.ProjectDilemma
     private void Update()
     {
       ProcessOverrideInputs();
-      if (InputEnabled)
-        ProcessInput();
+      // if (InputEnabled) // ! I needed a finer approach to deciding if an input should be blocked or not
+      ProcessInput();
     }
 
     public void ExecuteInputAction(string name)
@@ -272,10 +276,39 @@ namespace Workbench.ProjectDilemma
 
     }
 
+    bool inputBlocked = false;
     private void ProcessInput()
     {
       foreach (InputWrapper _input in Inputs)
       {
+        // check if this input is allowed even though the input is blocked
+        if (!InputEnabled)
+        {
+          inputBlocked = true;
+
+          foreach (InputCondition condition in inputConditions)
+          {
+
+            if (_input.allowEvenWhenTheseConditionsAreTrue.Contains(condition))
+            {
+              inputBlocked = false;
+            }
+            else
+            {
+              inputBlocked = true;
+              break;
+            }
+
+          }
+
+          // skip this input because it's blocked by conditions
+          if (inputBlocked)
+          {
+            continue;
+          }
+        }
+
+        // process the input
         switch (_input.InputMode)
         {
           case InputWrapper.Mode.OnPress:
@@ -421,17 +454,63 @@ namespace Workbench.ProjectDilemma
 
     public void InChatVoice()
     {
-      if (!inputConditions.Contains(ICKeys.USING_COMPUTER))
+      if (!inputConditions.Contains(InputCondition.USING_COMPUTER))
       {
-        inputConditions.Add(ICKeys.USING_COMPUTER);
+        inputConditions.Add(InputCondition.USING_COMPUTER);
       }
     }
 
     public void ExitChatVoice()
     {
-      if (inputConditions.Contains(ICKeys.USING_COMPUTER))
+      if (inputConditions.Contains(InputCondition.USING_COMPUTER))
       {
-        inputConditions.Remove(ICKeys.USING_COMPUTER);
+        inputConditions.Remove(InputCondition.USING_COMPUTER);
+      }
+    }
+
+    public void OnEnterRadialMenu()
+    {
+      if (!inputConditions.Contains(InputCondition.IN_RADIALMENU))
+      {
+        inputConditions.Add(InputCondition.IN_RADIALMENU);
+      }
+    }
+    public void OnExitRadialMenu()
+    {
+      if (inputConditions.Contains(InputCondition.IN_RADIALMENU))
+      {
+        inputConditions.Remove(InputCondition.IN_RADIALMENU);
+      }
+    }
+
+    public void OnStartedAiming()
+    {
+      if (!inputConditions.Contains(InputCondition.IS_AIMING))
+      {
+        inputConditions.Add(InputCondition.IS_AIMING);
+      }
+    }
+
+    public void OnFinishedAiming()
+    {
+      if (inputConditions.Contains(InputCondition.IS_AIMING))
+      {
+        inputConditions.Remove(InputCondition.IS_AIMING);
+      }
+    }
+
+    public void OnChoosingPerk()
+    {
+      if (!inputConditions.Contains(InputCondition.CHOOSING_PERK))
+      {
+        inputConditions.Add(InputCondition.CHOOSING_PERK);
+      }
+    }
+    public void OnPerkChosen()
+    {
+      if (inputConditions.Contains(InputCondition.CHOOSING_PERK))
+      {
+        inputConditions.Remove(InputCondition.CHOOSING_PERK);
       }
     }
 
@@ -448,14 +527,30 @@ namespace Workbench.ProjectDilemma
       }
     }
 
+    public void CoinFlip()
+    {
+      if (GameMechanic.Instance)
+      {
+        GameMechanic.Instance.localPlayerSpot.extrasActivator.CoinFlip();
+      }
+    }
+
+    public void DiceRoll()
+    {
+      if (GameMechanic.Instance)
+      {
+        GameMechanic.Instance.localPlayerSpot.extrasActivator.DiceRoll();
+      }
+    }
+
     #endregion
 
     #region Private Methods
     private void OnDiscussionEnded()
     {
-      if (!inputConditions.Contains(ICKeys.DISCUSSION_ENDED))
+      if (!inputConditions.Contains(InputCondition.DISCUSSION_ENDED))
       {
-        inputConditions.Add(ICKeys.DISCUSSION_ENDED);
+        inputConditions.Add(InputCondition.DISCUSSION_ENDED);
       }
     }
     #endregion
@@ -463,11 +558,14 @@ namespace Workbench.ProjectDilemma
 }
 
 /// <summary>
-/// ICKeys short for Input Condition Keys is a static class that contains bunch of predefined strings used as input conditions
+/// if any of these conditions exist in the conditions list the input is blocked
 /// </summary>
-public static class ICKeys
+public enum InputCondition
 {
-  public const string DISCUSSION_ENDED = "discussionEnded";
-  public const string EMOTE_PLAYING = "emotePlaying";
-  public const string USING_COMPUTER = "usingComputer";
+  DISCUSSION_ENDED,
+  EMOTE_PLAYING,
+  USING_COMPUTER,
+  IN_RADIALMENU,
+  IS_AIMING,
+  CHOOSING_PERK
 }

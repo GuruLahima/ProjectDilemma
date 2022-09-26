@@ -11,6 +11,9 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         public string name { get; }
 
         protected T selectedItem { get; private set; }
+        protected List<T> selectedItems = new List<T>(); // helps us keep track of selected items for multiediting
+        protected List<bool> inventoryItemsSelectedFlags = new List<bool>(); // helps us keep track of selected items for multiediting
+        protected bool m_allowMultiItemEditing;
 
         T m_PreviouslySelectedItem;
 
@@ -53,15 +56,18 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUI.DisabledGroupScope(Application.isPlaying))
-                {
-                    DrawSidebar();
-                    DrawContent();
-                }
+                DrawMultiEdittingToggle();
+                DrawSidebar();
+                DrawContent();
             }
         }
 
+        private void DrawMultiEdittingToggle(){
+            m_allowMultiItemEditing = GUI.Toggle(new Rect(15, 5, 350, 30), m_allowMultiItemEditing, "Allow multi-editting? (WARNING: Experimental feature");
+        }
+
         protected abstract void DrawDetail(T item);
+        protected abstract void DrawDetail(List<T> items);
 
         void DrawCreateForm()
         {
@@ -179,13 +185,101 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             var validItems = GetValidItems();
 
             if (validItems == null) return;
-            foreach (T item in validItems)
-            {
-                DrawSidebarListItem(item);
+
+            if(m_allowMultiItemEditing){
+              currentItemBeingDrawnIndex = 0;
+              foreach (T item in validItems)
+              {
+                  // ? custom code
+                  inventoryItemsSelectedFlags.Add(false);
+
+                  DrawSidebarListItem(item);
+
+                  // ? custom code
+                  currentItemBeingDrawnIndex++;
+              }
+            }
+            else{
+              // safe, single item editing (unmodified)
+              foreach (T item in validItems)
+              {
+                  DrawSidebarListItem(item);
+              }
             }
         }
 
         protected abstract void DrawSidebarListItem(T item);
+
+        protected void DrawMutlipleSelectionToggle(T item, Rect rect, int itemIndex){
+          // ? custom code
+          rect.width = 20;
+          if(inventoryItemsSelectedFlags.Count > itemIndex && itemIndex >= 0){
+
+            inventoryItemsSelectedFlags[itemIndex] = GUI.Toggle(rect, inventoryItemsSelectedFlags[itemIndex], "");
+
+            if (GUI.enabled
+                && rect.Contains(Event.current.mousePosition) )
+            {
+                switch (Event.current.type)
+                {
+                    case EventType.Used:
+                        if (Event.current.button == 0){
+                            isCreating = false;
+                            if(inventoryItemsSelectedFlags[itemIndex]){
+
+                            EditorApplication.delayCall += () =>
+                              {
+                                  SelectItem_MultiItemMode(item);
+                              };
+                            }
+                            else{
+                              EditorApplication.delayCall += () =>
+                              {
+                                  DeselectItem_MultiItemMode(item);
+                              };
+                            }
+                        }
+                        break;
+
+                    case EventType.MouseDown:
+                        if (Event.current.button == 0)
+                        {
+              Debug.Log("I'm clicking!");
+                            isCreating = false;
+                            EditorApplication.delayCall += () =>
+                            {
+              Debug.Log("Is this something new?");
+                                SelectItem_MultiItemMode(item);
+                            };
+                        }
+
+                        break;
+
+                    case EventType.ContextClick: // happens on mouse down, has to be mouse down because of Mac UX
+
+                        isCreating = false;
+
+                        EditorApplication.delayCall += () =>
+                        {
+                            SelectItem_MultiItemMode(item);
+                        };
+
+                        switch (item)
+                        {
+                            case CatalogItemAsset catalogItemAsset:
+                                SidebarItemContextMenu(catalogItemAsset);
+                                break;
+                            case TagAsset tagAsset:
+                                SidebarItemContextMenu(tagAsset);
+                                break;
+                        }
+
+                        break;
+                }
+            }
+          }
+
+        }
 
         protected void BeginSidebarItem(T item, Vector2 backgroundSize, Vector2 contentMargin)
         {
@@ -324,18 +418,30 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             EditorGUILayout.EndHorizontal();
         }
 
-        protected void DrawSidebarItemLabel(string text, int width, GUIStyle style, int height = -1)
+
+        private int currentItemBeingDrawnIndex;
+        Rect labelOffset;
+        protected void DrawSidebarItemLabel(T item, string text, int width, GUIStyle style, int height = -1)
         {
             m_SidebarItemOffset.width = width;
             m_SidebarItemOffset.height = height == -1 ? m_SidebarItemOffset.height : height;
 
+
+            // multi-item editing
+            labelOffset = m_SidebarItemOffset;
+            if(m_allowMultiItemEditing){
+              DrawMutlipleSelectionToggle(item, labelOffset, currentItemBeingDrawnIndex);
+              labelOffset.x += 20;
+              labelOffset.width -= 20;
+            }
+
             if (style == null)
             {
-                EditorGUI.LabelField(m_SidebarItemOffset, text);
+                EditorGUI.LabelField(labelOffset, text);
             }
             else
             {
-                EditorGUI.LabelField(m_SidebarItemOffset, text, style);
+                EditorGUI.LabelField(labelOffset, text, style);
             }
 
             m_SidebarItemOffset.x += width;
@@ -368,8 +474,12 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             if (selectedItem != null)
             {
                 isCreating = false;
-
-                DrawDetail(selectedItem);
+                if(m_allowMultiItemEditing && selectedItems.Count > 0){
+                  DrawDetail(selectedItems);
+                }
+                else{
+                  DrawDetail(selectedItem);
+                }
             }
             else if (isCreating)
             {
@@ -460,6 +570,39 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             GUI.FocusControl(null);
 
             m_Window.Repaint();
+        }
+                
+        protected virtual void SelectItem_MultiItemMode(T item)
+        {
+            Debug.Log("SelectItem_MultiItemMode");
+            // multi-item editing code
+            if(!selectedItems.Contains(item))
+              selectedItems.Add(item);
+
+            GUI.FocusControl(null);
+
+            m_Window.Repaint();
+        }        
+        protected virtual void DeselectItem_MultiItemMode(T item)
+        {
+            Debug.Log("DeselectItem_MultiItemMode");
+            // multi-item editing code
+            if(selectedItems.Contains(item))
+              selectedItems.Remove(item);
+
+            GUI.FocusControl(null);
+
+            m_Window.Repaint();
+        }
+
+
+
+        // multi-item editing code
+        protected virtual void UnselectItem(T item){
+            // multi-item editing code
+            if(selectedItems.Contains(item))
+              selectedItems.Remove(item);
+
         }
 
         protected void SelectValidItem(int listIndex)

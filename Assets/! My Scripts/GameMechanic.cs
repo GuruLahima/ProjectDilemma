@@ -329,6 +329,10 @@ namespace Workbench.ProjectDilemma
     public int localPlayerPoints;
     [Foldout("Debug")]
     public int otherPlayerPoints;
+    [Foldout("End screen references")]
+    [SerializeField] public Transform rewardContent;
+    [Foldout("End screen references")]
+    [SerializeField] public RewardDisplayPlaceholder rewardPlaceholderPrefab;
 
     [HideInInspector]
     public List<GameInfo> otherPlayerGames = new List<GameInfo>();
@@ -934,35 +938,44 @@ namespace Workbench.ProjectDilemma
 
       int ourTotalPoints = RewardCalculator.Instance.CalculatePointsAfterOutcome();
       coinsCounter.newAmount = ourTotalPoints;
-      if (BankManager.Instance)
-        BankManager.Instance.WalletEvaluate(ourTotalPoints);
+      if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+        if (BankManager.Instance)
+          BankManager.Instance.WalletEvaluate(ourTotalPoints);
+
       localPlayerPointsCounter.newAmount = localPlayerPoints + ourTotalPoints;
 
       Currency rankAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_RANK);
       int ourTotalRank = RewardCalculator.Instance.CalculateRankAfterOutcome();
-      GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
+      // if this is a private match don't save changes to rank
+      if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+        GameFoundationSdk.wallet.Set(rankAsCurrency, GameFoundationSdk.wallet.Get(rankAsCurrency) + ourTotalRank);
 
       Currency xpAsCurrency = GameFoundationSdk.catalog.Find<Currency>(Keys.CURRENCY_XP);
       int ourTotalXp = (int)GameFoundationSdk.wallet.Get(xpAsCurrency);
-      ourTotalXp += RewardCalculator.Instance.CalculateXPAfterOutcome();
-      GameFoundationSdk.wallet.Set(xpAsCurrency, GameFoundationSdk.wallet.Get(xpAsCurrency) + ourTotalXp);
+      int earnedXp = RewardCalculator.Instance.CalculateXPAfterOutcome();
+      ourTotalXp += earnedXp;
+      if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+        GameFoundationSdk.wallet.Set(xpAsCurrency, ourTotalXp);
 
       int ourLevel = ProgressData.Instance.GetLevel(ourTotalXp, out int experienceLeft);
 
-      experienceSlider.maxValue = MiscelaneousSettings.Instance.levelsDistribution[ourLevel];
+      experienceSlider.maxValue = ProgressData.Instance.ExperienceRequiredPerLevel[ourLevel];
       levelText.text = ourLevel.ToString();
-      experienceText.text = $"{experienceLeft}/{MiscelaneousSettings.Instance.levelsDistribution[ourLevel]}";
-      experienceCounter.newAmount = ourTotalXp;
+      experienceText.text = $"{experienceLeft}/{ProgressData.Instance.ExperienceRequiredPerLevel[ourLevel]}";
+      experienceCounter.newAmount = earnedXp;
       levelBarCounter.newAmount = experienceLeft;
 
-      RewardCalculator.Instance.CalculateRewardsAfterOutcome();
+      if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+        RewardCalculator.Instance.CalculateRewardsAfterOutcome();
+
       SyncDataToOtherPlayer();
 
       //add this game to latest games
-      if (PlayerData.Instance)
-      {
-        PlayerData.Instance.latestGames.Add(new GameInfo(votingOutcome, myChoice));
-      }
+      if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+        if (PlayerData.Instance)
+        {
+          PlayerData.Instance.latestGames.Add(new GameInfo(votingOutcome, myChoice));
+        }
     }
 
     public void LevelBar()
@@ -1765,24 +1778,20 @@ namespace Workbench.ProjectDilemma
         ActivateStarEvents(stars, perkCompletedMessageStar);
         yield return new WaitForSeconds(starActivationSpeed);
       }
-      foreach (RewardData reward in MasterData.Instance.allRewards)
+      if (RewardDisplayManager.Instance.listsOfRewards[rewardContent].Count > 0)
       {
-        if (reward.NewlyAdded)
-        {
-          stars++;
-          ActivateStarEvents(stars, questCompletedMessageStar);
-          yield return new WaitForSeconds(starActivationSpeed);
-          break;
-        }
+        stars++;
+        ActivateStarEvents(stars, questCompletedMessageStar);
+        yield return new WaitForSeconds(starActivationSpeed);
       }
     }
     IEnumerator ClaimRewardsCoroutine()
     {
       if (RewardDisplayManager.Instance)
       {
-        RewardDisplayManager.Instance.CreateRewards();
+        RewardDisplayManager.Instance.ViewReward(rewardContent);
         yield return new WaitForSeconds(0.3f);
-        yield return new WaitUntil(() => RewardDisplayManager.Instance.listOfRewardPlaceholders.Count <= 0);
+        yield return new WaitUntil(() => RewardDisplayManager.Instance.listsOfRewards[rewardContent].Count <= 0);
       }
       else
       {

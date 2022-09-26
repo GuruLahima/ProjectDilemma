@@ -3,7 +3,8 @@ namespace Workbench.ProjectDilemma
   public static class Keys
   {
     // exposed room properties
-    public const string MAP_PROP_KEY = "map"; // 0 is Lobby, 1 is Gameplay level
+    public const string MAP_PROP_KEY = "map"; // "in_queue" is in matchmaking, "Gameplay Level" is, well, gameplay Level
+    public const string PRIVATE_GAME = "is_private_game"; // the fact this property is sent means the game is private
     // custom properties
     public const string SKIP_INTRO = "Skip_intro";
     public const string PLAYER_SOFT_CURRENCY_POINTS = "SOFT_CURRENCY_POINTS";
@@ -39,12 +40,14 @@ namespace Workbench.ProjectDilemma
     public const string PERKS_TAG = "perks";
     public const string ABILITIES_TAG = "abilities";
     public const string RELICS_TAG = "relics";
+    public const string CHESTS_TAG = "chests";
     public const string ITEMPROPERTY_INGAMESCRIPTABLEOBJECT = "ingame_ScriptableObject";
     public const string ITEMPROPERTY_EQUIPPED = "equipped";
     public const string CURRENCY_XP = "player_xp";
     public const string CURRENCY_RANK = "currency_rank";
     public const string CURRENCY_HARD = "currency_hard";
     public const string CURRENCY_SOFT = "currency_dilemmaPoints";
+    public const string CURRENCY_SOFT_WALLET = "currency_Wallet";
 
   }
 }

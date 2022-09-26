@@ -20,6 +20,7 @@ public class ItemData : ScriptableObject
       AmountOwned = 0;
       ActivatedCardQuest = false;
       NewlyAddedInBook = true;
+      NewlyAdded = true;
     }
   }
 
@@ -59,20 +60,8 @@ public class ItemData : ScriptableObject
   public Sprite ico;
 
   //----------------earning this item via quest-------------------------//
-  public bool ActivatedCardQuest
-  {
-    get
-    {
-      return _activatedCardQuest;
-    }
-    set
-    {
-      _activatedCardQuest = value;
-      // Debug.Log((_activatedCardQuest ? "Added quest for: " : "Removed quest for: ") + (RewardData != null ? RewardData.name : "empty"));
-    }
-  }
   [Foldout("Earning this item")]
-  [SerializeField] private bool _activatedCardQuest;
+  public bool ActivatedCardQuest;
   [Foldout("Earning this item")]
   public RewardData RewardData;
 }

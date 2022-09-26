@@ -58,9 +58,9 @@ namespace Workbench.ProjectDilemma
       int level = 0;
 
       int totalRequiredXp = 0; int lastLevelExperience = 0;
-      for (int i = 0; i < MiscelaneousSettings.Instance.levelsDistribution.Count; i++)
+      for (int i = 0; i < ExperienceRequiredPerLevel.Length; i++)
       {
-        totalRequiredXp += MiscelaneousSettings.Instance.levelsDistribution[i];
+        totalRequiredXp += (int)ExperienceRequiredPerLevel[i];
         if (experience >= totalRequiredXp)
         {
           lastLevelExperience = totalRequiredXp;

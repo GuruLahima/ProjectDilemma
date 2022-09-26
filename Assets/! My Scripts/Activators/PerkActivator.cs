@@ -91,9 +91,9 @@ namespace Workbench.ProjectDilemma
       ChoosingPerk?.Invoke();
       MyDebug.Log("Showing perks window");
       ActiveState = true;
-/*       showChooseScreenFeedbacks.StopFeedbacks();
-      showChooseScreenFeedbacks.ResetFeedbacks();
-      showChooseScreenFeedbacks.Direction = MMFeedbacks.Directions.TopToBottom; */
+      /*       showChooseScreenFeedbacks.StopFeedbacks();
+            showChooseScreenFeedbacks.ResetFeedbacks();
+            showChooseScreenFeedbacks.Direction = MMFeedbacks.Directions.TopToBottom; */
       showChooseScreenFeedbacks.PlayFeedbacks();
 
     }
@@ -133,6 +133,8 @@ namespace Workbench.ProjectDilemma
 
     public void ActivatePerk()
     {
+      PlayerInputManager.Instance.OnPerkChosen();
+
       if (perkActivated)
         return;
 

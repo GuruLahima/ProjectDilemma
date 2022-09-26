@@ -77,6 +77,10 @@ namespace Workbench.ProjectDilemma
     private void OnDisable()
     {
       UnsubscribeFromGameFoundationEvents();
+
+#if ALEK_DEBUG_ON
+      ClearData();
+#endif
     }
 
     /// <summary>

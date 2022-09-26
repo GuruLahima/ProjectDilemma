@@ -31,7 +31,8 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     throwables,
     perks,
     abilities,
-    relics
+    relics,
+    chests
 
   }
   #region public fields
@@ -57,6 +58,10 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   [ReadOnly]
   [CustomTooltip("This list is populated from backend")]
   public List<RelicData> relics = new List<RelicData>();
+  [ReadOnly]
+  [CustomTooltip("This list is populated from backend")]
+  public List<ChestData> chests = new List<ChestData>();
+
   #endregion
 
   #region private fields
@@ -67,6 +72,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
   private List<InventoryItemDefinition> activePerksTypes = new List<InventoryItemDefinition>();
   private List<InventoryItemDefinition> abilitiesTypes = new List<InventoryItemDefinition>();
   private List<InventoryItemDefinition> relicsTypes = new List<InventoryItemDefinition>();
+  private List<InventoryItemDefinition> chestsTypes = new List<InventoryItemDefinition>();
   #endregion
 
   #region 
@@ -125,6 +131,8 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     abilitiesTypes.Clear();
     relics.Clear();
     relicsTypes.Clear();
+    chests.Clear();
+    chestsTypes.Clear();
 
   }
 
@@ -152,6 +160,7 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       ParseActivePerks(items);
       ParseAbilities(items);
       ParseRelics(items);
+      ParseChests(items);
     }
   }
 
@@ -237,6 +246,14 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
     relicsTypes.Add(item.definition);
     RelicData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<RelicData>();
     relics.Add(tmpData);
+  }
+
+  private void PopulateChestDataFromInventoryItem(InventoryItem item)
+  {
+    // MyDebug.Log("Populating chest data for ", item.definition.displayName);
+    chestsTypes.Add(item.definition);
+    ChestData tmpData = item.definition.GetStaticProperty(Keys.ITEMPROPERTY_INGAMESCRIPTABLEOBJECT).AsAsset<ChestData>();
+    chests.Add(tmpData);
   }
 
   public List<ProjectileData> ParseThrowables(ItemList allItemsList)
@@ -361,6 +378,27 @@ public class InventoryData : SingletonScriptableObject<InventoryData>
       }
     }
     return relics;
+  }
+
+  private List<ChestData> ParseChests(ItemList allItemsList)
+  {
+    if (allItemsList != null)
+    {
+
+      ItemList chestList = GameFoundationSdk.inventory.CreateList();
+
+      allItemsList.Find(GameFoundationSdk.tags.Find(Keys.CHESTS_TAG), chestList);
+
+      foreach (InventoryItem item in chestList)
+      {
+        if (chestsTypes.Contains(item.definition))
+        {
+          continue;
+        }
+        PopulateChestDataFromInventoryItem(item);
+      }
+    }
+    return chests;
   }
   #endregion
 

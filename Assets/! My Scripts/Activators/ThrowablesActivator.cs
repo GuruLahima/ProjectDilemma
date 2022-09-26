@@ -121,6 +121,7 @@ namespace Workbench.ProjectDilemma
     public void Pick()
     {
       MyDebug.Log("Pick projectile");
+      if (OnCooldown) return;
       if (iconOutline)
       {
         //we call this only once per activation (to avoid unnecessary tasks)
@@ -132,12 +133,14 @@ namespace Workbench.ProjectDilemma
       }
       ActiveState = true;
 
+      PlayerInputManager.Instance.OnEnterRadialMenu();
       radialMenu.ActivateRadialMenu(Set);
 
     }
     public void Set()
     {
       MyDebug.Log("Set projectile");
+      PlayerInputManager.Instance.OnExitRadialMenu();
       ActiveState = false;
       radialMenu.Deactivate();
       if (radialMenu.LastSelectedObject != null)
@@ -178,19 +181,24 @@ namespace Workbench.ProjectDilemma
         MyDebug.Log("Start aiming projectile");
         if (OnCooldown)
         {
+          MyDebug.Log("projectile on cooldown");
           // notify user there this ability is on cooldown
           ThrowablesOnCooldownFeedback();
+          PlayerInputManager.Instance.OnFinishedAiming();
           return;
         }
-        MyDebug.Log("projectile not on cooldown");
         if (selectedProjectile == null || selectedProjectile.AmountOwned <= 0)
         {
+          MyDebug.Log("we don't have a valid non-zero quantity projectile selected");
           OutOfThrowablesFeedback();
+          PlayerInputManager.Instance.OnFinishedAiming();
           return;
         }
-        MyDebug.Log("we own the projectile");
 
         aiming = true;
+
+        PlayerInputManager.Instance.OnStartedAiming();
+
 
         // switch to first person camera for aiming
         GameMechanic.Instance.localPlayerSpot.playerCam = GameMechanic.Instance.localPlayerSpot.firstPersonPlayerCam;
@@ -304,8 +312,9 @@ namespace Workbench.ProjectDilemma
       if (selectedProjectile && selectedProjectile.AmountOwned > 0)
       {
         // expend an item
-        if (InventoryManager.instance != null && selectedProjectile.inventoryitemDefinition != null)
-          InventoryManager.instance.RemoveItem(selectedProjectile.inventoryitemDefinition.key);
+        if (!PhotonNetwork.IsConnected || !PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey(Keys.PRIVATE_GAME))
+          if (InventoryManager.instance != null && selectedProjectile.inventoryitemDefinition != null)
+            InventoryManager.instance.RemoveItem(selectedProjectile.inventoryitemDefinition.key);
 
         // update hud
         selectedItemCounter.text = selectedProjectile.AmountOwned.ToString();
