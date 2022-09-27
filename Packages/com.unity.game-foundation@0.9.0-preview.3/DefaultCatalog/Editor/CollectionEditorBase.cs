@@ -574,7 +574,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                 
         protected virtual void SelectItem_MultiItemMode(T item)
         {
-            Debug.Log("SelectItem_MultiItemMode");
+            // Debug.Log("SelectItem_MultiItemMode");
             // multi-item editing code
             if(!selectedItems.Contains(item))
               selectedItems.Add(item);
@@ -585,7 +585,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         }        
         protected virtual void DeselectItem_MultiItemMode(T item)
         {
-            Debug.Log("DeselectItem_MultiItemMode");
+            // Debug.Log("DeselectItem_MultiItemMode");
             // multi-item editing code
             if(selectedItems.Contains(item))
               selectedItems.Remove(item);

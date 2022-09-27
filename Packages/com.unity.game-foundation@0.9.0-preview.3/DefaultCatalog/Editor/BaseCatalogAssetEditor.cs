@@ -216,44 +216,60 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             }
         }
 
-        
+        private void DrawWarningDetail()
+        {
+            EditorGUILayout.LabelField("WARNING: YOU ARE IN MULTI-ITEM EDITING MODE\nTHIS IS AN EXPERIMENTAL FEATURE", GameFoundationEditorStyles.warningHeaderStyle);
+        }
+
+        /// <summary>
+        /// same as DrawDetail(TCatalogItemAsset catalogItem) but for a selection of items
+        /// </summary>
+        /// <param name="catalogItems"></param>
         protected sealed override void DrawDetail(List<TCatalogItemAsset> catalogItems)
         {
+            DrawWarningDetail();
+
             DrawGeneralDetail(catalogItems);
 
             EditorGUILayout.Space();
 
-            foreach (TCatalogItemAsset catalogItem in catalogItems)
-            {
+
               
-              // save off previous state of tags so we can detect changes
-              using (DCTools.Pools.tagList.Get(out var previousTags))
-              {
-                  catalogItem.GetTags(previousTags);
+            // save off previous state of tags so we can detect changes
+            using (DCTools.Pools.tagList.Get(out var previousTags))
+            {
+                // catalogItem.GetTags(previousTags);
 
-                  m_TagPicker.DrawTagPicker(catalogItem);
+                // m_TagPicker.DrawTagPicker(catalogItem);
 
-                  EditorGUILayout.Space();
+                // EditorGUILayout.Space();
 
-                  DrawTypeSpecificBlocks(catalogItem);
+                // first get all shared properties (properties with the same key)
 
-                  EditorGUILayout.Space();
+                // then draw a single element for each shared property for all items so we can modify it for all items
+                // when drawing the element we draw two versions depending on whether the elements have the same value or not
+                // we need to handle the case where all items have the same value and 
+                // the case where at least one of them doesn't have the same value
 
-                  EditorGUILayout.LabelField(PropertiesEditor.staticPropertiesLabel, GameFoundationEditorStyles.titleStyle);
-                  using (new EditorGUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
-                  {
-                      m_StaticPropertiesEditor.Draw();
-                  }
+                DrawTypeSpecificBlocks(catalogItems);
 
-                  // make sure this is the last to draw
-                  m_TagPicker.DrawTagPickerPopup(catalogItem);
+                // EditorGUILayout.Space();
 
-                  // if tags changed then refresh item, including tags so tag filter can be updated
-                  if (!previousTags.SequenceEqual(catalogItem.m_Tags))
-                  {
-                      RefreshItems();
-                  }
-              }
+                // EditorGUILayout.LabelField(PropertiesEditor.staticPropertiesLabel, GameFoundationEditorStyles.titleStyle);
+                
+                // using (new EditorGUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
+                // {
+                //     m_StaticPropertiesEditor.Draw();
+                // }
+
+                // make sure this is the last to draw
+                // m_TagPicker.DrawTagPickerPopup(catalogItem);
+
+                // // if tags changed then refresh item, including tags so tag filter can be updated
+                // if (!previousTags.SequenceEqual(catalogItem.m_Tags))
+                // {
+                //     RefreshItems();
+                // }
             }
 
         }
@@ -261,6 +277,27 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         protected override void SelectItem(TCatalogItemAsset catalogItem)
         {
             base.SelectItem(catalogItem);
+
+            m_TagPicker.ResetTagSearch();
+
+            if (catalogItem != null)
+            {
+                var oldKeys = new HashSet<string>();
+                foreach (var item in m_Items)
+                {
+                    oldKeys.Add(item.key);
+                }
+
+                m_ReadableNameKeyEditor = new ReadableNameKeyEditor(false, oldKeys);
+                m_CurrentItemKey = catalogItem.key;
+            }
+
+            m_StaticPropertiesEditor.SelectItem(catalogItem);
+        }
+        
+        protected override void SelectItem_MultiItemMode(TCatalogItemAsset catalogItem)
+        {
+            base.SelectItem_MultiItemMode(catalogItem);
 
             m_TagPicker.ResetTagSearch();
 
@@ -301,6 +338,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         ///     The catalog item to draw additional blocks for.
         /// </param>
         protected virtual void DrawTypeSpecificBlocks(TCatalogItemAsset catalogItem) { }
+        protected virtual void DrawTypeSpecificBlocks(List<TCatalogItemAsset> catalogItems) { }
 
         protected virtual void DrawGeneralDetail(TCatalogItemAsset catalogItem)
         {
@@ -321,14 +359,14 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         }
         protected virtual void DrawGeneralDetail(List<TCatalogItemAsset> catalogItems)
         {
-                  Debug.Log("catalogItems.Count = " + catalogItems.Count);
+                  // Debug.Log("catalogItems.Count = " + catalogItems.Count);
             EditorGUILayout.LabelField("General", GameFoundationEditorStyles.titleStyle);
 
             using (new GUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
             {
                 foreach (TCatalogItemAsset catalogItem in catalogItems)
                 {
-                  Debug.Log(catalogItem.displayName.currentValue);
+                  // Debug.Log(catalogItem.displayName.currentValue);
                   string displayName = catalogItem.displayName;
                   m_ReadableNameKeyEditor.DrawReadableNameKeyFields(ref catalogItem.m_Key, ref displayName);
 

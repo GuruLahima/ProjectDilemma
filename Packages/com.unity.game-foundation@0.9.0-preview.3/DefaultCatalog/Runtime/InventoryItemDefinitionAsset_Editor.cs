@@ -109,6 +109,18 @@ namespace UnityEngine.GameFoundation.DefaultCatalog
 
             return true;
         }
+        
+        internal bool Editor_UpdateMutablePropertyForMultipleItems(string propertyName, Property value)
+        {
+            if (!mutableProperties.ContainsKey(propertyName))
+                return false;
+
+            //Don't forget to update the entry since we are working with structs.
+            mutableProperties[propertyName] = value;
+            EditorUtility.SetDirty(this);
+
+            return true;
+        }
 
         /// <summary>
         ///     Set the <see cref="initialAllocation"/> of this instance.

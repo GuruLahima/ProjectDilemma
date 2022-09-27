@@ -10,6 +10,10 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         public static readonly GUIContent mutablePropertiesLabel = new GUIContent(
             "Mutable Properties",
             "Store a set of variable data inside your inventory items you can read and edit at runtime.");
+            
+        public static readonly GUIContent sharedMutablePropertiesLabel = new GUIContent(
+            "SHared Mutable Properties",
+            "Store a set of variable data inside your inventory items you can read and edit at runtime.");
 
         static readonly GUIContent k_DefaultValueLabel = new GUIContent(
             "Default Value",
@@ -35,5 +39,8 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
         protected override void UpdateProperty(string propertyKey, Property value)
             => m_Asset.Editor_UpdateMutableProperty(propertyKey, value);
+            
+        protected override void UpdatePropertyForMultipleItems(string propertyKey, Property value)
+            => m_Asset.Editor_UpdateMutablePropertyForMultipleItems(propertyKey, value);
     }
 }

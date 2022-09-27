@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.GameFoundation.DefaultCatalog;
 
@@ -65,6 +66,13 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
             m_MutablePropertiesEditor.SelectItem(item);
         }
+        
+        protected override void SelectItem_MultiItemMode(InventoryItemDefinitionAsset item)
+        {
+            base.SelectItem_MultiItemMode(item);
+
+            m_MutablePropertiesEditor.SelectItem(item, true);
+        }
 
         protected override void DrawTypeSpecificBlocks(InventoryItemDefinitionAsset catalogItem)
         {
@@ -73,6 +81,39 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             using (new EditorGUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
             {
                 m_MutablePropertiesEditor.Draw();
+            }
+
+            EditorGUILayout.Space();
+        }
+        
+        protected override void DrawTypeSpecificBlocks(List<InventoryItemDefinitionAsset> catalogItems)
+        {
+            // // Draw properties.
+            EditorGUILayout.LabelField(MutablePropertiesEditor.sharedMutablePropertiesLabel, GameFoundationEditorStyles.titleStyle);
+            
+
+            var sharedProperties = new Dictionary<string, ExternalizableValue<UnityEngine.GameFoundation.Property>>();
+            var allProperties = new List<KeyValuePair<string, ExternalizableValue<UnityEngine.GameFoundation.Property>>>();
+            // fetch all properties (properties with the same key)
+            foreach (InventoryItemDefinitionAsset catalogItem in catalogItems)
+            {
+                allProperties.AddRange(catalogItem.mutableProperties);
+            }
+            // check which properties shared the same key AND are of the same type
+            foreach (KeyValuePair<string, ExternalizableValue<UnityEngine.GameFoundation.Property>> property in allProperties)
+            {
+                if( allProperties.FindAll( (obj) => { return (obj.Key == property.Key) && (obj.Value.baseValue.type == property.Value.baseValue.type); } ).Count == catalogItems.Count  ){
+                    // sharedPropertiesKeys.Add(key);
+                    if(!sharedProperties.ContainsKey(property.Key))
+                        sharedProperties.Add(property.Key, property.Value);
+                }              
+            }
+            // populate the shared properties with keys. values will be taken care of later (when I think of a way to deal with them :))
+            // sharedProperties.A
+
+            using (new EditorGUILayout.VerticalScope(GameFoundationEditorStyles.boxStyle))
+            {
+                m_MutablePropertiesEditor.DrawMultiple(sharedProperties);
             }
 
             EditorGUILayout.Space();

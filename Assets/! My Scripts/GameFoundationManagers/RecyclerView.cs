@@ -118,6 +118,12 @@ namespace GuruLaghima.ProjectDilemma
         GameFoundationSdk.inventory.Delete(duplicates[0]);
       }
 
+      // unequip from characters if we deleted all instances of this item
+      if (amountToRecycle >= someInt)
+      {
+        CharacterCustomizationManager.Instance.ActiveCharacterCustomization.RemoveClothing((RigData)selectedItem.whoDis); 
+      }
+
       // reset fields
       this.slotTextObj.SetActive(true);
       this.slotImage.sprite = this.defaultSlotSprite;

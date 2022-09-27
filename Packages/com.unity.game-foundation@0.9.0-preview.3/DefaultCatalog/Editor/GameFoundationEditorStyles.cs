@@ -18,6 +18,13 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         public static GUIStyle boldTextStyle { get; } = new GUIStyle(EditorStyles.label) { fontStyle = FontStyle.Bold };
         public static GUIStyle richTextLabelStyle { get; } = new GUIStyle(EditorStyles.label) { richText = true };
 
+        public static GUIStyle warningHeaderStyle { get; } = new GUIStyle(EditorStyles.label) { 
+          fontStyle = FontStyle.Bold, 
+          normal = { textColor =  Color.red } ,
+          margin = { top = 40, bottom = 10 },
+          fontSize = 15,
+          wordWrap = true
+        };
 
         public static GUIStyle sideBarStyle { get; } = new GUIStyle("HelpBox")
         {

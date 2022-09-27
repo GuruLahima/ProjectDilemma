@@ -1,4 +1,5 @@
 using GuruLaghima;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,13 @@ namespace Workbench.ProjectDilemma
     [SerializeField] private Transform rigRoot;
     [SerializeField] private ClothingData currentClothingData;
     [SerializeField] private bool setActiveOnEnable;
+    [Header("Default clothes")]
+    [SerializeField] RigData defaultMask;
+    [SerializeField] RigData defaultChest;
+    [SerializeField] RigData defaultGloves;
+    [SerializeField] RigData defaultLegs;
+    [SerializeField] RigData defaultShoes;
+    [SerializeField] RigData defaultSkin;
     #endregion
 
     #region Private Fields
@@ -166,6 +174,58 @@ namespace Workbench.ProjectDilemma
       currentClothingData.SaveClothes(this.Clothes);
       OnClothesEquiped?.Invoke();
       GenerateCharacter();
+    }
+    public void RemoveClothing(RigData rigToRemove)
+    {
+      if (rigToRemove == null)
+      {
+        MyDebug.Log("Trying to remove clothing with a null value");
+        return;
+      }
+
+      ClothingTree tree = GetClothingOfType(rigToRemove.type);
+      if (tree == null)
+      {
+        tree = new ClothingTree(rigToRemove.type);
+        Clothes.Add(tree);
+      }
+      if (tree.Clothing == rigToRemove)
+      {
+        MyDebug.Log("removing clothes of type ", rigToRemove.type.ToString());
+        AddDefaultClothing(rigToRemove.type);
+        return;
+      }
+      // // tree.Clothing = rigToRemove;
+      // currentClothingData.SaveClothes(this.Clothes);
+      // OnClothesEquiped?.Invoke();
+      // GenerateCharacter();
+    }
+
+    private void AddDefaultClothing(ClothingType type)
+    {
+      switch (type)
+      {
+        case ClothingType.Mask:
+          AddClothing(defaultMask);
+          break;
+        case ClothingType.Chest:
+          AddClothing(defaultChest);
+          break;
+        case ClothingType.Gloves:
+          AddClothing(defaultGloves);
+          break;
+        case ClothingType.Leggings:
+          AddClothing(defaultLegs);
+          break;
+        case ClothingType.Boots:
+          AddClothing(defaultShoes);
+          break;
+        case ClothingType.Skin:
+          AddClothing(defaultSkin);
+          break;
+        default:
+          break;
+      }
     }
     #endregion
 

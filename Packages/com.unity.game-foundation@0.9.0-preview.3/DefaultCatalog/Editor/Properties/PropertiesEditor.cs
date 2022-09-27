@@ -112,6 +112,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         where TCatalogItemAsset : CatalogItemAsset
     {
         protected TCatalogItemAsset m_Asset;
+        protected List<TCatalogItemAsset> m_Assets;
 
         /// <summary>
         ///     One drawer for each property.
@@ -129,13 +130,35 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
         PropertyType m_SelectedPropertyType;
 
-        public void SelectItem(TCatalogItemAsset asset)
+        public void SelectItem(TCatalogItemAsset asset, bool multiItemEditingMode = false)
         {
             m_Asset = asset;
 
             m_NewPropertyName = "";
 
             m_SelectedPropertyType = default;
+
+            if(multiItemEditingMode){
+                if(!m_Assets.Contains(asset))
+                    m_Assets.Add(asset);
+            }
+        }
+
+        /// <summary>
+        /// multi-item editing mode requires the option to deselect an item
+        /// </summary>
+        /// <param name="asset"></param>
+        /// <param name="multiItemEditingMode"></param>
+        public void DeselectItem(TCatalogItemAsset asset)
+        {
+            m_Asset = null;
+
+            // m_NewPropertyName = "";
+
+            // m_SelectedPropertyType = default;
+
+            if(m_Assets.Contains(asset))
+                m_Assets.Remove(asset);
         }
 
         public void Draw()
@@ -150,8 +173,21 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
             DrawPropertyCreation(properties);
         }
+        
+        public void DrawMultiple(Dictionary<string, ExternalizableValue<Property>> sharedProperties)
+        {
+            var properties = sharedProperties;
 
-        void DrawExistingProperties(Dictionary<string, ExternalizableValue<Property>> properties)
+            DrawExistingProperties(properties);
+
+            //Draw horizontal separator.
+            var separator = EditorGUILayout.GetControlRect(false, 1);
+            EditorGUI.DrawRect(separator, EditorGUIUtility.isProSkin ? Color.black : Color.gray);
+
+            // DrawPropertyCreation(properties);
+        }
+
+        void DrawExistingProperties(Dictionary<string, ExternalizableValue<Property>> properties, bool multiItemEditingMode = false)
         {
             //Draw list header.
             using (new GUILayout.HorizontalScope(GameFoundationEditorStyles.tableViewToolbarStyle))
@@ -279,7 +315,10 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                         if (check.changed)
                         {
                             //Update asset.
-                            UpdateProperty(propertyKey, property);
+                            if(multiItemEditingMode)
+                                UpdatePropertyForMultipleItems(propertyKey, property);
+                            else
+                                UpdateProperty(propertyKey, property);
                         }
                     }
 
@@ -370,6 +409,9 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             => m_Asset.Editor_RemoveStaticProperty(propertyKey);
 
         protected virtual void UpdateProperty(string propertyKey, Property value)
+            => m_Asset.Editor_UpdateStaticProperty(propertyKey, value);
+    
+        protected virtual void UpdatePropertyForMultipleItems(string propertyKey, Property value)
             => m_Asset.Editor_UpdateStaticProperty(propertyKey, value);
     }
 }
