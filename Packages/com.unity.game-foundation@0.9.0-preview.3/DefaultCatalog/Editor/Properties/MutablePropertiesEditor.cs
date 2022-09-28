@@ -33,6 +33,8 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
 
         protected override void AddProperty(string propertyKey, Property value)
             => m_Asset.Editor_AddMutableProperty(propertyKey, value);
+        protected override void AddPropertyForMultipleItems(string propertyKey, Property value)
+            => m_Assets.ForEach((ass) => { ass.Editor_AddMutableProperty(propertyKey, value); });
 
         protected override void RemoveProperty(string propertyKey)
             => m_Asset.Editor_RemoveMutableProperty(propertyKey);
@@ -41,6 +43,6 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             => m_Asset.Editor_UpdateMutableProperty(propertyKey, value);
             
         protected override void UpdatePropertyForMultipleItems(string propertyKey, Property value)
-            => m_Asset.Editor_UpdateMutablePropertyForMultipleItems(propertyKey, value);
+            => m_Assets.ForEach((ass) => { ass.Editor_UpdateMutableProperty(propertyKey, value);});
     }
 }

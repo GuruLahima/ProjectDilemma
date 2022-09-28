@@ -12,6 +12,7 @@ namespace Workbench.ProjectDilemma
     #region Exposed Private Fields
     [SerializeField] private UnityEngine.UI.Image abilitiesIcon;
     [SerializeField] private TooltipTrigger tooltip;
+    [SerializeField] private Color activatedAbilitiesColor;
     #endregion
 
     #region Private Fields
@@ -52,6 +53,8 @@ namespace Workbench.ProjectDilemma
 
       if (equipedAbility)
       {
+        if (abilitiesIcon)
+          abilitiesIcon.color = activatedAbilitiesColor;
         abiliyUsed = true;
         AddCooldown();
         ActiveState = true;

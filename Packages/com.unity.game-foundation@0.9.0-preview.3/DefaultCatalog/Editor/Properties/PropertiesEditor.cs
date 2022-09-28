@@ -112,7 +112,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         where TCatalogItemAsset : CatalogItemAsset
     {
         protected TCatalogItemAsset m_Asset;
-        protected List<TCatalogItemAsset> m_Assets;
+        protected List<TCatalogItemAsset> m_Assets = new List<TCatalogItemAsset>();
 
         /// <summary>
         ///     One drawer for each property.
@@ -178,13 +178,13 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
         {
             var properties = sharedProperties;
 
-            DrawExistingProperties(properties);
+            DrawExistingProperties(properties, true);
 
             //Draw horizontal separator.
             var separator = EditorGUILayout.GetControlRect(false, 1);
             EditorGUI.DrawRect(separator, EditorGUIUtility.isProSkin ? Color.black : Color.gray);
 
-            // DrawPropertyCreation(properties);
+            DrawPropertyCreation(properties, true);
         }
 
         void DrawExistingProperties(Dictionary<string, ExternalizableValue<Property>> properties, bool multiItemEditingMode = false)
@@ -348,7 +348,7 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             }
         }
 
-        void DrawPropertyCreation(IDictionary<string, ExternalizableValue<Property>> properties)
+        void DrawPropertyCreation(IDictionary<string, ExternalizableValue<Property>> properties, bool allowMultiItemediting = false)
         {
             using (new GUILayout.HorizontalScope())
             {
@@ -380,7 +380,10 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
                         };
 
                         //Update asset.
-                        AddProperty(m_NewPropertyName, property);
+                        if(allowMultiItemediting)
+                          AddPropertyForMultipleItems(m_NewPropertyName, property);
+                        else
+                          AddProperty(m_NewPropertyName, property);
 
                         m_SelectedPropertyType = default;
                         m_NewPropertyName = "";
@@ -403,6 +406,8 @@ namespace UnityEditor.GameFoundation.DefaultCatalog
             => k_EmptyStaticCollectionLabel;
 
         protected virtual void AddProperty(string propertyKey, Property value)
+            => m_Asset.Editor_AddStaticProperty(propertyKey, value);
+        protected virtual void AddPropertyForMultipleItems(string propertyKey, Property value)
             => m_Asset.Editor_AddStaticProperty(propertyKey, value);
 
         protected virtual void RemoveProperty(string propertyKey)

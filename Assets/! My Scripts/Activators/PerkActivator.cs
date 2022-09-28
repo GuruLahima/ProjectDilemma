@@ -57,6 +57,8 @@ namespace Workbench.ProjectDilemma
     [NaughtyAttributes.HorizontalLine]
     [SerializeField] TooltipTrigger perkTooltip;
     [SerializeField] DiamonMenuEntry menuEntry;
+    [SerializeField] UnityEngine.UI.Image perksIcon;
+    [SerializeField] Color activatedIconColor;
     #endregion
 
     #region Private Fields
@@ -158,6 +160,8 @@ namespace Workbench.ProjectDilemma
         perkBuffSlot.GetComponent<CanvasGroup>().alpha = 1;
       }
 
+      if (perksIcon)
+        perksIcon.color = activatedIconColor;
       // perk showcase tooltip
       perkTooltip.title = ownedPerk.inventoryitemDefinition.displayName;
       string descriptionKey = ProjectDilemmaCatalog.Items.perk_doubleDown.StaticProperties.description;
@@ -169,7 +173,6 @@ namespace Workbench.ProjectDilemma
         menuEntry.defaultIcon.sprite = menuEntry.chosenItemIcon.sprite;
       menuEntry.chosenItemIcon.sprite = ownedPerk.ico;
       menuEntry.switchToChosenIconFeedbacks.PlayFeedbacks();
-
       #endregion
 
       #region INTERNET STUFF
